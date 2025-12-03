@@ -24,7 +24,7 @@ export function CTA() {
                     >
                         <span className="mr-2">🚀</span> Start Your Project
                         <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
-                        <div className="absolute inset-0 -z-10 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 opacity-0 transition-opacity group-hover:opacity-10" />
+                        <div className="absolute inset-0 -z-10 bg-gradient-to-r from-blue-600 via-blue-500 to-blue-400 opacity-0 transition-opacity group-hover:opacity-10" />
                     </Link>
                     <Link
                         href="mailto:hello@framaxsolutions.com"

@@ -265,7 +265,7 @@ export function Features() {
                             Stunning visuals that capture your brand's unique identity.
                         </p>
                         {/* Visual: Floating Elements */}
-                        <div className="absolute right-[-20px] top-[-20px] h-24 w-24 rounded-full bg-gradient-to-br from-pink-500 to-purple-500 opacity-20 blur-2xl transition-all duration-500 group-hover:scale-150 group-hover:opacity-40" />
+                        <div className="absolute right-[-20px] top-[-20px] h-24 w-24 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 opacity-20 blur-2xl transition-all duration-500 group-hover:scale-150 group-hover:opacity-40" />
                         <motion.div
                             animate={{
                                 y: [0, -10, 0],
@@ -302,7 +302,7 @@ export function Features() {
                     >
                         <div className="grid gap-8 md:grid-cols-2">
                             <div>
-                                <div className="mb-4 inline-flex rounded-lg bg-purple-500/10 p-3 text-purple-500">
+                                <div className="mb-4 inline-flex rounded-lg bg-blue-600/10 p-3 text-blue-600">
                                     <Code className="h-6 w-6" />
                                 </div>
                                 <h3 className="mb-2 text-2xl font-bold text-foreground">Clean, Modern Code</h3>
@@ -336,7 +336,7 @@ export function Features() {
                                     <motion.span
                                         animate={{ opacity: [0, 1, 0] }}
                                         transition={{ duration: 0.8, repeat: Infinity }}
-                                        className="inline-block w-2 h-4 bg-purple-500 ml-1 align-middle"
+                                        className="inline-block w-2 h-4 bg-blue-600 ml-1 align-middle"
                                     />
                                 </div>
                             </div>
@@ -376,7 +376,7 @@ export function Features() {
                                         <div className="h-1 w-8 bg-muted rounded-full" />
                                     </div>
                                     {/* Hero */}
-                                    <div className="h-12 w-full bg-gradient-to-br from-primary/20 to-purple-500/20 rounded-lg mt-2" />
+                                    <div className="h-12 w-full bg-gradient-to-br from-primary/20 to-blue-500/20 rounded-lg mt-2" />
                                     {/* Content Lines */}
                                     <div className="space-y-1">
                                         <div className="h-1.5 w-3/4 bg-muted/60 rounded-full" />

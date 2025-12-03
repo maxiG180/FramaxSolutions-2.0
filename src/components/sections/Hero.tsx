@@ -7,9 +7,9 @@ export function Hero() {
         <section id="hero" className="relative flex min-h-[90vh] flex-col items-center justify-center overflow-hidden bg-background px-4 pt-20 text-center md:pt-32">
             {/* Background Gradients */}
             <div className="absolute inset-0 -z-10 h-full w-full bg-background">
-                <div className="absolute top-[-10%] left-[-10%] h-[500px] w-[500px] rounded-full bg-purple-500/20 blur-[120px] animate-pulse-slow" />
-                <div className="absolute bottom-[-10%] right-[-10%] h-[500px] w-[500px] rounded-full bg-blue-500/20 blur-[120px] animate-pulse-slow" style={{ animationDelay: "1.5s" }} />
-                <div className="absolute top-[20%] left-[50%] h-[300px] w-[300px] -translate-x-1/2 rounded-full bg-indigo-500/10 blur-[100px]" />
+                <div className="absolute top-[-10%] left-[-10%] h-[500px] w-[500px] rounded-full bg-[#2563eb]/20 blur-[120px] animate-pulse-slow" />
+                <div className="absolute bottom-[-10%] right-[-10%] h-[500px] w-[500px] rounded-full bg-[#2563eb]/20 blur-[120px] animate-pulse-slow" style={{ animationDelay: "1.5s" }} />
+                <div className="absolute top-[20%] left-[50%] h-[300px] w-[300px] -translate-x-1/2 rounded-full bg-[#2563eb]/10 blur-[100px]" />
             </div>
 
             {/* Content */}
@@ -23,7 +23,7 @@ export function Hero() {
                 <div className="animate-fade-in-up space-y-6 opacity-0" style={{ animationDelay: "0.2s", animationFillMode: "forwards" }}>
                     <h1 className="text-5xl font-bold tracking-tight text-foreground sm:text-7xl md:text-8xl leading-[1.1]">
                         We Build Websites That <br />
-                        <span className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 bg-clip-text text-transparent">
+                        <span className="bg-gradient-to-r from-[#2563eb] via-[#2563eb] to-[#3b82f6] bg-clip-text text-transparent">
                             Drive Real Growth
                         </span>
                     </h1>
@@ -37,9 +37,9 @@ export function Hero() {
                         href="#booking"
                         className="group relative inline-flex h-12 items-center justify-center overflow-hidden rounded-full bg-foreground px-8 font-medium text-background transition-all hover:scale-105 hover:bg-foreground/90 hover:shadow-lg hover:shadow-primary/20"
                     >
-                        <span className="mr-2">👋</span> Get a Proposal
+                        <span className="mr-2"></span> Get a Proposal
                         <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
-                        <div className="absolute inset-0 -z-10 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 opacity-0 transition-opacity group-hover:opacity-10" />
+                        <div className="absolute inset-0 -z-10 bg-gradient-to-r from-[#2563eb] via-[#2563eb] to-[#3b82f6] opacity-0 transition-opacity group-hover:opacity-10" />
                     </Link>
                     <Link
                         href="#portfolio"

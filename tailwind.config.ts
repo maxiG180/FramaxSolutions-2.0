@@ -16,7 +16,7 @@ const config: Config = {
                 background: "var(--background)",
                 foreground: "var(--foreground)",
                 primary: {
-                    DEFAULT: "#6366f1", // Indigo 500
+                    DEFAULT: "#2563eb", // Blue 600
                     foreground: "#ffffff",
                 },
                 secondary: {

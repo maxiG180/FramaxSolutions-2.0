@@ -275,8 +275,8 @@ export default function ProjectDetailsPage() {
                                                     </p>
                                                     <div className="flex items-center gap-2 mt-1">
                                                         <span className={`text-[10px] px-2 py-0.5 rounded-full uppercase font-bold ${task.priority === 'high' ? 'bg-red-500/20 text-red-400' :
-                                                                task.priority === 'medium' ? 'bg-yellow-500/20 text-yellow-400' :
-                                                                    'bg-blue-500/20 text-blue-400'
+                                                            task.priority === 'medium' ? 'bg-yellow-500/20 text-yellow-400' :
+                                                                'bg-blue-500/20 text-blue-400'
                                                             }`}>
                                                             {task.priority}
                                                         </span>

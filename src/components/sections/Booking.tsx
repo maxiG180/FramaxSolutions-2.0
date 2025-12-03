@@ -43,10 +43,13 @@ export function Booking() {
                         body: JSON.stringify({ date: selectedDate.toISOString() })
                     });
                     const data = await response.json();
-                    setBusySlots(data.busySlots || []);
+                    // Only set busy slots that are actually in our TIME_SLOTS array
+                    const validBusySlots = (data.busySlots || []).filter((slot: string) => TIME_SLOTS.includes(slot));
+                    setBusySlots(validBusySlots);
 
                 } catch (error) {
                     console.error("Failed to check availability:", error);
+                    setBusySlots([]); // Ensure we reset to empty on error
                 } finally {
                     setIsLoadingAvailability(false);
                 }
@@ -70,7 +73,7 @@ export function Booking() {
                 particleCount: 150,
                 spread: 100,
                 origin: { y: 0.6 },
-                colors: ['#FFD700', '#FF69B4', '#00BFFF', '#7B68EE']
+                colors: ['#2563eb', '#3b82f6', '#60a5fa', '#93c5fd']
             });
             setTitleClicks(0);
         }
@@ -134,7 +137,7 @@ export function Booking() {
             // Success Confetti
             const duration = 3 * 1000;
             const animationEnd = Date.now() + duration;
-            const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+            const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0, colors: ['#2563eb', '#3b82f6', '#60a5fa', '#93c5fd'] };
 
             const randomInRange = (min: number, max: number) => Math.random() * (max - min) + min;
 
@@ -177,70 +180,53 @@ export function Booking() {
             {/* Background Gradients */}
             <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
                 <div className="absolute top-[-10%] right-[-5%] w-[500px] h-[500px] bg-primary/5 rounded-full blur-[100px]" />
-                <div className="absolute bottom-[-10%] left-[-5%] w-[500px] h-[500px] bg-purple-500/5 rounded-full blur-[100px]" />
+                <div className="absolute bottom-[-10%] left-[-5%] w-[500px] h-[500px] bg-blue-500/5 rounded-full blur-[100px]" />
             </div>
 
             <div className="container mx-auto px-4 relative z-10">
                 <div className="max-w-6xl mx-auto">
                     <div className="grid lg:grid-cols-12 gap-8 lg:gap-12">
 
-                        {/* LEFT COLUMN: Context & Trust */}
+                        {/* LEFT COLUMN: Value Proposition */}
                         <div className="lg:col-span-5 flex flex-col justify-center">
                             <motion.div
                                 initial={{ opacity: 0, y: 20 }}
                                 whileInView={{ opacity: 1, y: 0 }}
                                 viewport={{ once: true }}
-                                className="mb-8"
+                                className="space-y-8"
                             >
-                                <div
-                                    className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-sm font-medium mb-6 cursor-pointer hover:bg-primary/20 transition-colors"
-                                    onClick={handleTitleClick}
-                                >
-                                    <Sparkles className="w-4 h-4" />
-                                    <span>Discovery Call</span>
+                                {/* Main Headline */}
+                                <div>
+                                    <h2 className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-[1.1] mb-6">
+                                        Book your
+                                        <span className="block bg-gradient-to-r from-primary via-blue-500 to-blue-400 bg-clip-text text-transparent">
+                                            free call
+                                        </span>
+                                    </h2>
+                                    <p className="text-xl text-muted-foreground leading-relaxed max-w-md">
+                                        30 minutes to discuss your project. Zero commitment, maximum value.
+                                    </p>
                                 </div>
-                                <h2 className="text-4xl md:text-5xl font-bold mb-6 tracking-tight leading-tight">
-                                    Let's build your <br />
-                                    <span className="text-primary">next big thing</span>
-                                </h2>
-                                <p className="text-muted-foreground text-lg mb-8 leading-relaxed">
-                                    Book a free 30-minute strategy session. We'll discuss your goals, technical requirements, and how we can help you scale.
-                                </p>
 
-                                {/* Host Profile */}
-                                <div className="flex items-center gap-4 p-4 rounded-2xl bg-card border border-border/50 shadow-sm mb-8">
-                                    <div className="relative">
-                                        <div className="w-12 h-12 rounded-full bg-gradient-to-tr from-primary to-purple-500 flex items-center justify-center text-white font-bold text-lg">
-                                            F
+                                {/* Quick Stats - Hidden on mobile, shown on desktop */}
+                                <div className="hidden lg:grid grid-cols-2 gap-6 pt-8">
+                                    <div className="space-y-2">
+                                        <div className="flex items-baseline gap-2">
+                                            <span className="text-4xl font-bold text-foreground">50+</span>
+                                            <span className="text-sm text-muted-foreground">projects</span>
                                         </div>
-                                        <div className="absolute -bottom-1 -right-1 bg-background rounded-full p-0.5">
-                                            <div className="w-4 h-4 bg-green-500 rounded-full border-2 border-background" />
-                                        </div>
+                                        <p className="text-sm text-muted-foreground">delivered successfully</p>
                                     </div>
-                                    <div>
-                                        <div className="flex items-center gap-2">
-                                            <h4 className="font-semibold">Framax Team</h4>
-                                            <ShieldCheck className="w-4 h-4 text-blue-500" />
+                                    <div className="space-y-2">
+                                        <div className="flex items-baseline gap-2">
+                                            <span className="text-4xl font-bold text-foreground">24h</span>
+                                            <span className="text-sm text-muted-foreground">response</span>
                                         </div>
-                                        <p className="text-xs text-muted-foreground">Senior Solutions Architect</p>
+                                        <p className="text-sm text-muted-foreground">average reply time</p>
                                     </div>
                                 </div>
 
-                                {/* Social Proof / Trust */}
-                                <div className="space-y-3">
-                                    <div className="flex items-center gap-3 text-sm text-muted-foreground">
-                                        <Check className="w-4 h-4 text-primary" />
-                                        <span>100% Free & No Obligation</span>
-                                    </div>
-                                    <div className="flex items-center gap-3 text-sm text-muted-foreground">
-                                        <Check className="w-4 h-4 text-primary" />
-                                        <span>Actionable Strategy Plan</span>
-                                    </div>
-                                    <div className="flex items-center gap-3 text-sm text-muted-foreground">
-                                        <Users className="w-4 h-4 text-primary" />
-                                        <span>Join 50+ happy clients</span>
-                                    </div>
-                                </div>
+
                             </motion.div>
                         </div>
 
@@ -389,7 +375,7 @@ export function Booking() {
                                             <div className="mt-auto pt-6 text-center">
                                                 <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-green-500/10 text-green-600 text-xs font-medium">
                                                     <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
-                                                    3 spots left for this day
+                                                    {TIME_SLOTS.length - busySlots.length} {TIME_SLOTS.length - busySlots.length === 1 ? 'spot' : 'spots'} left for this day
                                                 </span>
                                             </div>
                                         </motion.div>

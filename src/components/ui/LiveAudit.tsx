@@ -37,7 +37,7 @@ export function LiveAudit() {
         { label: "Performance", icon: Zap, color: "text-green-500", score: 100, delay: 0.2 },
         { label: "SEO", icon: Search, color: "text-blue-500", score: 100, delay: 0.4 },
         { label: "Accessibility", icon: MousePointer2, color: "text-orange-500", score: 100, delay: 0.6 },
-        { label: "Best Practices", icon: ShieldCheck, color: "text-purple-500", score: 100, delay: 0.8 },
+        { label: "Best Practices", icon: ShieldCheck, color: "text-blue-600", score: 100, delay: 0.8 },
     ];
 
     return (

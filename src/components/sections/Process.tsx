@@ -26,8 +26,8 @@ const steps = [
         title: "Development",
         description: "Our engineers build your solution using cutting-edge technologies, ensuring speed, security, and scalability.",
         icon: Code2,
-        color: "text-purple-500",
-        bg: "bg-purple-500/10",
+        color: "text-blue-600",
+        bg: "bg-blue-600/10",
     },
     {
         id: "04",
