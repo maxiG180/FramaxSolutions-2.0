@@ -26,7 +26,7 @@ export function Header() {
         >
             <div className="container mx-auto px-4 flex items-center justify-between">
                 <Link href="#hero" className="text-2xl font-bold tracking-tighter">
-                    Framax<span className="text-primary">.</span>
+                    <span className="text-[#2563eb]">Framax</span><span className="text-white">Solutions</span>
                 </Link>
 
                 <nav className="hidden md:flex items-center gap-8">
@@ -45,7 +45,7 @@ export function Header() {
                     <Link href="#faq" className="text-sm font-medium hover:text-primary transition-colors">
                         FAQ
                     </Link>
-                    <Link href="#contact" className="bg-primary text-primary-foreground px-5 py-2 rounded-full text-sm font-medium hover:bg-primary/90 transition-all hover:scale-105 active:scale-95">
+                    <Link href="#booking" className="bg-primary text-primary-foreground px-5 py-2 rounded-full text-sm font-medium hover:bg-primary/90 transition-all hover:scale-105 active:scale-95">
                         Get Started
                     </Link>
                 </nav>

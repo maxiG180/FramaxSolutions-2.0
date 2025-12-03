@@ -34,7 +34,7 @@ export function Hero() {
 
                 <div className="animate-fade-in-up flex flex-col items-center justify-center gap-4 opacity-0 sm:flex-row" style={{ animationDelay: "0.4s", animationFillMode: "forwards" }}>
                     <Link
-                        href="#contact"
+                        href="#booking"
                         className="group relative inline-flex h-12 items-center justify-center overflow-hidden rounded-full bg-foreground px-8 font-medium text-background transition-all hover:scale-105 hover:bg-foreground/90 hover:shadow-lg hover:shadow-primary/20"
                     >
                         <span className="mr-2">👋</span> Get a Proposal
@@ -42,7 +42,7 @@ export function Hero() {
                         <div className="absolute inset-0 -z-10 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 opacity-0 transition-opacity group-hover:opacity-10" />
                     </Link>
                     <Link
-                        href="#services"
+                        href="#portfolio"
                         className="inline-flex h-12 items-center justify-center rounded-full border border-input bg-background px-8 font-medium text-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
                     >
                         View Our Work

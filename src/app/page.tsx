@@ -7,6 +7,7 @@ import { Process } from "@/components/sections/Process";
 import { SocialProof } from "@/components/sections/SocialProof";
 import { FAQ } from "@/components/sections/FAQ";
 import { Booking } from "@/components/sections/Booking";
+import { Offer } from "@/components/sections/Offer";
 import { DiscountOffer } from "@/components/ui/DiscountOffer";
 import { ProjectEstimator } from "@/components/ui/ProjectEstimator";
 
@@ -21,6 +22,7 @@ export default function Home() {
       {/* <SocialProof /> */}
       <FAQ />
       <Booking />
+      <Offer />
       <DiscountOffer />
       <ProjectEstimator />
     </main>
