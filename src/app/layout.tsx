@@ -11,6 +11,7 @@ import { Footer } from "@/components/layout/Footer";
 import { DeveloperMode } from "@/components/ui/DeveloperMode";
 import { KonamiTrigger } from "@/components/ui/KonamiTrigger";
 import { usePathname } from "next/navigation";
+import { LanguageProvider } from "@/context/LanguageContext";
 
 const outfit = Outfit({
   variable: "--font-sans",
@@ -38,17 +39,19 @@ export default function RootLayout({
         suppressHydrationWarning
         className={`${outfit.variable} ${inter.variable} antialiased font-sans bg-background text-foreground overflow-x-hidden`}
       >
-        {showLayout && <Header />}
-        <main className={showLayout ? "min-h-screen pt-20" : ""}>
-          {children}
-        </main>
-        {showLayout && (
-          <>
-            <DeveloperMode />
-            <KonamiTrigger />
-            <Footer />
-          </>
-        )}
+        <LanguageProvider>
+          {showLayout && <Header />}
+          <main className={showLayout ? "min-h-screen pt-20" : ""}>
+            {children}
+          </main>
+          {showLayout && (
+            <>
+              <DeveloperMode />
+              <KonamiTrigger />
+              <Footer />
+            </>
+          )}
+        </LanguageProvider>
       </body>
     </html>
   );

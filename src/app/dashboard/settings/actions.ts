@@ -22,6 +22,7 @@ export async function updateProfile(formData: FormData) {
             email: user.email,
             full_name: fullName,
             avatar_url: avatarUrl,
+            discord_webhook_url: formData.get('discordWebhookUrl') as string,
             role: formData.get('role') as string,
             updated_at: new Date().toISOString(),
         })

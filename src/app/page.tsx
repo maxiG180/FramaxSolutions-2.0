@@ -1,8 +1,8 @@
 
 import { Hero } from "@/components/sections/Hero";
 import { Features } from "@/components/sections/Features";
-import { Portfolio } from "@/components/sections/Portfolio";
-import { Comparison } from "@/components/sections/Comparison";
+import { NewPortfolio } from "@/components/sections/NewPortfolio";
+
 import { Process } from "@/components/sections/Process";
 import { SocialProof } from "@/components/sections/SocialProof";
 import { FAQ } from "@/components/sections/FAQ";
@@ -15,8 +15,8 @@ export default function Home() {
     <main className="min-h-screen bg-background text-foreground overflow-x-hidden">
       <Hero />
       <Features />
-      <Portfolio />
-      <Comparison />
+      <NewPortfolio />
+
       <Process />
       {/* <SocialProof /> */}
       <Booking />

@@ -3,13 +3,16 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion, useScroll, useMotionValueEvent } from "framer-motion";
+import { useLanguage } from "@/context/LanguageContext";
 import { cn } from "@/lib/utils";
 import { Menu, X } from "lucide-react";
+import { LanguageSwitcher } from "@/components/ui/LanguageSwitcher";
 
 export function Header() {
     const { scrollY } = useScroll();
     const [isScrolled, setIsScrolled] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const { t } = useLanguage();
 
     useMotionValueEvent(scrollY, "change", (latest) => {
         setIsScrolled(latest > 50);
@@ -31,22 +34,21 @@ export function Header() {
 
                 <nav className="hidden md:flex items-center gap-8">
                     <Link href="#features" className="text-sm font-medium hover:text-primary transition-colors">
-                        Features
+                        {t.header.features}
                     </Link>
                     <Link href="#portfolio" className="text-sm font-medium hover:text-primary transition-colors">
-                        Portfolio
+                        {t.header.portfolio}
                     </Link>
-                    <Link href="#comparison" className="text-sm font-medium hover:text-primary transition-colors">
-                        Why Framax
-                    </Link>
+
                     <Link href="#process" className="text-sm font-medium hover:text-primary transition-colors">
-                        Process
+                        {t.header.process}
                     </Link>
                     <Link href="#faq" className="text-sm font-medium hover:text-primary transition-colors">
-                        FAQ
+                        {t.header.faq}
                     </Link>
+                    <LanguageSwitcher />
                     <Link href="#booking" className="bg-primary text-primary-foreground px-5 py-2 rounded-full text-sm font-medium hover:bg-primary/90 transition-all hover:scale-105 active:scale-95">
-                        Get Started
+                        {t.header.getStarted}
                     </Link>
                 </nav>
 
@@ -71,35 +73,35 @@ export function Header() {
                         className="text-sm font-medium p-2 hover:bg-muted rounded-md"
                         onClick={() => setIsMobileMenuOpen(false)}
                     >
-                        Features
+                        {t.header.features}
                     </Link>
                     <Link
                         href="#process"
                         className="text-sm font-medium p-2 hover:bg-muted rounded-md"
                         onClick={() => setIsMobileMenuOpen(false)}
                     >
-                        Process
+                        {t.header.process}
                     </Link>
                     <Link
                         href="#social-proof"
                         className="text-sm font-medium p-2 hover:bg-muted rounded-md"
                         onClick={() => setIsMobileMenuOpen(false)}
                     >
-                        Results
+                        {t.header.results}
                     </Link>
                     <Link
                         href="#faq"
                         className="text-sm font-medium p-2 hover:bg-muted rounded-md"
                         onClick={() => setIsMobileMenuOpen(false)}
                     >
-                        FAQ
+                        {t.header.faq}
                     </Link>
                     <Link
                         href="#contact"
                         className="bg-primary text-primary-foreground w-full py-3 rounded-full text-sm font-medium text-center"
                         onClick={() => setIsMobileMenuOpen(false)}
                     >
-                        Get Started
+                        {t.header.getStarted}
                     </Link>
                 </motion.div>
             )}

@@ -41,7 +41,7 @@ export async function getProfiles() {
     return data
 }
 
-export async function createTask(title: string, assignee: string | null, tags: string[]) {
+export async function createTask(title: string, assignee: string | null, tags: string[], alertInterval: string) {
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
 
@@ -57,7 +57,9 @@ export async function createTask(title: string, assignee: string | null, tags: s
             assignee: assignee, // null means 'Everyone'
             tags: tags,
             priority: 'Medium',
-            due_date: new Date().toISOString()
+            due_date: new Date().toISOString(),
+            alert_interval: alertInterval,
+            last_alert_sent_at: null
         })
         .select()
         .single()

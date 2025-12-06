@@ -186,6 +186,7 @@ export default function SettingsPage() {
                                 </div>
 
                                 <input type="hidden" name="avatarUrl" value={profile?.avatar_url || ""} />
+                                <input type="hidden" name="discordWebhookUrl" value={profile?.discord_webhook_url || ""} />
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div className="space-y-2">
@@ -236,10 +237,41 @@ export default function SettingsPage() {
 
                     {/* Notifications Section */}
                     {activeTab === "notifications" && (
-                        <div className="bg-white/5 border border-white/10 rounded-2xl p-6 space-y-6">
-                            <h2 className="text-xl font-bold border-b border-white/10 pb-4">Notification Settings</h2>
-                            <p className="text-white/40">Notification settings are not yet implemented.</p>
-                        </div>
+                        <form action={handleProfileUpdate}>
+                            <div className="bg-white/5 border border-white/10 rounded-2xl p-6 space-y-6">
+                                <h2 className="text-xl font-bold border-b border-white/10 pb-4">Notification Settings</h2>
+
+                                <div className="space-y-2">
+                                    <label className="text-sm font-medium text-white/60">Discord Webhook URL</label>
+                                    <input
+                                        name="discordWebhookUrl"
+                                        type="url"
+                                        placeholder="https://discord.com/api/webhooks/..."
+                                        defaultValue={profile?.discord_webhook_url || ""}
+                                        className="w-full bg-black border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-white/30"
+                                    />
+                                    <p className="text-xs text-white/40">
+                                        Create a webhook in your Discord server settings and paste the URL here to receive task alerts.
+                                    </p>
+                                </div>
+
+                                {/* Hidden fields to preserve other profile data */}
+                                <input type="hidden" name="fullName" value={profile?.full_name || ""} />
+                                <input type="hidden" name="avatarUrl" value={profile?.avatar_url || ""} />
+                                <input type="hidden" name="role" value={profile?.role || "Member"} />
+                            </div>
+
+                            <div className="mt-6 flex justify-end">
+                                <button
+                                    type="submit"
+                                    disabled={saving}
+                                    className="bg-white text-black px-6 py-3 rounded-xl font-bold flex items-center gap-2 hover:bg-gray-200 transition-colors disabled:opacity-50"
+                                >
+                                    {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                                    Save Notification Settings
+                                </button>
+                            </div>
+                        </form>
                     )}
 
                     {/* Security Section */}

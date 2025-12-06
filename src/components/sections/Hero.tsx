@@ -15,9 +15,12 @@ export function Hero() {
             {/* Content */}
             <div className="relative z-10 max-w-5xl space-y-8">
                 {/* Badge */}
-                <div className="animate-fade-in-up mx-auto flex w-fit items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-4 py-1.5 text-sm font-medium text-primary opacity-0" style={{ animationDelay: "0.1s", animationFillMode: "forwards" }}>
-                    <Sparkles className="h-4 w-4" />
-                    <span>Premium Web Solutions for Growing Businesses</span>
+                <div className="animate-fade-in-up mx-auto flex w-fit items-center gap-2 rounded-full border border-white/10 bg-white/5 px-5 py-2 text-sm font-medium backdrop-blur-md transition-all hover:bg-white/10 hover:border-white/20 opacity-0" style={{ animationDelay: "0.1s", animationFillMode: "forwards" }}>
+                    <span className="relative flex h-2 w-2">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-500 opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
+                    </span>
+                    <span className="text-white/90">More Than Just a Website.</span>
                 </div>
 
                 <div className="animate-fade-in-up space-y-6 opacity-0" style={{ animationDelay: "0.2s", animationFillMode: "forwards" }}>

@@ -74,6 +74,8 @@ export default function TodoPage() {
     const activeTasks = filteredTasks.filter(t => t.status !== 'Done');
     const completedTasks = filteredTasks.filter(t => t.status === 'Done');
 
+    const [alertInterval, setAlertInterval] = useState("None");
+
     const addTask = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!newTask.trim()) return;
@@ -87,12 +89,13 @@ export default function TodoPage() {
             assigneeId = selectedAssignee;
         }
 
-        const { data, error } = await createTask(newTask, assigneeId, selectedTags);
+        const { data, error } = await createTask(newTask, assigneeId, selectedTags, alertInterval);
         if (data) {
             setTasks([data, ...tasks]);
             setNewTask("");
             setSelectedTags([]);
             setShowTagInput(false);
+            setAlertInterval("None");
         }
     };
 
@@ -229,6 +232,17 @@ export default function TodoPage() {
                                 className="w-full bg-black/20 border border-white/10 rounded-xl pl-4 pr-32 py-4 text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all placeholder:text-white/20"
                             />
                             <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-2">
+                                <select
+                                    value={alertInterval}
+                                    onChange={(e) => setAlertInterval(e.target.value)}
+                                    className="bg-white/10 text-xs text-white/80 focus:outline-none px-2 py-1.5 rounded-lg cursor-pointer hover:bg-white/20 transition-colors border-none"
+                                    title="Alert Interval"
+                                >
+                                    <option value="None" className="bg-gray-900">No Alerts</option>
+                                    <option value="1h" className="bg-gray-900">Every 1h</option>
+                                    <option value="24h" className="bg-gray-900">Every 24h</option>
+                                    <option value="1w" className="bg-gray-900">Every 1w</option>
+                                </select>
                                 <select
                                     value={selectedAssignee || 'everyone'}
                                     onChange={(e) => setSelectedAssignee(e.target.value)}

@@ -8,7 +8,7 @@ export function Footer() {
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
                     <div className="col-span-1 md:col-span-2">
                         <Link href="/" className="text-2xl font-bold tracking-tighter mb-4 block">
-                            Framax<span className="text-primary">.</span>
+                            <span className="text-[#2563eb]">Framax</span><span className="text-white">Solutions</span>
                         </Link>
                         <p className="text-muted-foreground max-w-sm">
                             Building digital experiences that feel alive. Fast, responsive, and delightful.
@@ -49,12 +49,6 @@ export function Footer() {
                             <Linkedin size={20} />
                         </Link>
                     </div>
-                </div>
-
-                <div className="mt-8 text-center">
-                    <p className="text-xs text-muted-foreground flex items-center justify-center gap-1">
-                        Made with <Heart size={12} className="text-red-500 fill-red-500 animate-pulse" /> by Framax Team
-                    </p>
                 </div>
             </div>
         </footer>
