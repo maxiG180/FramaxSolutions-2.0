@@ -1,11 +1,13 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { User, Bell, Lock, Globe, Save, Loader2 } from "lucide-react";
+import { User, Bell, Lock, Globe, Save, Loader2, Calendar, Blocks } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
-import { updateProfile, updatePassword } from "./actions";
+import { updateProfile, updatePassword, saveGoogleCalendarToken, deleteGoogleCalendarToken } from "./actions";
+import { useGoogleLogin } from '@react-oauth/google';
+import { useSearchParams } from 'next/navigation';
 
-type SettingsTab = "profile" | "notifications" | "security" | "domain";
+type SettingsTab = "profile" | "notifications" | "security" | "integrations" | "domain";
 
 export default function SettingsPage() {
     const [activeTab, setActiveTab] = useState<SettingsTab>("profile");
@@ -13,9 +15,15 @@ export default function SettingsPage() {
     const [user, setUser] = useState<any>(null);
     const [profile, setProfile] = useState<any>(null);
     const [saving, setSaving] = useState(false);
-    const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
+
+    const [googleAccessToken, setGoogleAccessToken] = useState<string | null>(null);
+    const [showDiscordModal, setShowDiscordModal] = useState(false);
+    const [discordWebhookUrl, setDiscordWebhookUrl] = useState("");
+    const [webhookInput, setWebhookInput] = useState("");
 
     const supabase = createClient();
+    const searchParams = useSearchParams();
+    const tabParam = searchParams.get('tab') as SettingsTab | null;
 
     useEffect(() => {
         const getUser = async () => {
@@ -29,46 +37,67 @@ export default function SettingsPage() {
                     .eq('id', user.id)
                     .single();
                 setProfile(profile);
+                // Set Google Calendar token from profile
+                if (profile?.google_calendar_token) {
+                    setGoogleAccessToken(profile.google_calendar_token);
+                }
+                // Set Discord webhook URL
+                if (profile?.discord_webhook_url) {
+                    setDiscordWebhookUrl(profile.discord_webhook_url);
+                }
             }
             setLoading(false);
         };
         getUser();
-    }, []);
+
+        // Set tab from URL parameter if provided
+        if (tabParam && ['profile', 'notifications', 'security', 'integrations', 'domain'].includes(tabParam)) {
+            setActiveTab(tabParam);
+        }
+    }, [tabParam]);
 
     const handleProfileUpdate = async (formData: FormData) => {
         setSaving(true);
-        setMessage(null);
 
         const result = await updateProfile(formData);
 
-        if (result.error) {
-            setMessage({ type: 'error', text: result.error });
-        } else {
-            setMessage({ type: 'success', text: 'Profile updated successfully' });
-        }
         setSaving(false);
     };
 
     const handlePasswordUpdate = async (formData: FormData) => {
         setSaving(true);
-        setMessage(null);
 
         const result = await updatePassword(formData);
 
-        if (result.error) {
-            setMessage({ type: 'error', text: result.error });
-        } else {
-            setMessage({ type: 'success', text: 'Password updated successfully' });
+        if (!result.error) {
             // Optional: Clear form
             (document.getElementById('password-form') as HTMLFormElement)?.reset();
         }
         setSaving(false);
     };
 
+    const googleLogin = useGoogleLogin({
+        onSuccess: async (tokenResponse) => {
+            setGoogleAccessToken(tokenResponse.access_token);
+            const result = await saveGoogleCalendarToken(tokenResponse.access_token);
+        },
+        onError: () => {
+        },
+        scope: 'https://www.googleapis.com/auth/calendar.readonly',
+    });
+
+    const handleGoogleSignOut = async () => {
+        const result = await deleteGoogleCalendarToken();
+        if (!result.error) {
+            setGoogleAccessToken(null);
+        }
+    };
+
     const tabs = [
         { id: "profile" as SettingsTab, label: "Profile", icon: User },
         { id: "notifications" as SettingsTab, label: "Notifications", icon: Bell },
         { id: "security" as SettingsTab, label: "Security", icon: Lock },
+        { id: "integrations" as SettingsTab, label: "Integrations", icon: Blocks },
         { id: "domain" as SettingsTab, label: "Domain & SEO", icon: Globe },
     ];
 
@@ -102,14 +131,7 @@ export default function SettingsPage() {
 
                 {/* Main Content Area */}
                 <div className="lg:col-span-3 space-y-6">
-                    {message && (
-                        <div className={`p-4 rounded-xl border ${message.type === 'success'
-                            ? 'bg-green-500/10 border-green-500/20 text-green-400'
-                            : 'bg-red-500/10 border-red-500/20 text-red-400'
-                            }`}>
-                            {message.text}
-                        </div>
-                    )}
+
 
                     {/* Profile Section */}
                     {activeTab === "profile" && (
@@ -153,7 +175,6 @@ export default function SettingsPage() {
 
                                                     if (uploadError) {
                                                         console.error("Upload error:", uploadError);
-                                                        setMessage({ type: 'error', text: `Error uploading image: ${uploadError.message}` });
                                                         setSaving(false);
                                                         return;
                                                     }
@@ -241,24 +262,45 @@ export default function SettingsPage() {
                             <div className="bg-white/5 border border-white/10 rounded-2xl p-6 space-y-6">
                                 <h2 className="text-xl font-bold border-b border-white/10 pb-4">Notification Settings</h2>
 
-                                <div className="space-y-2">
-                                    <label className="text-sm font-medium text-white/60">Discord Webhook URL</label>
-                                    <input
-                                        name="discordWebhookUrl"
-                                        type="url"
-                                        placeholder="https://discord.com/api/webhooks/..."
-                                        defaultValue={profile?.discord_webhook_url || ""}
-                                        className="w-full bg-black border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-white/30"
-                                    />
-                                    <p className="text-xs text-white/40">
-                                        Create a webhook in your Discord server settings and paste the URL here to receive task alerts.
-                                    </p>
+                                <div className="space-y-4">
+                                    <div className="flex items-center justify-between p-4 bg-white/5 rounded-lg border border-white/10">
+                                        <div>
+                                            <h3 className="font-medium text-white">Real-time Notifications</h3>
+                                            <p className="text-sm text-white/60 mt-1">Get instant notifications for important updates</p>
+                                        </div>
+                                        <label className="relative inline-flex items-center cursor-pointer">
+                                            <input
+                                                type="checkbox"
+                                                name="realtimeNotifications"
+                                                defaultChecked={profile?.realtime_notifications ?? true}
+                                                className="sr-only peer"
+                                            />
+                                            <div className="w-11 h-6 bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-500"></div>
+                                        </label>
+                                    </div>
+
+                                    <div className="flex items-center justify-between p-4 bg-white/5 rounded-lg border border-white/10">
+                                        <div>
+                                            <h3 className="font-medium text-white">Email Notifications</h3>
+                                            <p className="text-sm text-white/60 mt-1">Receive email updates for tasks and events</p>
+                                        </div>
+                                        <label className="relative inline-flex items-center cursor-pointer">
+                                            <input
+                                                type="checkbox"
+                                                name="emailNotifications"
+                                                defaultChecked={profile?.email_notifications ?? true}
+                                                className="sr-only peer"
+                                            />
+                                            <div className="w-11 h-6 bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-500"></div>
+                                        </label>
+                                    </div>
                                 </div>
 
                                 {/* Hidden fields to preserve other profile data */}
                                 <input type="hidden" name="fullName" value={profile?.full_name || ""} />
                                 <input type="hidden" name="avatarUrl" value={profile?.avatar_url || ""} />
-                                <input type="hidden" name="role" value={profile?.role || "Member"} />
+                                <input type="hidden" name="role" value={profile?.role || ""} />
+                                <input type="hidden" name="discordWebhookUrl" value={profile?.discord_webhook_url || ""} />
                             </div>
 
                             <div className="mt-6 flex justify-end">
@@ -315,6 +357,159 @@ export default function SettingsPage() {
                                 </button>
                             </div>
                         </form>
+                    )}
+
+                    {/* Integrations Section */}
+                    {activeTab === "integrations" && (
+                        <div className="bg-white/5 border border-white/10 rounded-2xl p-6 space-y-6">
+                            <h2 className="text-xl font-bold border-b border-white/10 pb-4">Integrations</h2>
+
+                            {/* Google Calendar */}
+                            <div className="space-y-4 pb-6 border-b border-white/10">
+                                <div className="flex items-start justify-between">
+                                    <div className="flex items-start gap-4">
+                                        <div className="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center">
+                                            <Calendar className="w-6 h-6 text-red-400" />
+                                        </div>
+                                        <div>
+                                            <h3 className="font-bold text-lg">Google Calendar</h3>
+                                            <p className="text-sm text-white/60 mt-1">
+                                                {googleAccessToken
+                                                    ? "Connected - Your calendar events are synced"
+                                                    : "Connect your Google Calendar to view and manage events"}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    {googleAccessToken ? (
+                                        <button
+                                            onClick={handleGoogleSignOut}
+                                            className="px-4 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-lg text-sm font-medium transition-colors border border-red-500/30"
+                                        >
+                                            Disconnect
+                                        </button>
+                                    ) : (
+                                        <button
+                                            onClick={() => googleLogin()}
+                                            className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg text-sm font-medium transition-colors shadow-lg shadow-red-500/20"
+                                        >
+                                            Connect
+                                        </button>
+                                    )}
+                                </div>
+                                {googleAccessToken && (
+                                    <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-3 flex items-center gap-2">
+                                        <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
+                                        <span className="text-sm text-green-400">Active connection</span>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Discord Webhook */}
+                            <div className="space-y-4">
+                                <div className="flex items-start justify-between">
+                                    <div className="flex items-start gap-4">
+                                        <div className="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center">
+                                            <Bell className="w-6 h-6 text-indigo-400" />
+                                        </div>
+                                        <div>
+                                            <h3 className="font-bold text-lg">Discord Webhook</h3>
+                                            <p className="text-sm text-white/60 mt-1">
+                                                {discordWebhookUrl
+                                                    ? "Connected - Receiving task alerts in Discord"
+                                                    : "Connect Discord to receive task alerts and notifications"}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    {discordWebhookUrl ? (
+                                        <button
+                                            onClick={async () => {
+                                                const formData = new FormData();
+                                                formData.append('discordWebhookUrl', '');
+                                                formData.append('fullName', profile?.full_name || '');
+                                                formData.append('avatarUrl', profile?.avatar_url || '');
+                                                formData.append('role', profile?.role || '');
+                                                const result = await updateProfile(formData);
+                                                if (!result.error) {
+                                                    setDiscordWebhookUrl('');
+                                                    setProfile({ ...profile, discord_webhook_url: '' });
+
+                                                }
+                                            }}
+                                            className="px-4 py-2 bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-400 rounded-lg text-sm font-medium transition-colors border border-indigo-500/30"
+                                        >
+                                            Disconnect
+                                        </button>
+                                    ) : (
+                                        <button
+                                            onClick={() => {
+                                                setWebhookInput(discordWebhookUrl || "");
+                                                setShowDiscordModal(true);
+                                            }}
+                                            className="px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg text-sm font-medium transition-colors shadow-lg shadow-indigo-500/20"
+                                        >
+                                            Connect
+                                        </button>
+                                    )}
+                                </div>
+                                {profile?.discord_webhook_url && (
+                                    <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-3 flex items-center gap-2">
+                                        <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
+                                        <span className="text-sm text-green-400">Active connection</span>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Discord Modal */}
+                            {showDiscordModal && (
+                                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50" onClick={() => setShowDiscordModal(false)}>
+                                    <div className="bg-[#1A1A1A] border border-white/10 rounded-2xl p-6 max-w-md w-full mx-4" onClick={(e) => e.stopPropagation()}>
+                                        <h3 className="text-xl font-bold mb-4">Connect Discord Webhook</h3>
+                                        <p className="text-sm text-white/60 mb-4">
+                                            Create a webhook in your Discord server settings and paste the URL here to receive task alerts.
+                                        </p>
+                                        <input
+                                            type="url"
+                                            placeholder="https://discord.com/api/webhooks/..."
+                                            value={webhookInput}
+                                            onChange={(e) => setWebhookInput(e.target.value)}
+                                            className="w-full bg-black border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-indigo-500 mb-4"
+                                        />
+                                        <div className="flex gap-3 justify-end">
+                                            <button
+                                                onClick={() => {
+                                                    setShowDiscordModal(false);
+                                                    setWebhookInput('');
+                                                }}
+                                                className="px-4 py-2 bg-white/5 hover:bg-white/10 text-white rounded-lg text-sm font-medium transition-colors"
+                                            >
+                                                Cancel
+                                            </button>
+                                            <button
+                                                onClick={async () => {
+                                                    const formData = new FormData();
+                                                    formData.append('discordWebhookUrl', webhookInput);
+                                                    formData.append('fullName', profile?.full_name || '');
+                                                    formData.append('avatarUrl', profile?.avatar_url || '');
+                                                    formData.append('role', profile?.role || '');
+                                                    const result = await updateProfile(formData);
+                                                    if (!result.error) {
+                                                        setShowDiscordModal(false);
+                                                        setDiscordWebhookUrl(webhookInput);
+                                                        setProfile({ ...profile, discord_webhook_url: webhookInput });
+
+                                                    } else {
+                                                    }
+                                                }}
+                                                disabled={!webhookInput}
+                                                className="px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                            >
+                                                Save
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
                     )}
 
                     {/* Domain & SEO Section */}

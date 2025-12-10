@@ -68,6 +68,73 @@ export async function createTask(title: string, assignee: string | null, tags: s
         return { error: error.message }
     }
 
+    // Attempt to send immediate alert if applicable
+    if (alertInterval !== 'None') {
+        let targetUrl: string | null = null;
+        let mention = '';
+
+        if (assignee) {
+            // Specific assignee
+            const { data: profile } = await supabase
+                .from('profiles')
+                .select('discord_webhook_url, full_name')
+                .eq('id', assignee)
+                .single()
+
+            if (profile) {
+                targetUrl = profile.discord_webhook_url;
+                mention = profile.full_name.toLowerCase().includes('francisco') ? '<@1301992654396985465>' :
+                    profile.full_name.toLowerCase().includes('maksym') ? '<@249214815371788289>' : '';
+            }
+        } else {
+            // Everyone
+            mention = '<@1301992654396985465> <@249214815371788289>';
+        }
+
+        // Fallback if no URL found yet (either profile missing url or it's 'Everyone' and we need a default)
+        if (!targetUrl) {
+            const { data: fallback } = await supabase
+                .from('profiles')
+                .select('discord_webhook_url')
+                .neq('discord_webhook_url', null)
+                .limit(1)
+                .single();
+            targetUrl = fallback?.discord_webhook_url || null;
+        }
+
+        if (targetUrl) {
+            try {
+                const response = await fetch(targetUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        content: mention,
+                        embeds: [{
+                            title: '🔔 Task Reminder',
+                            description: title,
+                            color: 0x2563eb,
+                            footer: { text: `Framax Solutions • ${new Date().toLocaleDateString()}` }
+                        }]
+                    })
+                })
+
+                if (response.ok) {
+                    // Update last_alert_sent_at so cron doesn't send duplicate immediately
+                    await supabase
+                        .from('tasks')
+                        .update({ last_alert_sent_at: new Date().toISOString() })
+                        .eq('id', data.id)
+                }
+            } catch (err) {
+                console.error('Failed to send immediate discord alert', err)
+                // We ignore the error here so the task is still created successfully.
+                // The cron job will pick it up later.
+            }
+        }
+    }
+
+
+
     revalidatePath('/dashboard/todo')
     return { data }
 }

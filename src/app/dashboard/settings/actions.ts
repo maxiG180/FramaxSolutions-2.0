@@ -64,3 +64,51 @@ export async function updatePassword(formData: FormData) {
     revalidatePath('/dashboard/settings')
     return { success: true }
 }
+
+export async function saveGoogleCalendarToken(token: string) {
+    const supabase = await createClient()
+    const { data: { user }, error: userError } = await supabase.auth.getUser()
+
+    if (userError || !user) {
+        return { error: 'User not found' }
+    }
+
+    const { error } = await supabase
+        .from('profiles')
+        .upsert({
+            id: user.id,
+            email: user.email,
+            google_calendar_token: token,
+            updated_at: new Date().toISOString(),
+        })
+
+    if (error) {
+        return { error: error.message }
+    }
+
+    revalidatePath('/dashboard/settings')
+    revalidatePath('/dashboard/calendar')
+    return { success: true }
+}
+
+export async function deleteGoogleCalendarToken() {
+    const supabase = await createClient()
+    const { data: { user }, error: userError } = await supabase.auth.getUser()
+
+    if (userError || !user) {
+        return { error: 'User not found' }
+    }
+
+    const { error } = await supabase
+        .from('profiles')
+        .update({ google_calendar_token: null })
+        .eq('id', user.id)
+
+    if (error) {
+        return { error: error.message }
+    }
+
+    revalidatePath('/dashboard/settings')
+    revalidatePath('/dashboard/calendar')
+    return { success: true }
+}

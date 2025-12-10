@@ -15,6 +15,12 @@ const FOLDER_COLORS = [
     { color: "text-orange-400", bg: "bg-orange-400/10" },
     { color: "text-pink-400", bg: "bg-pink-400/10" },
     { color: "text-cyan-400", bg: "bg-cyan-400/10" },
+    { color: "text-red-400", bg: "bg-red-400/10" },
+    { color: "text-yellow-400", bg: "bg-yellow-400/10" },
+    { color: "text-lime-400", bg: "bg-lime-400/10" },
+    { color: "text-teal-400", bg: "bg-teal-400/10" },
+    { color: "text-indigo-400", bg: "bg-indigo-400/10" },
+    { color: "text-gray-400", bg: "bg-gray-400/10" },
 ];
 
 export default function DocsPage() {
@@ -28,12 +34,28 @@ export default function DocsPage() {
     const [mounted, setMounted] = useState(false);
     const [activeFolderMenu, setActiveFolderMenu] = useState<string | null>(null);
     const [isDragging, setIsDragging] = useState(false);
+    const [textPreviewContent, setTextPreviewContent] = useState<string | null>(null);
+    const [isCreateFolderOpen, setIsCreateFolderOpen] = useState(false);
+    const [newFolderData, setNewFolderData] = useState({ name: "", colorIndex: 0 });
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const dragCounter = useRef(0);
 
     useEffect(() => {
         setMounted(true);
         loadData();
     }, []);
+
+    useEffect(() => {
+        if (selectedFile?.type === 'code' && selectedFile.url) {
+            setTextPreviewContent('Loading...');
+            fetch(selectedFile.url)
+                .then(res => res.text())
+                .then(text => setTextPreviewContent(text))
+                .catch(err => setTextPreviewContent('Error loading preview: ' + err.message));
+        } else {
+            setTextPreviewContent(null);
+        }
+    }, [selectedFile]);
 
     const loadData = async () => {
         setIsLoadingData(true);
@@ -51,15 +73,21 @@ export default function DocsPage() {
         setIsLoadingData(false);
     };
 
-    const handleCreateFolder = async () => {
-        const name = prompt("Enter folder name:");
-        if (!name) return;
+    const handleCreateFolder = () => {
+        setNewFolderData({ name: "", colorIndex: 0 });
+        setIsCreateFolderOpen(true);
+    };
 
-        const colorScheme = FOLDER_COLORS[Math.floor(Math.random() * FOLDER_COLORS.length)];
-        const result = await createFolder(name, colorScheme.color, colorScheme.bg);
+    const submitCreateFolder = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!newFolderData.name) return;
+
+        const colorScheme = FOLDER_COLORS[newFolderData.colorIndex];
+        const result = await createFolder(newFolderData.name, colorScheme.color, colorScheme.bg);
 
         if (result.folder) {
             setFolders([result.folder, ...folders]);
+            setIsCreateFolderOpen(false);
         } else {
             alert('Error creating folder: ' + result.error);
         }
@@ -85,19 +113,34 @@ export default function DocsPage() {
         fileInputRef.current?.click();
     };
 
-    const handleDragOver = (e: React.DragEvent) => {
+    const handleDragEnter = (e: React.DragEvent) => {
         e.preventDefault();
-        setIsDragging(true);
+        e.stopPropagation();
+        dragCounter.current += 1;
+        if (e.dataTransfer.items && e.dataTransfer.items.length > 0) {
+            setIsDragging(true);
+        }
     };
 
     const handleDragLeave = (e: React.DragEvent) => {
         e.preventDefault();
-        setIsDragging(false);
+        e.stopPropagation();
+        dragCounter.current -= 1;
+        if (dragCounter.current === 0) {
+            setIsDragging(false);
+        }
+    };
+
+    const handleDragOver = (e: React.DragEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
     };
 
     const handleDrop = async (e: React.DragEvent) => {
         e.preventDefault();
+        e.stopPropagation();
         setIsDragging(false);
+        dragCounter.current = 0;
         const files = Array.from(e.dataTransfer.files);
         if (files.length > 0) {
             await processFileUpload(files[0]);
@@ -113,7 +156,7 @@ export default function DocsPage() {
             const tempFile: FileType = {
                 id: tempId,
                 name: file.name,
-                type: file.name.split('.').pop()?.toLowerCase() || 'file',
+                type: getFileType(file.name),
                 size: (file.size / 1024).toFixed(1) + ' KB',
                 date: 'Uploading...',
                 folder: currentFolder?.name || 'Unsorted',
@@ -145,7 +188,7 @@ export default function DocsPage() {
             console.log('Creating DB record...');
             const result = await createFileRecord({
                 name: file.name,
-                type: file.name.split('.').pop()?.toLowerCase() || 'file',
+                type: getFileType(file.name),
                 size: file.size,
                 storage_path: storagePath,
                 folder_id: folderId
@@ -241,18 +284,16 @@ export default function DocsPage() {
 
     if (isLoadingData) {
         return (
-            <div className="flex items-center justify-center min-h-[400px] text-white">
-                <div className="text-center">
-                    <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4 text-blue-500" />
-                    <p className="text-white/60">Loading documents...</p>
-                </div>
+            <div className="h-full flex items-center justify-center">
+                <Loader2 className="w-8 h-8 animate-spin text-purple-400" />
             </div>
         );
     }
 
     return (
         <div
-            className="space-y-8 text-white relative min-h-screen"
+            className="space-y-6 relative"
+            onDragEnter={handleDragEnter}
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
@@ -539,6 +580,90 @@ export default function DocsPage() {
                 )}
             </div>
 
+            {/* Create Folder Modal */}
+            {mounted && createPortal(
+                <AnimatePresence>
+                    {isCreateFolderOpen && (
+                        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
+                            <motion.div
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                exit={{ opacity: 0 }}
+                                onClick={() => setIsCreateFolderOpen(false)}
+                                className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+                            />
+                            <motion.div
+                                initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                                animate={{ opacity: 1, scale: 1, y: 0 }}
+                                exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                                className="relative w-full max-w-md bg-[#0A0A0A] border border-white/10 rounded-2xl overflow-hidden shadow-2xl z-10 p-6"
+                            >
+                                <div className="flex items-center justify-between mb-6">
+                                    <h3 className="text-xl font-bold text-white">Create New Folder</h3>
+                                    <button
+                                        onClick={() => setIsCreateFolderOpen(false)}
+                                        className="p-2 hover:bg-white/10 rounded-lg text-white/60 hover:text-white transition-colors"
+                                    >
+                                        <X className="w-5 h-5" />
+                                    </button>
+                                </div>
+
+                                <form onSubmit={submitCreateFolder} className="space-y-6">
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-medium text-white/60">Folder Name</label>
+                                        <input
+                                            type="text"
+                                            value={newFolderData.name}
+                                            onChange={(e) => setNewFolderData({ ...newFolderData, name: e.target.value })}
+                                            placeholder="e.g., Marketing Assets"
+                                            autoFocus
+                                            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all placeholder:text-white/20"
+                                        />
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-medium text-white/60">Color Code</label>
+                                        <div className="relative overflow-hidden px-2">
+                                            <motion.div
+                                                drag="x"
+                                                dragConstraints={{ left: -400, right: 0 }}
+                                                className="flex gap-3 cursor-grab active:cursor-grabbing py-2"
+                                            >
+                                                {FOLDER_COLORS.map((theme, index) => (
+                                                    <motion.button
+                                                        key={index}
+                                                        type="button"
+                                                        onClick={() => setNewFolderData({ ...newFolderData, colorIndex: index })}
+                                                        whileHover={{ scale: 1.1 }}
+                                                        whileTap={{ scale: 0.95 }}
+                                                        className={cn(
+                                                            "w-12 h-12 rounded-full flex items-center justify-center transition-all border-2 flex-shrink-0",
+                                                            newFolderData.colorIndex === index ? "border-white scale-110" : "border-transparent",
+                                                            theme.bg
+                                                        )}
+                                                    >
+                                                        <div className={cn("w-5 h-5 rounded-full", theme.color.replace('text-', 'bg-'))} />
+                                                    </motion.button>
+                                                ))}
+                                            </motion.div>
+                                        </div>
+                                    </div>
+
+                                    <button
+                                        type="submit"
+                                        disabled={!newFolderData.name}
+                                        className="w-full bg-blue-600 text-white py-3 rounded-xl font-bold hover:bg-blue-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                    >
+                                        Create Folder
+                                    </button>
+                                </form>
+                            </motion.div>
+                        </div>
+                    )}
+                </AnimatePresence>,
+                document.body
+            )}
+
             {/* File Preview Modal */}
             {mounted && createPortal(
                 <AnimatePresence>
@@ -608,6 +733,16 @@ export default function DocsPage() {
                                                 </div>
                                             )}
                                         </div>
+                                    ) : selectedFile.type === "code" ? (
+                                        <div className="w-full h-full bg-[#1e1e1e] p-6 overflow-auto rounded-xl shadow-inner">
+                                            <pre className="font-mono text-sm text-gray-300 whitespace-pre-wrap break-words leading-relaxed">
+                                                {textPreviewContent || (
+                                                    <div className="flex items-center gap-2 text-white/40">
+                                                        <Loader2 className="w-4 h-4 animate-spin" /> Loading content...
+                                                    </div>
+                                                )}
+                                            </pre>
+                                        </div>
                                     ) : selectedFile.type === "pdf" ? (
                                         <div className="w-full h-full rounded-xl shadow-lg overflow-hidden bg-transparent">
                                             {selectedFile.url ? (
@@ -646,4 +781,17 @@ export default function DocsPage() {
             )}
         </div>
     );
+}
+
+function getFileType(name: string): string {
+    const ext = name.split('.').pop()?.toLowerCase()
+    if (['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'].includes(ext || '')) return 'image'
+    if (['mp4', 'webm', 'ogg', 'mov'].includes(ext || '')) return 'video'
+    if (['mp3', 'wav', 'm4a'].includes(ext || '')) return 'audio'
+    if (['pdf'].includes(ext || '')) return 'pdf'
+    if (['xls', 'xlsx', 'csv'].includes(ext || '')) return 'sheet'
+    if (['zip', 'rar', '7z'].includes(ext || '')) return 'zip'
+    if (['doc', 'docx'].includes(ext || '')) return 'doc'
+    if (['txt', 'md', 'json', 'js', 'ts', 'tsx', 'css', 'html', 'xml', 'yml', 'yaml'].includes(ext || '')) return 'code'
+    return 'file'
 }

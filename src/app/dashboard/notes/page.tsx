@@ -77,8 +77,8 @@ export default function NotesPage() {
 
     if (loading) {
         return (
-            <div className="h-[calc(100vh-4rem)] flex items-center justify-center">
-                <Loader2 className="w-8 h-8 animate-spin text-white/20" />
+            <div className="h-full flex items-center justify-center">
+                <Loader2 className="w-8 h-8 animate-spin text-yellow-400" />
             </div>
         );
     }

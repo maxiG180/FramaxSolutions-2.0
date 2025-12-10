@@ -27,7 +27,7 @@ const PRODUCTIVITY_ITEMS = [
     { name: "Calendar", icon: Calendar, href: "/dashboard/calendar", color: "text-red-500" },
     { name: "Notes", icon: FileText, href: "/dashboard/notes", color: "text-yellow-500" },
     { name: "Tasks", icon: CheckSquare, href: "/dashboard/todo", color: "text-blue-500" },
-    { name: "Docs", icon: Folder, href: "/dashboard/docs", color: "text-blue-600" },
+    { name: "Docs", icon: Folder, href: "/dashboard/docs", color: "text-purple-500" },
 ];
 
 interface SidebarProps {

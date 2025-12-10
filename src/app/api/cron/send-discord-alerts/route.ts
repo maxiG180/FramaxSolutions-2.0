@@ -5,6 +5,15 @@ export async function GET() {
     try {
         const supabase = await createClient();
 
+        // Fetch fallback webhook URL (first non-null found)
+        const { data: fallbackProfile } = await supabase
+            .from('profiles')
+            .select('discord_webhook_url')
+            .neq('discord_webhook_url', null)
+            .limit(1)
+            .single();
+        const fallbackUrl = fallbackProfile?.discord_webhook_url;
+
         // 1. Fetch tasks with alert_interval set
         const { data: tasks, error } = await supabase
             .from('tasks')
@@ -55,20 +64,42 @@ export async function GET() {
             }
 
             if (shouldSend) {
-                // Check if assignee has webhook URL
-                // Note: assignee is an object because of the join
+                // Check if assignee has webhook URL or use fallback
                 const assignee = task.assignee as any;
+                const targetUrl = assignee?.discord_webhook_url || fallbackUrl;
 
-                if (assignee && assignee.discord_webhook_url) {
+                if (targetUrl) {
                     try {
+                        let mention = '';
+                        if (assignee) {
+                            mention = assignee.full_name.toLowerCase().includes('francisco') ? '<@1301992654396985465>' :
+                                assignee.full_name.toLowerCase().includes('maksym') ? '<@249214815371788289>' : '';
+                        } else {
+                            // Everyone matches
+                            mention = '<@1301992654396985465> <@249214815371788289>';
+                        }
+
                         // Send Discord message
-                        await fetch(assignee.discord_webhook_url, {
+                        const response = await fetch(targetUrl, {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({
-                                content: `🔔 **Task Alert**: ${task.title}\nPriority: ${task.priority}\nStatus: ${task.status}\n<https://framax-solutions.vercel.app/dashboard/todo>`
+                                content: mention,
+                                embeds: [{
+                                    title: '🔔 Task Reminder',
+                                    description: task.title,
+                                    color: 0x2563eb,
+                                    footer: { text: `Framax Solutions • ${new Date().toLocaleDateString()}` }
+                                }]
                             })
                         });
+
+                        if (!response.ok) {
+                            const errorText = await response.text();
+                            console.error(`Failed to send Discord alert for task ${task.id}: ${response.status} ${errorText}`);
+                            results.push({ taskId: task.id, status: 'failed', error: `Discord API error: ${response.status} ${errorText}` });
+                            continue; // Skip DB update
+                        }
 
                         // Update last_alert_sent_at
                         await supabase
@@ -82,7 +113,7 @@ export async function GET() {
                         results.push({ taskId: task.id, status: 'failed', error: err });
                     }
                 } else {
-                    results.push({ taskId: task.id, status: 'skipped', reason: 'no webhook url' });
+                    results.push({ taskId: task.id, status: 'skipped', reason: 'no webhook url found' });
                 }
             } else {
                 results.push({ taskId: task.id, status: 'skipped', reason: 'not due yet' });

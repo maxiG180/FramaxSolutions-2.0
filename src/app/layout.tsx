@@ -12,6 +12,7 @@ import { DeveloperMode } from "@/components/ui/DeveloperMode";
 import { KonamiTrigger } from "@/components/ui/KonamiTrigger";
 import { usePathname } from "next/navigation";
 import { LanguageProvider } from "@/context/LanguageContext";
+import { GoogleOAuthProvider } from '@react-oauth/google';
 
 const outfit = Outfit({
   variable: "--font-sans",
@@ -39,19 +40,21 @@ export default function RootLayout({
         suppressHydrationWarning
         className={`${outfit.variable} ${inter.variable} antialiased font-sans bg-background text-foreground overflow-x-hidden`}
       >
-        <LanguageProvider>
-          {showLayout && <Header />}
-          <main className={showLayout ? "min-h-screen pt-20" : ""}>
-            {children}
-          </main>
-          {showLayout && (
-            <>
-              <DeveloperMode />
-              <KonamiTrigger />
-              <Footer />
-            </>
-          )}
-        </LanguageProvider>
+        <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || ''}>
+          <LanguageProvider>
+            {showLayout && <Header />}
+            <main className={showLayout ? "min-h-screen pt-20" : ""}>
+              {children}
+            </main>
+            {showLayout && (
+              <>
+                <DeveloperMode />
+                <KonamiTrigger />
+                <Footer />
+              </>
+            )}
+          </LanguageProvider>
+        </GoogleOAuthProvider>
       </body>
     </html>
   );

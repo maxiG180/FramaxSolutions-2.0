@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Plus, Check, Trash2, Calendar, Tag, Loader2, User, Users, X, Layout, ListFilter, Hash } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { getTasks, createTask, toggleTask, deleteTask, getProfiles } from "./actions";
@@ -38,6 +38,7 @@ export default function TodoPage() {
     const [loading, setLoading] = useState(true);
     const [showTagInput, setShowTagInput] = useState(false);
     const [activeFilter, setActiveFilter] = useState<FilterType>('all');
+    const taskInputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
         const init = async () => {
@@ -55,6 +56,13 @@ export default function TodoPage() {
         };
         init();
     }, []);
+
+    useEffect(() => {
+        // Auto-focus the task input after loading
+        if (!loading && taskInputRef.current) {
+            taskInputRef.current.focus();
+        }
+    }, [loading]);
 
     // Derived state for tags
     const allTags = Array.from(new Set(tasks.flatMap(t => t.tags || []))).sort();
@@ -148,8 +156,8 @@ export default function TodoPage() {
 
     if (loading) {
         return (
-            <div className="h-[calc(100vh-4rem)] flex items-center justify-center">
-                <Loader2 className="w-8 h-8 animate-spin text-white/20" />
+            <div className="h-full flex items-center justify-center">
+                <Loader2 className="w-8 h-8 animate-spin text-blue-400" />
             </div>
         );
     }
@@ -225,6 +233,7 @@ export default function TodoPage() {
                     <form onSubmit={addTask} className="space-y-3">
                         <div className="relative">
                             <input
+                                ref={taskInputRef}
                                 type="text"
                                 value={newTask}
                                 onChange={(e) => setNewTask(e.target.value)}
