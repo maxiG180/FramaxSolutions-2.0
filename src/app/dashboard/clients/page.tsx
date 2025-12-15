@@ -1,10 +1,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Search, MoreVertical, Plus, X, Trash2, Edit2, Mail, Phone, Globe } from "lucide-react";
+
+import { Search, MoreVertical, Plus, X, Trash2, Edit2, Mail, Phone, Globe, MapPin, User, Building2, ImageIcon } from "lucide-react";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { createClient } from "@/utils/supabase/client";
+import { Loader } from "@/components/ui/loader";
 
 type ClientStatus = "Active" | "Inactive";
 
@@ -16,6 +18,9 @@ interface Client {
     website: string;
     status: ClientStatus;
     notes: string;
+    logo?: string;
+    contact_person?: string;
+    country?: string;
 }
 
 export default function ClientsPage() {
@@ -27,14 +32,19 @@ export default function ClientsPage() {
     const [mounted, setMounted] = useState(false);
     const [loading, setLoading] = useState(true);
 
+    const [editingId, setEditingId] = useState<number | null>(null);
+
     // Form State
-    const [newClient, setNewClient] = useState<Partial<Client>>({
+    const [formData, setFormData] = useState<Partial<Client>>({
         name: "",
         email: "",
         phone: "",
         website: "",
         status: "Active",
         notes: "",
+        logo: "",
+        contact_person: "",
+        country: ""
     });
 
     useEffect(() => {
@@ -59,34 +69,91 @@ export default function ClientsPage() {
 
     const filteredClients = clients.filter(client => {
         const matchesSearch = client.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            (client.email && client.email.toLowerCase().includes(searchQuery.toLowerCase()));
+            (client.email && client.email.toLowerCase().includes(searchQuery.toLowerCase())) ||
+            (client.contact_person && client.contact_person.toLowerCase().includes(searchQuery.toLowerCase()));
         const matchesStatus = statusFilter === "All" || client.status === statusFilter;
         return matchesSearch && matchesStatus;
     });
 
-    const handleAddClient = async (e: React.FormEvent) => {
+    const resetForm = () => {
+        setFormData({ name: "", email: "", phone: "", website: "", status: "Active", notes: "", logo: "", contact_person: "", country: "" });
+        setEditingId(null);
+        setIsModalOpen(false);
+    };
+
+    const handleOpenAdd = () => {
+        resetForm();
+        setIsModalOpen(true);
+    };
+
+    const handleEditClick = (client: Client) => {
+        setFormData({
+            name: client.name,
+            email: client.email,
+            phone: client.phone,
+            website: client.website,
+            status: client.status,
+            notes: client.notes,
+            logo: client.logo || "",
+            contact_person: client.contact_person || "",
+            country: client.country || ""
+        });
+        setEditingId(client.id);
+        setIsModalOpen(true);
+    };
+
+    const handleSaveClient = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        const { data, error } = await supabase
-            .from('clients')
-            .insert([{
-                name: newClient.name,
-                email: newClient.email,
-                phone: newClient.phone,
-                website: newClient.website,
-                status: newClient.status,
-                notes: newClient.notes
-            }])
-            .select()
-            .single();
+        if (editingId) {
+            // Update existing client
+            const { error } = await supabase
+                .from('clients')
+                .update({
+                    name: formData.name,
+                    email: formData.email,
+                    phone: formData.phone,
+                    website: formData.website,
+                    status: formData.status,
+                    notes: formData.notes,
+                    logo: formData.logo,
+                    contact_person: formData.contact_person,
+                    country: formData.country
+                })
+                .eq('id', editingId);
 
-        if (error) {
-            console.error('Error adding client:', error);
-            alert('Error adding client');
+            if (error) {
+                console.error('Error updating client:', error);
+                alert('Error updating client');
+            } else {
+                setClients(clients.map(c => c.id === editingId ? { ...c, ...formData } as Client : c));
+                resetForm();
+            }
         } else {
-            setClients([data, ...clients]);
-            setIsModalOpen(false);
-            setNewClient({ name: "", email: "", phone: "", website: "", status: "Active", notes: "" });
+            // Create new client
+            const { data, error } = await supabase
+                .from('clients')
+                .insert([{
+                    name: formData.name,
+                    email: formData.email,
+                    phone: formData.phone,
+                    website: formData.website,
+                    status: formData.status,
+                    notes: formData.notes,
+                    logo: formData.logo,
+                    contact_person: formData.contact_person,
+                    country: formData.country
+                }])
+                .select()
+                .single();
+
+            if (error) {
+                console.error('Error adding client:', error);
+                alert('Error adding client');
+            } else {
+                setClients([data, ...clients]);
+                resetForm();
+            }
         }
     };
 
@@ -114,7 +181,7 @@ export default function ClientsPage() {
                     <p className="text-white/60">Manage your client relationships.</p>
                 </div>
                 <button
-                    onClick={() => setIsModalOpen(true)}
+                    onClick={handleOpenAdd}
                     className="bg-blue-600 text-white px-4 py-2 rounded-lg font-bold flex items-center gap-2 hover:bg-blue-500 transition-colors shadow-lg shadow-blue-500/20"
                 >
                     <Plus className="w-4 h-4" /> Add Client
@@ -133,15 +200,24 @@ export default function ClientsPage() {
                         className="w-full bg-white/5 border border-white/10 rounded-xl pl-10 pr-4 py-3 text-white focus:outline-none focus:border-blue-500/50 transition-colors"
                     />
                 </div>
-                <select
-                    value={statusFilter}
-                    onChange={(e) => setStatusFilter(e.target.value as ClientStatus | "All")}
-                    className="bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-blue-500/50 cursor-pointer"
-                >
-                    <option value="All">All Status</option>
-                    <option value="Active">Active</option>
-                    <option value="Inactive">Inactive</option>
-                </select>
+                <div className="flex items-center gap-2 p-1 bg-white/5 rounded-xl border border-white/10">
+                    {(["All", "Active", "Inactive"] as const).map((status) => (
+                        <button
+                            key={status}
+                            onClick={() => setStatusFilter(status)}
+                            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${statusFilter === status
+                                ? status === "Active"
+                                    ? "bg-green-500/10 text-green-400 shadow-sm ring-1 ring-green-500/20"
+                                    : status === "Inactive"
+                                        ? "bg-gray-500/10 text-gray-400 shadow-sm ring-1 ring-gray-500/20"
+                                        : "bg-white/10 text-white shadow-sm ring-1 ring-white/20"
+                                : "text-white/40 hover:text-white hover:bg-white/5"
+                                }`}
+                        >
+                            {status === "All" ? "All" : status}
+                        </button>
+                    ))}
+                </div>
             </div>
 
             {/* Clients Table */}
@@ -150,17 +226,19 @@ export default function ClientsPage() {
                     <table className="w-full text-left">
                         <thead className="bg-white/5 text-white/60 text-sm uppercase">
                             <tr>
-                                <th className="p-4 font-medium">Client Name</th>
-                                <th className="p-4 font-medium">Contact</th>
+                                <th className="p-4 font-medium pl-6">Client</th>
+                                <th className="p-4 font-medium">Contact Person</th>
+                                <th className="p-4 font-medium">Region</th>
                                 <th className="p-4 font-medium">Status</th>
-                                <th className="p-4 font-medium">Notes</th>
-                                <th className="p-4 font-medium text-right">Actions</th>
+                                <th className="p-4 font-medium text-right pr-6">Actions</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-white/10">
                             {loading ? (
                                 <tr>
-                                    <td colSpan={5} className="p-8 text-center text-white/40">Loading clients...</td>
+                                    <td colSpan={5} className="p-8 text-center text-white/40">
+                                        <Loader />
+                                    </td>
                                 </tr>
                             ) : filteredClients.length === 0 ? (
                                 <tr>
@@ -171,39 +249,74 @@ export default function ClientsPage() {
                             ) : (
                                 filteredClients.map((client) => (
                                     <tr key={client.id} className="hover:bg-white/5 transition-colors group">
-                                        <td className="p-4">
-                                            <div className="font-bold text-white">{client.name}</div>
-                                            {client.website && (
-                                                <a href={`https://${client.website}`} target="_blank" rel="noreferrer" className="text-sm text-blue-400 hover:underline flex items-center gap-1">
-                                                    <Globe className="w-3 h-3" /> {client.website}
-                                                </a>
-                                            )}
-                                        </td>
-                                        <td className="p-4">
-                                            <div className="flex flex-col gap-1 text-sm text-white/60">
-                                                {client.email && (
-                                                    <div className="flex items-center gap-2">
-                                                        <Mail className="w-3 h-3" /> {client.email}
-                                                    </div>
-                                                )}
-                                                {client.phone && (
-                                                    <div className="flex items-center gap-2">
-                                                        <Phone className="w-3 h-3" /> {client.phone}
-                                                    </div>
-                                                )}
+                                        <td className="p-4 pl-6">
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center overflow-hidden border border-white/10 shrink-0">
+                                                    {client.logo ? (
+                                                        <img src={client.logo} alt={client.name} className="w-full h-full object-cover" />
+                                                    ) : (
+                                                        <Building2 className="w-5 h-5 text-white/40" />
+                                                    )}
+                                                </div>
+                                                <div>
+                                                    <div className="font-bold text-white">{client.name}</div>
+                                                    {client.website && (
+                                                        <a href={`https://${client.website}`} target="_blank" rel="noreferrer" className="text-sm text-blue-400 hover:underline flex items-center gap-1">
+                                                            <Globe className="w-3 h-3" /> {client.website}
+                                                        </a>
+                                                    )}
+                                                </div>
                                             </div>
                                         </td>
                                         <td className="p-4">
+                                            {client.contact_person ? (
+                                                <div className="flex flex-col gap-1">
+                                                    <div className="flex items-center gap-2 text-white font-medium">
+                                                        <User className="w-3 h-3 text-white/60" /> {client.contact_person}
+                                                    </div>
+                                                    <div className="text-sm text-white/60 pl-5">
+                                                        {client.email}
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                <div className="flex flex-col gap-1 text-sm text-white/60">
+                                                    {client.email && (
+                                                        <div className="flex items-center gap-2">
+                                                            <Mail className="w-3 h-3" /> {client.email}
+                                                        </div>
+                                                    )}
+                                                    {client.phone && (
+                                                        <div className="flex items-center gap-2">
+                                                            <Phone className="w-3 h-3" /> {client.phone}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            )}
+                                        </td>
+                                        <td className="p-4">
+                                            {client.country ? (
+                                                <div className="flex items-center gap-2 text-white/80">
+                                                    <MapPin className="w-4 h-4 text-white/40" />
+                                                    {client.country}
+                                                </div>
+                                            ) : (
+                                                <span className="text-white/20">-</span>
+                                            )}
+                                        </td>
+                                        <td className="p-4">
                                             <span className={`px-2 py-1 rounded-full text-xs font-medium border ${client.status === "Active" ? "bg-green-500/10 text-green-400 border-green-500/20" :
-                                                    "bg-gray-500/10 text-gray-400 border-gray-500/20"
+                                                "bg-gray-500/10 text-gray-400 border-gray-500/20"
                                                 }`}>
                                                 {client.status}
                                             </span>
                                         </td>
-                                        <td className="p-4 text-white/60 text-sm truncate max-w-xs">{client.notes}</td>
-                                        <td className="p-4 text-right">
+                                        <td className="p-4 text-right pr-6">
                                             <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                <button className="p-2 hover:bg-white/10 rounded-lg text-white/60 hover:text-white transition-colors" title="Edit">
+                                                <button
+                                                    onClick={() => handleEditClick(client)}
+                                                    className="p-2 hover:bg-white/10 rounded-lg text-white/60 hover:text-white transition-colors"
+                                                    title="Edit"
+                                                >
                                                     <Edit2 className="w-4 h-4" />
                                                 </button>
                                                 <button
@@ -223,7 +336,7 @@ export default function ClientsPage() {
                 </div>
             </div>
 
-            {/* Add Client Modal */}
+            {/* Add/Edit Client Modal */}
             {mounted && createPortal(
                 <AnimatePresence>
                     {isModalOpen && (
@@ -242,7 +355,7 @@ export default function ClientsPage() {
                                 className="relative w-full max-w-lg bg-[#0A0A0A] border border-white/10 rounded-2xl shadow-2xl overflow-hidden z-10"
                             >
                                 <div className="flex items-center justify-between p-6 border-b border-white/10 bg-white/5">
-                                    <h2 className="text-xl font-bold text-white">Add New Client</h2>
+                                    <h2 className="text-xl font-bold text-white">{editingId ? "Edit Client" : "Add New Client"}</h2>
                                     <button
                                         onClick={() => setIsModalOpen(false)}
                                         className="text-white/40 hover:text-white transition-colors"
@@ -250,76 +363,126 @@ export default function ClientsPage() {
                                         <X className="w-5 h-5" />
                                     </button>
                                 </div>
-                                <form onSubmit={handleAddClient} className="p-6 space-y-4">
-                                    <div className="space-y-2">
-                                        <label className="text-sm font-medium text-white/60">Company Name</label>
-                                        <input
-                                            required
-                                            type="text"
-                                            placeholder="e.g. Acme Corp"
-                                            value={newClient.name}
-                                            onChange={e => setNewClient({ ...newClient, name: e.target.value })}
-                                            className="w-full bg-black border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500/50"
-                                        />
-                                    </div>
-                                    <div className="grid grid-cols-2 gap-4">
+                                <form onSubmit={handleSaveClient} className="p-6 space-y-4">
+                                    <div className="space-y-4">
+                                        <div className="flex items-center gap-4">
+                                            <div className="w-20 h-20 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center overflow-hidden shrink-0 group relative">
+                                                {formData.logo ? (
+                                                    <img src={formData.logo} alt="Preview" className="w-full h-full object-cover" />
+                                                ) : (
+                                                    <ImageIcon className="w-8 h-8 text-white/20" />
+                                                )}
+                                            </div>
+                                            <div className="flex-1 space-y-2">
+                                                <label className="text-sm font-medium text-white/60">Logo URL</label>
+                                                <input
+                                                    type="url"
+                                                    placeholder="https://..."
+                                                    value={formData.logo}
+                                                    onChange={e => setFormData({ ...formData, logo: e.target.value })}
+                                                    className="w-full bg-black border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500/50"
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <div className="space-y-2">
+                                                <label className="text-sm font-medium text-white/60">Company Name</label>
+                                                <input
+                                                    required
+                                                    type="text"
+                                                    placeholder="e.g. Acme Corp"
+                                                    value={formData.name}
+                                                    onChange={e => setFormData({ ...formData, name: e.target.value })}
+                                                    className="w-full bg-black border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500/50"
+                                                />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <label className="text-sm font-medium text-white/60">Website</label>
+                                                <input
+                                                    type="text"
+                                                    placeholder="company.com"
+                                                    value={formData.website}
+                                                    onChange={e => setFormData({ ...formData, website: e.target.value })}
+                                                    className="w-full bg-black border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500/50"
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <div className="space-y-2">
+                                                <label className="text-sm font-medium text-white/60">Contact Person</label>
+                                                <input
+                                                    type="text"
+                                                    placeholder="e.g. John Doe"
+                                                    value={formData.contact_person}
+                                                    onChange={e => setFormData({ ...formData, contact_person: e.target.value })}
+                                                    className="w-full bg-black border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500/50"
+                                                />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <label className="text-sm font-medium text-white/60">Country</label>
+                                                <input
+                                                    type="text"
+                                                    placeholder="e.g. USA"
+                                                    value={formData.country}
+                                                    onChange={e => setFormData({ ...formData, country: e.target.value })}
+                                                    className="w-full bg-black border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500/50"
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <div className="space-y-2">
+                                                <label className="text-sm font-medium text-white/60">Email</label>
+                                                <input
+                                                    type="email"
+                                                    placeholder="contact@company.com"
+                                                    value={formData.email}
+                                                    onChange={e => setFormData({ ...formData, email: e.target.value })}
+                                                    className="w-full bg-black border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500/50"
+                                                />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <label className="text-sm font-medium text-white/60">Phone</label>
+                                                <input
+                                                    type="tel"
+                                                    placeholder="+1 (555) ..."
+                                                    value={formData.phone}
+                                                    onChange={e => setFormData({ ...formData, phone: e.target.value })}
+                                                    className="w-full bg-black border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500/50"
+                                                />
+                                            </div>
+                                        </div>
+
                                         <div className="space-y-2">
-                                            <label className="text-sm font-medium text-white/60">Email</label>
-                                            <input
-                                                type="email"
-                                                placeholder="contact@company.com"
-                                                value={newClient.email}
-                                                onChange={e => setNewClient({ ...newClient, email: e.target.value })}
-                                                className="w-full bg-black border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500/50"
+                                            <label className="text-sm font-medium text-white/60">Notes</label>
+                                            <textarea
+                                                placeholder="Internal notes about this client..."
+                                                value={formData.notes}
+                                                onChange={e => setFormData({ ...formData, notes: e.target.value })}
+                                                className="w-full bg-black border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500/50 h-24 resize-none"
                                             />
                                         </div>
+
                                         <div className="space-y-2">
-                                            <label className="text-sm font-medium text-white/60">Phone</label>
-                                            <input
-                                                type="tel"
-                                                placeholder="+1 (555) ..."
-                                                value={newClient.phone}
-                                                onChange={e => setNewClient({ ...newClient, phone: e.target.value })}
+                                            <label className="text-sm font-medium text-white/60">Status</label>
+                                            <select
+                                                value={formData.status}
+                                                onChange={e => setFormData({ ...formData, status: e.target.value as ClientStatus })}
                                                 className="w-full bg-black border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500/50"
-                                            />
+                                            >
+                                                <option value="Active">Active</option>
+                                                <option value="Inactive">Inactive</option>
+                                            </select>
                                         </div>
-                                    </div>
-                                    <div className="space-y-2">
-                                        <label className="text-sm font-medium text-white/60">Website</label>
-                                        <input
-                                            type="text"
-                                            placeholder="company.com"
-                                            value={newClient.website}
-                                            onChange={e => setNewClient({ ...newClient, website: e.target.value })}
-                                            className="w-full bg-black border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500/50"
-                                        />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <label className="text-sm font-medium text-white/60">Notes</label>
-                                        <textarea
-                                            placeholder="Internal notes about this client..."
-                                            value={newClient.notes}
-                                            onChange={e => setNewClient({ ...newClient, notes: e.target.value })}
-                                            className="w-full bg-black border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500/50 h-24 resize-none"
-                                        />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <label className="text-sm font-medium text-white/60">Status</label>
-                                        <select
-                                            value={newClient.status}
-                                            onChange={e => setNewClient({ ...newClient, status: e.target.value as ClientStatus })}
-                                            className="w-full bg-black border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500/50"
-                                        >
-                                            <option value="Active">Active</option>
-                                            <option value="Inactive">Inactive</option>
-                                        </select>
                                     </div>
                                     <div className="pt-4">
                                         <button
                                             type="submit"
                                             className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl transition-colors shadow-lg shadow-blue-500/20"
                                         >
-                                            Add Client
+                                            {editingId ? "Save Changes" : "Add Client"}
                                         </button>
                                     </div>
                                 </form>

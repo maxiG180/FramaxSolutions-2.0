@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { ProjectCard } from "@/components/dashboard/projects/ProjectCard";
+import { Loader } from "@/components/ui/loader";
 import { Plus, Search, Filter, X, Calendar, Users, Briefcase } from "lucide-react";
 
 type ProjectStatus = "in-progress" | "review" | "completed" | "on-hold";
@@ -95,7 +96,19 @@ export default function ProjectsPage() {
 
     useEffect(() => {
         setMounted(true);
+        const timer = setTimeout(() => {
+            // Simulate loading
+        }, 1000);
+        return () => clearTimeout(timer);
     }, []);
+
+    const [loading, setLoading] = useState(true);
+    useEffect(() => {
+        const timer = setTimeout(() => setLoading(false), 1000);
+        return () => clearTimeout(timer);
+    }, []);
+
+    if (loading) return <Loader />;
 
     const filteredProjects = projects.filter(project => {
         const matchesSearch = project.title.toLowerCase().includes(searchQuery.toLowerCase()) ||

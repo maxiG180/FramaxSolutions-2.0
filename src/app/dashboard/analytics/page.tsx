@@ -1,6 +1,8 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import { Loader } from "@/components/ui/loader";
 import { ArrowUpRight, ArrowDownRight, Users, DollarSign, Activity, MousePointer2, TrendingUp, MoreHorizontal } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -48,6 +50,15 @@ const METRICS = [
 ];
 
 export default function AnalyticsPage() {
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const timer = setTimeout(() => setLoading(false), 1000);
+        return () => clearTimeout(timer);
+    }, []);
+
+    if (loading) return <Loader />;
+
     return (
         <div className="space-y-8 text-white">
             {/* Header */}

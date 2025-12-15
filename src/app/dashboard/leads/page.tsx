@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { Loader } from "@/components/ui/loader";
 import { Plus, MoreHorizontal, Phone, Mail, Trash2, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -20,6 +21,8 @@ type Lead = typeof INITIAL_LEADS[0];
 export default function LeadsPage() {
     const [leads, setLeads] = useState(INITIAL_LEADS);
     const [showAddModal, setShowAddModal] = useState(false);
+    const [mounted, setMounted] = useState(false);
+    const [loading, setLoading] = useState(true);
     const [newLead, setNewLead] = useState({ name: "", contact: "", value: "", tag: "" });
     const [draggedLead, setDraggedLead] = useState<number | null>(null);
 
@@ -67,6 +70,14 @@ export default function LeadsPage() {
     const handleDragEnd = () => {
         setDraggedLead(null);
     };
+
+    useEffect(() => {
+        setMounted(true);
+        const timer = setTimeout(() => setLoading(false), 1000);
+        return () => clearTimeout(timer);
+    }, []);
+
+    if (loading) return <Loader />;
 
     const handleDrop = (targetStatus: string) => {
         if (draggedLead !== null) {

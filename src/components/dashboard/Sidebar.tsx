@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { LayoutDashboard, Users, ShoppingBag, CreditCard, Settings, LogOut, Globe, FileText, CheckSquare, Folder, Target, Calendar, Briefcase, FolderKanban, ChevronDown, ChevronRight, BarChart3, PanelLeftClose, PanelLeftOpen } from "lucide-react";
+import { LayoutDashboard, Users, ShoppingBag, CreditCard, Settings, LogOut, Globe, FileText, CheckSquare, Folder, Target, Calendar, Briefcase, FolderKanban, ChevronDown, ChevronRight, BarChart3, PanelLeftClose, PanelLeftOpen, Receipt } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/utils/supabase/client";
@@ -18,7 +18,7 @@ const MANAGEMENT_ITEMS = [
 ];
 
 const FINANCE_ITEMS = [
-    { name: "Invoices", icon: FileText, href: "/dashboard/invoices" },
+    { name: "Invoices", icon: Receipt, href: "/dashboard/invoices" },
     { name: "Payments", icon: CreditCard, href: "/dashboard/payments" },
     { name: "Orders", icon: ShoppingBag, href: "/dashboard/orders" },
 ];

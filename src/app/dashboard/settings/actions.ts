@@ -7,6 +7,7 @@ export async function updateProfile(formData: FormData) {
     const supabase = await createClient()
     const fullName = formData.get('fullName') as string
     const avatarUrl = formData.get('avatarUrl') as string
+    const location = formData.get('location') as string
 
     const { data: { user }, error: userError } = await supabase.auth.getUser()
 
@@ -24,6 +25,7 @@ export async function updateProfile(formData: FormData) {
             avatar_url: avatarUrl,
             discord_webhook_url: formData.get('discordWebhookUrl') as string,
             role: formData.get('role') as string,
+            location: location,
             updated_at: new Date().toISOString(),
         })
 
@@ -40,6 +42,7 @@ export async function updateProfile(formData: FormData) {
         return { error: authError.message }
     }
 
+    revalidatePath('/dashboard')
     revalidatePath('/dashboard/settings')
     return { success: true }
 }
@@ -65,7 +68,7 @@ export async function updatePassword(formData: FormData) {
     return { success: true }
 }
 
-export async function saveGoogleCalendarToken(token: string) {
+export async function saveGoogleCalendarToken(token: string, refreshToken?: string) {
     const supabase = await createClient()
     const { data: { user }, error: userError } = await supabase.auth.getUser()
 
@@ -73,18 +76,32 @@ export async function saveGoogleCalendarToken(token: string) {
         return { error: 'User not found' }
     }
 
-    const { error } = await supabase
+    const updateData: any = {
+        id: user.id,
+        email: user.email,
+        google_calendar_token: token,
+        updated_at: new Date().toISOString(),
+    };
+
+    // Only update refresh token if provided
+    if (refreshToken) {
+        updateData.google_calendar_refresh_token = refreshToken;
+    }
+
+    console.log('Saving Google Calendar token for user:', user.id);
+    console.log('Update data keys:', Object.keys(updateData));
+
+    const { error, data } = await supabase
         .from('profiles')
-        .upsert({
-            id: user.id,
-            email: user.email,
-            google_calendar_token: token,
-            updated_at: new Date().toISOString(),
-        })
+        .upsert(updateData)
+        .select()
 
     if (error) {
+        console.error('Error saving Google Calendar token:', error);
         return { error: error.message }
     }
+
+    console.log('Google Calendar token saved successfully. Returned data:', data);
 
     revalidatePath('/dashboard/settings')
     revalidatePath('/dashboard/calendar')

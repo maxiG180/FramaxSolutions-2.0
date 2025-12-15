@@ -1,6 +1,9 @@
+
 "use client";
 
+import { useState, useEffect } from "react";
 import { Search, Filter, Download } from "lucide-react";
+import { Loader } from "@/components/ui/loader";
 
 const ORDERS = [
     { id: "ORD-001", client: "Acme Corp", date: "Oct 24, 2024", status: "Completed", amount: "$2,500" },
@@ -10,6 +13,17 @@ const ORDERS = [
 ];
 
 export default function OrdersPage() {
+    const [mounted, setMounted] = useState(false);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        setMounted(true);
+        const timer = setTimeout(() => setLoading(false), 1000);
+        return () => clearTimeout(timer);
+    }, []);
+
+    if (loading) return <Loader />;
+
     return (
         <div className="space-y-8">
             <div className="flex items-center justify-between">
@@ -56,10 +70,10 @@ export default function OrdersPage() {
                                 <td className="p-4 font-bold">{order.client}</td>
                                 <td className="p-4 text-white/60">{order.date}</td>
                                 <td className="p-4">
-                                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${order.status === "Completed" ? "bg-green-500/20 text-green-400" :
+                                    <span className={`px - 2 py - 1 rounded - full text - xs font - medium ${order.status === "Completed" ? "bg-green-500/20 text-green-400" :
                                         order.status === "Processing" ? "bg-blue-500/20 text-blue-400" :
                                             "bg-yellow-500/20 text-yellow-400"
-                                        }`}>
+                                        } `}>
                                         {order.status}
                                     </span>
                                 </td>
@@ -72,3 +86,4 @@ export default function OrdersPage() {
         </div>
     );
 }
+

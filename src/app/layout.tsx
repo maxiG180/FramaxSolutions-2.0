@@ -10,6 +10,7 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { DeveloperMode } from "@/components/ui/DeveloperMode";
 import { KonamiTrigger } from "@/components/ui/KonamiTrigger";
+import Chatbot from "@/components/chatbot/Chatbot";
 import { usePathname } from "next/navigation";
 import { LanguageProvider } from "@/context/LanguageContext";
 import { GoogleOAuthProvider } from '@react-oauth/google';
@@ -50,6 +51,7 @@ export default function RootLayout({
               <>
                 <DeveloperMode />
                 <KonamiTrigger />
+                <Chatbot />
                 <Footer />
               </>
             )}

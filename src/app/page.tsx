@@ -1,14 +1,10 @@
-
 import { Hero } from "@/components/sections/Hero";
 import { Features } from "@/components/sections/Features";
 import { NewPortfolio } from "@/components/sections/NewPortfolio";
-
 import { Process } from "@/components/sections/Process";
-import { SocialProof } from "@/components/sections/SocialProof";
-import { FAQ } from "@/components/sections/FAQ";
+import { TechStack } from "@/components/sections/TechStack";
 import { Booking } from "@/components/sections/Booking";
 import { DiscountOffer } from "@/components/ui/DiscountOffer";
-import { ProjectEstimator } from "@/components/ui/ProjectEstimator";
 
 export default function Home() {
   return (
@@ -16,13 +12,10 @@ export default function Home() {
       <Hero />
       <Features />
       <NewPortfolio />
-
       <Process />
-      {/* <SocialProof /> */}
       <Booking />
-      <FAQ />
+      <TechStack />
       <DiscountOffer />
-      <ProjectEstimator />
     </main>
   );
 }

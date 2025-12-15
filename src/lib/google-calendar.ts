@@ -40,7 +40,6 @@ export async function getCalendarEvents(accessToken: string, timeMin?: Date, tim
             meetLink: event.hangoutLink || undefined,
         }));
     } catch (error) {
-        console.error('Error fetching calendar events:', error);
         throw error;
     }
 }

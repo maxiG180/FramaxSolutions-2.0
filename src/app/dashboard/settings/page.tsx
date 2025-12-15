@@ -1,20 +1,30 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { User, Bell, Lock, Globe, Save, Loader2, Calendar, Blocks } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { User, Users, Bell, Lock, Globe, Save, Loader2, Calendar, Blocks, Settings, MoreVertical, Trash2, Check } from "lucide-react";
+import { LocationAutocomplete } from "./LocationAutocomplete";
 import { createClient } from "@/utils/supabase/client";
 import { updateProfile, updatePassword, saveGoogleCalendarToken, deleteGoogleCalendarToken } from "./actions";
 import { useGoogleLogin } from '@react-oauth/google';
 import { useSearchParams } from 'next/navigation';
+import { getURL } from '@/utils/getURL';
 
-type SettingsTab = "profile" | "notifications" | "security" | "integrations" | "domain";
+type SettingsTab = "profile" | "notifications" | "security" | "integrations" | "team" | "domain";
 
 export default function SettingsPage() {
     const [activeTab, setActiveTab] = useState<SettingsTab>("profile");
+    const [inviteEmail, setInviteEmail] = useState("");
+    const [showInviteModal, setShowInviteModal] = useState(false);
+    const [activeMenuId, setActiveMenuId] = useState<string | null>(null);
+
+    const [teamMembers, setTeamMembers] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [user, setUser] = useState<any>(null);
     const [profile, setProfile] = useState<any>(null);
     const [saving, setSaving] = useState(false);
+    const [saveStatus, setSaveStatus] = useState<'idle' | 'success'>('idle');
+    const router = useRouter();
 
     const [googleAccessToken, setGoogleAccessToken] = useState<string | null>(null);
     const [showDiscordModal, setShowDiscordModal] = useState(false);
@@ -40,26 +50,59 @@ export default function SettingsPage() {
                 // Set Google Calendar token from profile
                 if (profile?.google_calendar_token) {
                     setGoogleAccessToken(profile.google_calendar_token);
+                } else {
+                    console.log('No Google Calendar token found in profile:', profile);
                 }
                 // Set Discord webhook URL
-                if (profile?.discord_webhook_url) {
-                    setDiscordWebhookUrl(profile.discord_webhook_url);
-                }
+                setDiscordWebhookUrl(profile.discord_webhook_url || "");
             }
+
+            // Fetch all profiles for team list
+            const { data: allProfiles } = await supabase
+                .from('profiles')
+                .select('*');
+
+            if (allProfiles) {
+                setTeamMembers(allProfiles);
+            }
+
             setLoading(false);
         };
         getUser();
 
         // Set tab from URL parameter if provided
-        if (tabParam && ['profile', 'notifications', 'security', 'integrations', 'domain'].includes(tabParam)) {
+        if (tabParam && ['profile', 'notifications', 'security', 'integrations', 'team', 'domain'].includes(tabParam)) {
             setActiveTab(tabParam);
         }
-    }, [tabParam]);
+
+        // Handle OAuth callback success/error messages
+        const success = searchParams.get('success');
+        const error = searchParams.get('error');
+        if (success === 'calendar_connected') {
+            // Show success toast or notification if desired
+            console.log('Google Calendar connected successfully');
+        }
+        if (error) {
+            console.error('OAuth error:', error);
+        }
+    }, [tabParam, searchParams]);
 
     const handleProfileUpdate = async (formData: FormData) => {
         setSaving(true);
 
         const result = await updateProfile(formData);
+
+        if (result.success) {
+            setProfile((prev: any) => ({
+                ...prev,
+                full_name: formData.get('fullName') as string,
+                location: formData.get('location') as string,
+                role: formData.get('role') as string,
+            }));
+            router.refresh();
+            setSaveStatus('success');
+            setTimeout(() => setSaveStatus('idle'), 2000);
+        }
 
         setSaving(false);
     };
@@ -76,13 +119,22 @@ export default function SettingsPage() {
         setSaving(false);
     };
 
+
+
+    // Use environment variable for consistent redirect URI between client and server
+    const baseUrl = (process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000').replace(/\/$/, '');
+    const loginUrl = `${baseUrl}/api/auth/google/callback`;
+    console.log('Google Auth Redirect URI (Client):', loginUrl);
+
     const googleLogin = useGoogleLogin({
-        onSuccess: async (tokenResponse) => {
-            setGoogleAccessToken(tokenResponse.access_token);
-            const result = await saveGoogleCalendarToken(tokenResponse.access_token);
+        onSuccess: (codeResponse) => {
+            // With auth-code flow, this will be called after the user authorizes
+            // The code exchange happens on the server in the callback route
+            // We just need to show a loading or success state here if needed
         },
-        onError: () => {
-        },
+        flow: 'auth-code',
+        ux_mode: 'redirect',
+        redirect_uri: loginUrl,
         scope: 'https://www.googleapis.com/auth/calendar.readonly',
     });
 
@@ -98,6 +150,7 @@ export default function SettingsPage() {
         { id: "notifications" as SettingsTab, label: "Notifications", icon: Bell },
         { id: "security" as SettingsTab, label: "Security", icon: Lock },
         { id: "integrations" as SettingsTab, label: "Integrations", icon: Blocks },
+        { id: "team" as SettingsTab, label: "Team", icon: Users },
         { id: "domain" as SettingsTab, label: "Domain & SEO", icon: Globe },
     ];
 
@@ -220,6 +273,10 @@ export default function SettingsPage() {
                                         />
                                     </div>
                                     <div className="space-y-2">
+                                        <label className="text-sm font-medium text-white/60">Location</label>
+                                        <LocationAutocomplete defaultValue={profile?.location || ""} name="location" />
+                                    </div>
+                                    <div className="space-y-2">
                                         <label className="text-sm font-medium text-white/60">Contact Email</label>
                                         <input
                                             type="email"
@@ -246,11 +303,15 @@ export default function SettingsPage() {
                             <div className="mt-6 flex justify-end">
                                 <button
                                     type="submit"
-                                    disabled={saving}
-                                    className="bg-white text-black px-6 py-3 rounded-xl font-bold flex items-center gap-2 hover:bg-gray-200 transition-colors disabled:opacity-50"
+                                    disabled={saving || saveStatus === 'success'}
+                                    className={`px-6 py-3 rounded-xl font-bold flex items-center gap-2 transition-colors disabled:opacity-50 ${saveStatus === 'success'
+                                        ? "bg-green-500/20 text-green-400"
+                                        : "bg-white text-black hover:bg-gray-200"
+                                        }`}
                                 >
-                                    {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-                                    Save Changes
+                                    {saving && <Loader2 className="w-4 h-4 animate-spin" />}
+                                    {saveStatus === 'success' && <Check className="w-4 h-4" />}
+                                    {saveStatus === 'success' ? "Saved!" : (saving ? "Saving..." : "Save Changes")}
                                 </button>
                             </div>
                         </form>
@@ -504,6 +565,132 @@ export default function SettingsPage() {
                                                 className="px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                                             >
                                                 Save
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    )}
+
+                    {/* Team Section */}
+                    {activeTab === "team" && (
+                        <div className="bg-white/5 border border-white/10 rounded-2xl p-6 space-y-6">
+                            <div className="flex items-center justify-between border-b border-white/10 pb-4">
+                                <div>
+                                    <h2 className="text-xl font-bold">Team Management</h2>
+                                    <p className="text-sm text-white/60 mt-1">Manage your team members and roles.</p>
+                                </div>
+                                <button
+                                    onClick={() => setShowInviteModal(true)}
+                                    className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
+                                >
+                                    <User className="w-4 h-4" />
+                                    Invite Member
+                                </button>
+                            </div>
+
+                            <div className="space-y-4">
+                                {teamMembers.map((member) => (
+                                    <div key={member.id} className="flex items-center justify-between p-4 bg-black/20 rounded-xl border border-white/5">
+                                        <div className="flex items-center gap-4">
+                                            {member.avatar_url ? (
+                                                <img src={member.avatar_url} alt={member.full_name} className="w-10 h-10 rounded-full object-cover" />
+                                            ) : (
+                                                <div className={`w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-sm font-bold text-white`}>
+                                                    {member.full_name?.split(' ').map((n: string) => n[0]).join('').substring(0, 2).toUpperCase() || 'U'}
+                                                </div>
+                                            )}
+                                            <div>
+                                                <h3 className="font-medium text-white">{member.full_name || "Unknown User"}</h3>
+                                                <p className="text-xs text-white/60">{member.role || "Member"}</p>
+                                            </div>
+                                        </div>
+                                        <div className="flex items-center gap-4 relative">
+                                            <span className={`px-2 py-1 rounded-full text-xs font-medium bg-green-500/20 text-green-400`}>
+                                                Active
+                                            </span>
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    setActiveMenuId(activeMenuId === member.id ? null : member.id);
+                                                }}
+                                                className="text-white/40 hover:text-white transition-colors p-2"
+                                            >
+                                                <MoreVertical className="w-4 h-4" />
+                                            </button>
+
+                                            {activeMenuId === member.id && (
+                                                <>
+                                                    <div
+                                                        className="fixed inset-0 z-40"
+                                                        onClick={() => setActiveMenuId(null)}
+                                                    />
+                                                    <div className="absolute right-0 top-10 w-32 bg-neutral-800 border border-white/10 rounded-lg shadow-xl z-50 overflow-hidden">
+                                                        <button
+                                                            className="w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-white/5 flex items-center gap-2 transition-colors"
+                                                            onClick={() => {
+                                                                // Mock delete action
+                                                                alert("Remove member functionality coming soon");
+                                                                setActiveMenuId(null);
+                                                            }}
+                                                        >
+                                                            <Trash2 className="w-3 h-3" />
+                                                            Remove
+                                                        </button>
+                                                    </div>
+                                                </>
+                                            )}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+
+                            {/* Invite Modal */}
+                            {showInviteModal && (
+                                <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 px-4" onClick={() => setShowInviteModal(false)}>
+                                    <div className="bg-[#1A1A1A] border border-white/10 rounded-2xl p-6 max-w-md w-full" onClick={(e) => e.stopPropagation()}>
+                                        <h3 className="text-xl font-bold mb-4">Invite Team Member</h3>
+                                        <p className="text-sm text-white/60 mb-4">
+                                            Send an invitation to a new team member. They will receive an email with instructions.
+                                        </p>
+                                        <div className="space-y-4">
+                                            <div>
+                                                <label className="text-sm font-medium text-white/60 mb-2 block">Email Address</label>
+                                                <input
+                                                    type="email"
+                                                    placeholder="colleague@framax.com"
+                                                    value={inviteEmail}
+                                                    onChange={(e) => setInviteEmail(e.target.value)}
+                                                    className="w-full bg-black border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500"
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="text-sm font-medium text-white/60 mb-2 block">Role</label>
+                                                <select className="w-full bg-black border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500 appearance-none">
+                                                    <option>Member</option>
+                                                    <option>Admin</option>
+                                                    <option>Manager</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div className="flex gap-3 justify-end mt-6">
+                                            <button
+                                                onClick={() => setShowInviteModal(false)}
+                                                className="px-4 py-2 bg-white/5 hover:bg-white/10 text-white rounded-lg text-sm font-medium transition-colors"
+                                            >
+                                                Cancel
+                                            </button>
+                                            <button
+                                                onClick={() => {
+                                                    setShowInviteModal(false);
+                                                    setInviteEmail("");
+                                                    // Mock invite action
+                                                    alert("Invitation sent! (Mock)");
+                                                }}
+                                                className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-sm font-medium transition-colors"
+                                            >
+                                                Send Invite
                                             </button>
                                         </div>
                                     </div>

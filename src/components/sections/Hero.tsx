@@ -46,7 +46,7 @@ export function Hero() {
                     </Link>
                     <Link
                         href="#portfolio"
-                        className="inline-flex h-12 items-center justify-center rounded-full border border-input bg-background px-8 font-medium text-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
+                        className="inline-flex h-12 items-center justify-center rounded-full border border-input bg-background px-8 font-medium text-foreground transition-colors hover:bg-[#2563eb] hover:text-white"
                     >
                         View Our Work
                     </Link>

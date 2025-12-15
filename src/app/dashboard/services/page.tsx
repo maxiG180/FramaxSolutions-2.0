@@ -1,5 +1,7 @@
 "use client";
 
+import { useState, useEffect } from "react";
+import { Loader } from "@/components/ui/loader";
 import { ServiceCard } from "@/components/dashboard/services/ServiceCard";
 import { Plus } from "lucide-react";
 
@@ -37,6 +39,17 @@ const SERVICES = [
 ];
 
 export default function ServicesPage() {
+    const [mounted, setMounted] = useState(false);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        setMounted(true);
+        const timer = setTimeout(() => setLoading(false), 1000);
+        return () => clearTimeout(timer);
+    }, []);
+
+    if (loading) return <Loader />;
+
     return (
         <div className="space-y-8">
             <div className="flex items-center justify-between">

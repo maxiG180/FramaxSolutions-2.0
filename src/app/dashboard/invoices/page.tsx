@@ -1,7 +1,10 @@
+
 "use client";
 
+import { useState, useEffect } from "react";
 import { InvoiceList } from "@/components/dashboard/invoices/InvoiceList";
 import { Plus, FileText, AlertCircle, CheckCircle } from "lucide-react";
+import { Loader } from "@/components/ui/loader";
 
 const INVOICES = [
     { id: "#INV-2024-001", client: "Fashion Nova", amount: "$2,500.00", date: "Nov 25, 2025", status: "paid" as const },
@@ -12,6 +15,17 @@ const INVOICES = [
 ];
 
 export default function InvoicesPage() {
+    const [mounted, setMounted] = useState(false);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        setMounted(true);
+        const timer = setTimeout(() => setLoading(false), 1000);
+        return () => clearTimeout(timer);
+    }, []);
+
+    if (loading) return <Loader />;
+
     return (
         <div className="space-y-8">
             <div className="flex items-center justify-between">
