@@ -158,7 +158,7 @@ export default function NotesPage() {
                             </div>
                         </div>
 
-                        <div className="flex-1 overflow-y-auto p-8">
+                        <div className="flex-1 p-8 overflow-y-auto">
                             <input
                                 type="text"
                                 value={selectedNote.title}
@@ -169,7 +169,7 @@ export default function NotesPage() {
                             <textarea
                                 value={selectedNote.content || ""}
                                 onChange={(e) => handleUpdateNote(selectedNote.id, { content: e.target.value })}
-                                className="w-full h-full bg-transparent text-lg text-white/80 leading-relaxed focus:outline-none resize-none placeholder:text-white/20 font-sans"
+                                className="w-full min-h-[calc(100vh-20rem)] bg-transparent text-lg text-white/80 leading-relaxed focus:outline-none resize-none placeholder:text-white/20 font-sans"
                                 placeholder="Start typing..."
                             />
                         </div>

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Calendar, Clock, ArrowRight, Check, Sparkles, ChevronLeft, ChevronRight, Star, ShieldCheck, Users } from "lucide-react";
+import { Calendar, Clock, ArrowRight, Check, Sparkles, ChevronLeft, ChevronRight, Star, ShieldCheck, Users, X } from "lucide-react";
 import confetti from "canvas-confetti";
 import { cn } from "@/lib/utils";
 
@@ -26,6 +26,17 @@ export function Booking() {
     const [busySlots, setBusySlots] = useState<string[]>([]);
     const [isLoadingAvailability, setIsLoadingAvailability] = useState(false);
     const [titleClicks, setTitleClicks] = useState(0);
+    const [promoCode, setPromoCode] = useState("");
+    const [promoStatus, setPromoStatus] = useState<'idle' | 'validating' | 'valid' | 'invalid'>('idle');
+    const [promoMessage, setPromoMessage] = useState("");
+
+    // Auto-fill promo code from localStorage
+    useEffect(() => {
+        const savedCode = localStorage.getItem("framax_promo_code");
+        if (savedCode) {
+            setPromoCode(savedCode);
+        }
+    }, []);
 
     // Fetch availability when date changes
     useEffect(() => {
@@ -34,14 +45,18 @@ export function Booking() {
                 setIsLoadingAvailability(true);
                 setBusySlots([]); // Reset
 
-                const AVAILABILITY_WEBHOOK = "https://hook.eu1.make.com/zum9fcvc124vwh6iwa0q2jjr6nx5cg0i";
-
                 try {
-                    const response = await fetch(AVAILABILITY_WEBHOOK, {
+                    // Call our own API endpoint (which proxies to Make.com server-side)
+                    const response = await fetch('/api/check-availability', {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify({ date: selectedDate.toISOString() })
                     });
+
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch availability');
+                    }
+
                     const data = await response.json();
                     // Only set busy slots that are actually in our TIME_SLOTS array
                     const validBusySlots = (data.busySlots || []).filter((slot: string) => TIME_SLOTS.includes(slot));
@@ -96,6 +111,35 @@ export function Booking() {
         return "";
     };
 
+    const validatePromoCode = async (code: string) => {
+        if (!code) {
+            setPromoStatus('idle');
+            setPromoMessage("");
+            return;
+        }
+
+        setPromoStatus('validating');
+        try {
+            const res = await fetch('/api/validate-discount', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ code })
+            });
+            const data = await res.json();
+
+            if (data.valid) {
+                setPromoStatus('valid');
+                setPromoMessage(data.message);
+            } else {
+                setPromoStatus('invalid');
+                setPromoMessage(data.message);
+            }
+        } catch (error) {
+            setPromoStatus('invalid');
+            setPromoMessage("Error checking code");
+        }
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
@@ -125,7 +169,8 @@ export function Booking() {
             const payload = {
                 ...formData,
                 date: dateTime.toISOString(),
-                time: selectedTime
+                time: selectedTime,
+                promoCode: promoCode // Send promo code to webhook
             };
 
             await fetch(WEBHOOK_URL, {
@@ -133,6 +178,20 @@ export function Booking() {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(payload)
             });
+
+            // If there's a valid promo code, redeem it
+            if (promoCode && promoStatus === 'valid') {
+                try {
+                    await fetch('/api/redeem-discount', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ code: promoCode })
+                    });
+                } catch (err) {
+                    console.error("Failed to redeem code:", err);
+                    // Non-blocking error, user booked successfully
+                }
+            }
 
             // Success Confetti
             const duration = 3 * 1000;
@@ -372,12 +431,17 @@ export function Booking() {
                                                     })
                                                 )}
                                             </div>
-                                            <div className="mt-auto pt-6 text-center">
-                                                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-green-500/10 text-green-600 text-xs font-medium">
-                                                    <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
-                                                    {TIME_SLOTS.length - busySlots.length} {TIME_SLOTS.length - busySlots.length === 1 ? 'spot' : 'spots'} left for this day
-                                                </span>
-                                            </div>
+                                            {!isLoadingAvailability && (
+                                                <div className="mt-auto pt-6 text-center">
+                                                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-green-500/10 text-green-600 text-xs font-medium">
+                                                        <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+                                                        {(() => {
+                                                            const availableCount = TIME_SLOTS.filter(slot => !busySlots.includes(slot)).length;
+                                                            return `${availableCount} ${availableCount === 1 ? 'spot' : 'spots'} left for this day`;
+                                                        })()}
+                                                    </span>
+                                                </div>
+                                            )}
                                         </motion.div>
                                     )}
 
@@ -463,6 +527,42 @@ export function Booking() {
                                                         className="w-full px-4 py-3 rounded-xl border border-border bg-zinc-950/50 text-zinc-100 placeholder:text-muted-foreground focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all resize-none h-24"
                                                         placeholder="Tell us a bit about your goals..."
                                                     />
+                                                </div>
+                                                <div className="space-y-1.5">
+                                                    <label className="text-sm font-medium text-foreground ml-1">Promo Code (Optional)</label>
+                                                    <div className="relative">
+                                                        <input
+                                                            type="text"
+                                                            value={promoCode}
+                                                            onChange={e => {
+                                                                setPromoCode(e.target.value.toUpperCase());
+                                                                setPromoStatus('idle');
+                                                                setPromoMessage('');
+                                                            }}
+                                                            onBlur={() => validatePromoCode(promoCode)}
+                                                            className={cn(
+                                                                "w-full px-4 py-3 rounded-xl border border-border bg-zinc-950/50 text-zinc-100 placeholder:text-muted-foreground focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all font-mono",
+                                                                promoStatus === 'valid' && "border-green-500/50 bg-green-500/5",
+                                                                promoStatus === 'invalid' && "border-red-500/50 bg-red-500/5"
+                                                            )}
+                                                            placeholder="FRAMAX-XXXX"
+                                                        />
+                                                        {promoStatus === 'validating' && (
+                                                            <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                                                                <div className="w-4 h-4 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
+                                                            </div>
+                                                        )}
+                                                        {promoStatus === 'valid' && (
+                                                            <div className="absolute right-3 top-1/2 -translate-y-1/2 text-green-500 flex items-center gap-1 text-xs font-medium bg-green-500/10 px-2 py-1 rounded-full">
+                                                                <Check className="w-3 h-3" /> {promoMessage}
+                                                            </div>
+                                                        )}
+                                                        {promoStatus === 'invalid' && (
+                                                            <div className="absolute right-3 top-1/2 -translate-y-1/2 text-red-500 flex items-center gap-1 text-xs font-medium bg-red-500/10 px-2 py-1 rounded-full">
+                                                                <X className="w-3 h-3" /> {promoMessage}
+                                                            </div>
+                                                        )}
+                                                    </div>
                                                 </div>
 
                                                 <button

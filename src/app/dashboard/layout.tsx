@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/utils/supabase/client";
+import { Loader2 } from "lucide-react";
 
 export default function DashboardLayout({
     children,
@@ -31,7 +32,11 @@ export default function DashboardLayout({
     }, [router]);
 
     if (isLoading) {
-        return <div className="min-h-screen bg-black flex items-center justify-center text-white">Loading...</div>;
+        return (
+            <div className="min-h-screen bg-black flex items-center justify-center">
+                <Loader2 className="w-8 h-8 animate-spin text-blue-400" />
+            </div>
+        );
     }
 
     return (

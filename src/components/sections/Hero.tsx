@@ -20,7 +20,7 @@ export function Hero() {
                         <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-500 opacity-75"></span>
                         <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
                     </span>
-                    <span className="text-white/90">More Than Just a Website.</span>
+                    <span className="text-white/90">Turn Visitors into Clients.</span>
                 </div>
 
                 <div className="animate-fade-in-up space-y-6 opacity-0" style={{ animationDelay: "0.2s", animationFillMode: "forwards" }}>
@@ -40,7 +40,7 @@ export function Hero() {
                         href="#booking"
                         className="group relative inline-flex h-12 items-center justify-center overflow-hidden rounded-full bg-foreground px-8 font-medium text-background transition-all hover:scale-105 hover:bg-foreground/90 hover:shadow-lg hover:shadow-primary/20"
                     >
-                        <span className="mr-2"></span> Get a Proposal
+                        <span className="mr-2"></span> Lets Work Together
                         <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
                         <div className="absolute inset-0 -z-10 bg-gradient-to-r from-[#2563eb] via-[#2563eb] to-[#3b82f6] opacity-0 transition-opacity group-hover:opacity-10" />
                     </Link>

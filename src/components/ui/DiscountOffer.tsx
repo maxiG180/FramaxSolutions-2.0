@@ -7,14 +7,15 @@ import confetti from "canvas-confetti";
 
 export function DiscountOffer() {
     const [isOpen, setIsOpen] = useState(false);
-    const [step, setStep] = useState<"offer" | "form" | "success">("offer");
+    const [step, setStep] = useState<"offer" | "form" | "email" | "success">("offer");
     const [formData, setFormData] = useState({
+        email: "",
         company: "",
         role: "",
         teamSize: "",
         challenge: ""
     });
-    const [copied, setCopied] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     // Auto-open after 10 seconds if not already interacted
     useEffect(() => {
@@ -27,38 +28,53 @@ export function DiscountOffer() {
         return () => clearTimeout(timer);
     }, []);
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleFormSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        // Simulate data collection
-        console.log("Lead Data Collected:", formData);
-
-        setStep("success");
-        localStorage.setItem("framax_discount_seen", "true");
-
-        // Trigger confetti
-        const duration = 3 * 1000;
-        const animationEnd = Date.now() + duration;
-        const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 100 };
-
-        const randomInRange = (min: number, max: number) => Math.random() * (max - min) + min;
-
-        const interval: any = setInterval(function () {
-            const timeLeft = animationEnd - Date.now();
-
-            if (timeLeft <= 0) {
-                return clearInterval(interval);
-            }
-
-            const particleCount = 50 * (timeLeft / duration);
-            confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } });
-            confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } });
-        }, 250);
+        setStep("email");
     };
 
-    const copyCode = () => {
-        navigator.clipboard.writeText("FRAMAX100");
-        setCopied(true);
-        setTimeout(() => setCopied(false), 2000);
+    const handleFinalSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setIsSubmitting(true);
+
+        try {
+            const response = await fetch('/api/send-discount', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData),
+            });
+
+            const data = await response.json();
+
+            if (data.success && data.code) {
+                // Save code to localStorage for auto-fill but DON'T show it
+                localStorage.setItem("framax_promo_code", data.code);
+                localStorage.setItem("framax_discount_seen", "true");
+
+                setStep("success");
+
+                // Trigger confetti
+                const duration = 3 * 1000;
+                const animationEnd = Date.now() + duration;
+                const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 100 };
+                const randomInRange = (min: number, max: number) => Math.random() * (max - min) + min;
+
+                const interval: any = setInterval(function () {
+                    const timeLeft = animationEnd - Date.now();
+                    if (timeLeft <= 0) return clearInterval(interval);
+                    const particleCount = 50 * (timeLeft / duration);
+                    confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } });
+                    confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } });
+                }, 250);
+            }
+        } catch (error) {
+            console.error('Error sending discount:', error);
+            alert("Failed to send discount code. Please try again.");
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     return (
@@ -122,7 +138,7 @@ export function DiscountOffer() {
                                 {step === "form" && (
                                     <div>
                                         <h3 className="text-xl font-bold mb-6">Tell us about you</h3>
-                                        <form onSubmit={handleSubmit} className="space-y-4">
+                                        <form onSubmit={handleFormSubmit} className="space-y-4">
                                             <div>
                                                 <label className="block text-sm font-medium mb-1">Company Name</label>
                                                 <input
@@ -174,9 +190,40 @@ export function DiscountOffer() {
                                             </div>
                                             <button
                                                 type="submit"
-                                                className="w-full bg-primary text-primary-foreground py-3 rounded-xl font-medium hover:bg-primary/90 transition-all mt-2"
+                                                className="w-full bg-primary text-primary-foreground py-3 rounded-xl font-medium hover:bg-primary/90 transition-all mt-2 flex items-center justify-center gap-2"
                                             >
-                                                Get My Code
+                                                Continue <ArrowRight className="w-4 h-4" />
+                                            </button>
+                                        </form>
+                                    </div>
+                                )}
+
+                                {step === "email" && (
+                                    <div>
+                                        <div className="text-center mb-6">
+                                            <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center text-primary mx-auto mb-4">
+                                                <Gift className="w-6 h-6" />
+                                            </div>
+                                            <h3 className="text-xl font-bold">Where should we send your code?</h3>
+                                        </div>
+                                        <form onSubmit={handleFinalSubmit} className="space-y-4">
+                                            <div>
+                                                <label className="block text-sm font-medium mb-1">Email Address</label>
+                                                <input
+                                                    required
+                                                    type="email"
+                                                    value={formData.email}
+                                                    onChange={e => setFormData({ ...formData, email: e.target.value })}
+                                                    className="w-full px-4 py-2 rounded-lg border border-border bg-background focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"
+                                                    placeholder="you@company.com"
+                                                />
+                                            </div>
+                                            <button
+                                                type="submit"
+                                                disabled={isSubmitting}
+                                                className="w-full bg-primary text-primary-foreground py-3 rounded-xl font-medium hover:bg-primary/90 transition-all mt-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                                            >
+                                                {isSubmitting ? "Sending..." : "Unlock My 100€ Code"}
                                             </button>
                                         </form>
                                     </div>
@@ -187,26 +234,18 @@ export function DiscountOffer() {
                                         <div className="w-16 h-16 bg-green-500/10 rounded-full flex items-center justify-center text-green-500 mx-auto mb-6">
                                             <Check className="w-8 h-8" />
                                         </div>
-                                        <h3 className="text-2xl font-bold mb-2">Here's your code!</h3>
-                                        <p className="text-muted-foreground mb-6">
-                                            Use this code during your discovery call to get 100€ off.
+                                        <h3 className="text-2xl font-bold mb-2">Code Sent!</h3>
+                                        <p className="text-muted-foreground mb-8">
+                                            We've sent your unique 100€ discount code to <strong>{formData.email}</strong>.
+                                            <br /><br />
+                                            Please check your inbox (and spam folder) to retrieve it before booking your call.
                                         </p>
-
-                                        <div className="bg-muted p-4 rounded-xl flex items-center justify-between mb-6 border border-border border-dashed">
-                                            <code className="text-xl font-mono font-bold tracking-wider text-primary">FRAMAX100</code>
-                                            <button
-                                                onClick={copyCode}
-                                                className="p-2 hover:bg-background rounded-lg transition-colors text-muted-foreground hover:text-foreground"
-                                            >
-                                                {copied ? <Check className="w-5 h-5 text-green-500" /> : <Copy className="w-5 h-5" />}
-                                            </button>
-                                        </div>
 
                                         <button
                                             onClick={() => setIsOpen(false)}
-                                            className="text-sm text-muted-foreground hover:text-foreground underline"
+                                            className="w-full bg-muted text-foreground py-3 rounded-xl font-medium hover:bg-muted/80 transition-all"
                                         >
-                                            Close and continue browsing
+                                            Close
                                         </button>
                                     </div>
                                 )}

@@ -2,11 +2,12 @@
 
 import { useState, useEffect } from "react";
 
-import { Search, MoreVertical, Plus, X, Trash2, Edit2, Mail, Phone, Globe, MapPin, User, Building2, ImageIcon } from "lucide-react";
+import { Search, MoreVertical, Plus, X, Trash2, Edit2, Mail, Phone, Globe, MapPin, User, Building2, ImageIcon, Loader2 } from "lucide-react";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { createClient } from "@/utils/supabase/client";
 import { Loader } from "@/components/ui/loader";
+import { AddressAutocomplete } from "@/components/ui/AddressAutocomplete";
 
 type ClientStatus = "Active" | "Inactive";
 
@@ -17,10 +18,10 @@ interface Client {
     phone: string;
     website: string;
     status: ClientStatus;
-    notes: string;
     logo?: string;
     contact_person?: string;
     country?: string;
+    address?: string; // Should be added if not present in the DB, or just use it if it is
 }
 
 export default function ClientsPage() {
@@ -41,10 +42,10 @@ export default function ClientsPage() {
         phone: "",
         website: "",
         status: "Active",
-        notes: "",
         logo: "",
         contact_person: "",
-        country: ""
+        country: "",
+        address: ""
     });
 
     useEffect(() => {
@@ -76,7 +77,7 @@ export default function ClientsPage() {
     });
 
     const resetForm = () => {
-        setFormData({ name: "", email: "", phone: "", website: "", status: "Active", notes: "", logo: "", contact_person: "", country: "" });
+        setFormData({ name: "", email: "", phone: "", website: "", status: "Active", logo: "", contact_person: "", country: "", address: "" });
         setEditingId(null);
         setIsModalOpen(false);
     };
@@ -93,10 +94,10 @@ export default function ClientsPage() {
             phone: client.phone,
             website: client.website,
             status: client.status,
-            notes: client.notes,
             logo: client.logo || "",
             contact_person: client.contact_person || "",
-            country: client.country || ""
+            country: client.country || "",
+            address: client.address || ""
         });
         setEditingId(client.id);
         setIsModalOpen(true);
@@ -115,10 +116,10 @@ export default function ClientsPage() {
                     phone: formData.phone,
                     website: formData.website,
                     status: formData.status,
-                    notes: formData.notes,
                     logo: formData.logo,
                     contact_person: formData.contact_person,
-                    country: formData.country
+                    country: formData.country,
+                    address: formData.address
                 })
                 .eq('id', editingId);
 
@@ -139,10 +140,10 @@ export default function ClientsPage() {
                     phone: formData.phone,
                     website: formData.website,
                     status: formData.status,
-                    notes: formData.notes,
                     logo: formData.logo,
                     contact_person: formData.contact_person,
-                    country: formData.country
+                    country: formData.country,
+                    address: formData.address
                 }])
                 .select()
                 .single();
@@ -352,7 +353,7 @@ export default function ClientsPage() {
                                 initial={{ opacity: 0, scale: 0.95, y: 20 }}
                                 animate={{ opacity: 1, scale: 1, y: 0 }}
                                 exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                                className="relative w-full max-w-lg bg-[#0A0A0A] border border-white/10 rounded-2xl shadow-2xl overflow-hidden z-10"
+                                className="relative w-full max-w-7xl bg-[#0A0A0A] border border-white/10 rounded-2xl shadow-2xl overflow-hidden z-10"
                             >
                                 <div className="flex items-center justify-between p-6 border-b border-white/10 bg-white/5">
                                     <h2 className="text-xl font-bold text-white">{editingId ? "Edit Client" : "Add New Client"}</h2>
@@ -363,127 +364,192 @@ export default function ClientsPage() {
                                         <X className="w-5 h-5" />
                                     </button>
                                 </div>
-                                <form onSubmit={handleSaveClient} className="p-6 space-y-4">
-                                    <div className="space-y-4">
-                                        <div className="flex items-center gap-4">
-                                            <div className="w-20 h-20 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center overflow-hidden shrink-0 group relative">
-                                                {formData.logo ? (
-                                                    <img src={formData.logo} alt="Preview" className="w-full h-full object-cover" />
-                                                ) : (
-                                                    <ImageIcon className="w-8 h-8 text-white/20" />
-                                                )}
+                                <form onSubmit={handleSaveClient} className="p-6">
+                                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+                                        {/* Column 1: Visuals (Logo & Status) - Span 3 */}
+                                        <div className="lg:col-span-3 space-y-6">
+                                            <div className="flex flex-col items-center gap-4 p-6 bg-white/5 rounded-xl border border-white/10">
+                                                <div className="relative group">
+                                                    <div className="w-32 h-32 rounded-full bg-black/40 border-2 border-dashed border-white/20 flex items-center justify-center overflow-hidden relative">
+                                                        {formData.logo ? (
+                                                            <img src={formData.logo} alt="Preview" className="w-full h-full object-cover" />
+                                                        ) : (
+                                                            <div className="flex flex-col items-center gap-2 text-white/20">
+                                                                <ImageIcon className="w-8 h-8" />
+                                                                <span className="text-xs uppercase font-medium">No Logo</span>
+                                                            </div>
+                                                        )}
+
+                                                        {loading ? (
+                                                            <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
+                                                                <Loader2 className="w-6 h-6 text-white animate-spin" />
+                                                            </div>
+                                                        ) : (
+                                                            <label className="absolute inset-0 flex flex-col items-center justify-center bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
+                                                                <Plus className="w-8 h-8 text-white mb-1" />
+                                                                <span className="text-xs text-white font-medium">Upload</span>
+                                                                <input
+                                                                    type="file"
+                                                                    accept="image/*"
+                                                                    className="hidden"
+                                                                    onChange={async (e) => {
+                                                                        const file = e.target.files?.[0];
+                                                                        if (!file) return;
+
+                                                                        const fileExt = file.name.split('.').pop();
+                                                                        const fileName = `${Math.random()}.${fileExt}`;
+                                                                        const filePath = `${fileName}`;
+
+                                                                        setLoading(true);
+                                                                        const { error: uploadError } = await supabase.storage
+                                                                            .from('client-logos')
+                                                                            .upload(filePath, file);
+
+                                                                        if (uploadError) {
+                                                                            console.error('Error uploading image:', uploadError);
+                                                                            alert('Error uploading image. Make sure "client-logos" bucket exists.');
+                                                                            setLoading(false);
+                                                                            return;
+                                                                        }
+
+                                                                        const { data: { publicUrl } } = supabase.storage
+                                                                            .from('client-logos')
+                                                                            .getPublicUrl(filePath);
+
+                                                                        setFormData({ ...formData, logo: publicUrl });
+                                                                        setLoading(false);
+                                                                    }}
+                                                                />
+                                                            </label>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                                <div className="w-full space-y-2">
+                                                    <label className="text-xs font-medium text-white/40 uppercase text-center block">Or Paste URL</label>
+                                                    <input
+                                                        type="url"
+                                                        placeholder="https://..."
+                                                        value={formData.logo}
+                                                        onChange={e => setFormData({ ...formData, logo: e.target.value })}
+                                                        className="w-full bg-black border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500/50 text-center"
+                                                    />
+                                                </div>
                                             </div>
-                                            <div className="flex-1 space-y-2">
-                                                <label className="text-sm font-medium text-white/60">Logo URL</label>
-                                                <input
-                                                    type="url"
-                                                    placeholder="https://..."
-                                                    value={formData.logo}
-                                                    onChange={e => setFormData({ ...formData, logo: e.target.value })}
-                                                    className="w-full bg-black border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500/50"
-                                                />
+
+                                            <div className="space-y-2">
+                                                <label className="text-sm font-medium text-white/60">Status</label>
+                                                <select
+                                                    value={formData.status}
+                                                    onChange={e => setFormData({ ...formData, status: e.target.value as ClientStatus })}
+                                                    className="w-full bg-black border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-blue-500/50"
+                                                >
+                                                    <option value="Active">Active</option>
+                                                    <option value="Inactive">Inactive</option>
+                                                </select>
                                             </div>
                                         </div>
 
-                                        <div className="grid grid-cols-2 gap-4">
+                                        {/* Column 2: Company Details - Span 5 */}
+                                        <div className="lg:col-span-5 space-y-4">
+                                            <h3 className="text-sm font-semibold text-white/40 uppercase tracking-wider mb-2">Company Details</h3>
+
                                             <div className="space-y-2">
-                                                <label className="text-sm font-medium text-white/60">Company Name</label>
-                                                <input
-                                                    required
-                                                    type="text"
-                                                    placeholder="e.g. Acme Corp"
-                                                    value={formData.name}
-                                                    onChange={e => setFormData({ ...formData, name: e.target.value })}
-                                                    className="w-full bg-black border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500/50"
-                                                />
+                                                <label className="text-sm font-medium text-white/60">Company Name <span className="text-red-500">*</span></label>
+                                                <div className="relative">
+                                                    <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20" />
+                                                    <input
+                                                        required
+                                                        type="text"
+                                                        placeholder="e.g. Framax Solutions"
+                                                        value={formData.name}
+                                                        onChange={e => setFormData({ ...formData, name: e.target.value })}
+                                                        className="w-full bg-black border border-white/10 rounded-lg pl-10 pr-4 py-3 text-white focus:outline-none focus:border-blue-500/50"
+                                                    />
+                                                </div>
                                             </div>
+
                                             <div className="space-y-2">
                                                 <label className="text-sm font-medium text-white/60">Website</label>
-                                                <input
-                                                    type="text"
-                                                    placeholder="company.com"
-                                                    value={formData.website}
-                                                    onChange={e => setFormData({ ...formData, website: e.target.value })}
-                                                    className="w-full bg-black border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500/50"
+                                                <div className="relative">
+                                                    <Globe className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20" />
+                                                    <input
+                                                        type="text"
+                                                        placeholder="company.com"
+                                                        value={formData.website}
+                                                        onChange={e => setFormData({ ...formData, website: e.target.value })}
+                                                        className="w-full bg-black border border-white/10 rounded-lg pl-10 pr-4 py-3 text-white focus:outline-none focus:border-blue-500/50"
+                                                    />
+                                                </div>
+                                            </div>
+
+                                            <div className="space-y-2">
+                                                <label className="text-sm font-medium text-white/60">Address & Location</label>
+                                                <AddressAutocomplete
+                                                    defaultValue={formData.address}
+                                                    onSelect={(address, country) => {
+                                                        setFormData(prev => ({ ...prev, address, country }));
+                                                    }}
                                                 />
                                             </div>
                                         </div>
 
-                                        <div className="grid grid-cols-2 gap-4">
-                                            <div className="space-y-2">
-                                                <label className="text-sm font-medium text-white/60">Contact Person</label>
-                                                <input
-                                                    type="text"
-                                                    placeholder="e.g. John Doe"
-                                                    value={formData.contact_person}
-                                                    onChange={e => setFormData({ ...formData, contact_person: e.target.value })}
-                                                    className="w-full bg-black border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500/50"
-                                                />
-                                            </div>
-                                            <div className="space-y-2">
-                                                <label className="text-sm font-medium text-white/60">Country</label>
-                                                <input
-                                                    type="text"
-                                                    placeholder="e.g. USA"
-                                                    value={formData.country}
-                                                    onChange={e => setFormData({ ...formData, country: e.target.value })}
-                                                    className="w-full bg-black border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500/50"
-                                                />
-                                            </div>
-                                        </div>
+                                        {/* Column 3: Contact Info - Span 4 */}
+                                        <div className="lg:col-span-4 space-y-4">
+                                            <h3 className="text-sm font-semibold text-white/40 uppercase tracking-wider mb-2">Contact Person</h3>
 
-                                        <div className="grid grid-cols-2 gap-4">
+                                            <div className="space-y-2">
+                                                <label className="text-sm font-medium text-white/60">Full Name</label>
+                                                <div className="relative">
+                                                    <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20" />
+                                                    <input
+                                                        type="text"
+                                                        placeholder="e.g. John Doe"
+                                                        value={formData.contact_person}
+                                                        onChange={e => setFormData({ ...formData, contact_person: e.target.value })}
+                                                        className="w-full bg-black border border-white/10 rounded-lg pl-10 pr-4 py-3 text-white focus:outline-none focus:border-blue-500/50"
+                                                    />
+                                                </div>
+                                            </div>
+
                                             <div className="space-y-2">
                                                 <label className="text-sm font-medium text-white/60">Email</label>
-                                                <input
-                                                    type="email"
-                                                    placeholder="contact@company.com"
-                                                    value={formData.email}
-                                                    onChange={e => setFormData({ ...formData, email: e.target.value })}
-                                                    className="w-full bg-black border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500/50"
-                                                />
+                                                <div className="relative">
+                                                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20" />
+                                                    <input
+                                                        type="email"
+                                                        placeholder="contact@company.com"
+                                                        value={formData.email}
+                                                        onChange={e => setFormData({ ...formData, email: e.target.value })}
+                                                        className="w-full bg-black border border-white/10 rounded-lg pl-10 pr-4 py-3 text-white focus:outline-none focus:border-blue-500/50"
+                                                    />
+                                                </div>
                                             </div>
+
                                             <div className="space-y-2">
                                                 <label className="text-sm font-medium text-white/60">Phone</label>
-                                                <input
-                                                    type="tel"
-                                                    placeholder="+1 (555) ..."
-                                                    value={formData.phone}
-                                                    onChange={e => setFormData({ ...formData, phone: e.target.value })}
-                                                    className="w-full bg-black border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500/50"
-                                                />
+                                                <div className="relative">
+                                                    <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20" />
+                                                    <input
+                                                        type="tel"
+                                                        placeholder="+351 ..."
+                                                        value={formData.phone}
+                                                        onChange={e => setFormData({ ...formData, phone: e.target.value })}
+                                                        className="w-full bg-black border border-white/10 rounded-lg pl-10 pr-4 py-3 text-white focus:outline-none focus:border-blue-500/50"
+                                                    />
+                                                </div>
+                                            </div>
+
+                                            <div className="pt-8">
+                                                <button
+                                                    type="submit"
+                                                    disabled={loading}
+                                                    className="w-full bg-blue-600 hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-4 rounded-xl transition-colors shadow-lg shadow-blue-500/20"
+                                                >
+                                                    {editingId ? "Save Changes" : "Add Client"}
+                                                </button>
                                             </div>
                                         </div>
-
-                                        <div className="space-y-2">
-                                            <label className="text-sm font-medium text-white/60">Notes</label>
-                                            <textarea
-                                                placeholder="Internal notes about this client..."
-                                                value={formData.notes}
-                                                onChange={e => setFormData({ ...formData, notes: e.target.value })}
-                                                className="w-full bg-black border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500/50 h-24 resize-none"
-                                            />
-                                        </div>
-
-                                        <div className="space-y-2">
-                                            <label className="text-sm font-medium text-white/60">Status</label>
-                                            <select
-                                                value={formData.status}
-                                                onChange={e => setFormData({ ...formData, status: e.target.value as ClientStatus })}
-                                                className="w-full bg-black border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500/50"
-                                            >
-                                                <option value="Active">Active</option>
-                                                <option value="Inactive">Inactive</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div className="pt-4">
-                                        <button
-                                            type="submit"
-                                            className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl transition-colors shadow-lg shadow-blue-500/20"
-                                        >
-                                            {editingId ? "Save Changes" : "Add Client"}
-                                        </button>
                                     </div>
                                 </form>
                             </motion.div>

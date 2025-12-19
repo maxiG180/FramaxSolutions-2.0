@@ -26,6 +26,7 @@ export function Loader() {
                         fill
                         className="object-contain"
                         priority
+                        sizes="64px"
                     />
                 </motion.div>
             </div>

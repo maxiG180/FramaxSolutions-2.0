@@ -112,10 +112,8 @@ export const useChatStore = create<ChatState>()(
             name: 'framax-chatbot-storage',
             storage: createJSONStorage(() => localStorage),
             partialize: (state) => ({
-                // Persist hasSeenWelcome and sessionId to maintain history continuity
+                // Persist hasSeenWelcome to maintain history continuity
                 hasSeenWelcome: state.hasSeenWelcome,
-                sessionId: state.sessionId,
-                messages: state.messages, // Persisting messages effectively now as per recent patterns
             }),
         }
     )

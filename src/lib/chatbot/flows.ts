@@ -178,4 +178,4 @@ export function findBestMatch(input: string): string {
     return 'default';
 }
 
-export const INITIAL_MESSAGE = `👋 Hi! I'm the Framax Solutions Assistant. I can answer questions about our services, pricing, timelines, and more. What would you like to know?`;
+export const INITIAL_MESSAGE = `👋 Hey! How can I help you today?`;

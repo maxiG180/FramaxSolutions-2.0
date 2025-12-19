@@ -1,8 +1,24 @@
 import { createClient } from '@/utils/supabase/server';
 import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
+import { logger, SecurityEventType } from '@/utils/logger';
+import { z } from 'zod';
 
-export async function GET() {
+export async function GET(request: NextRequest) {
     try {
+        // Verify Vercel Cron Secret authorization
+        const authHeader = request.headers.get('authorization');
+        const cronSecret = process.env.CRON_SECRET;
+
+        if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
+            logger.logUnauthorizedAccess('/api/cron/send-discord-alerts', undefined);
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        }
+
+        logger.logSecurityEvent(SecurityEventType.CRON_EXECUTION, {
+            endpoint: '/api/cron/send-discord-alerts',
+        });
+
         const supabase = await createClient();
 
         // Fetch fallback webhook URL (first non-null found)
@@ -14,7 +30,22 @@ export async function GET() {
             .single();
         const fallbackUrl = fallbackProfile?.discord_webhook_url;
 
-        // 1. Fetch tasks with alert_interval set
+        // Validate Discord webhook URL format
+        const discordWebhookSchema = z
+            .string()
+            .url()
+            .regex(/^https:\/\/discord\.com\/api\/webhooks\/\d+\/[\w-]+$/);
+
+        if (fallbackUrl) {
+            const validation = discordWebhookSchema.safeParse(fallbackUrl);
+            if (!validation.success) {
+                logger.logWarning('Invalid fallback Discord webhook URL format', {
+                    endpoint: '/api/cron/send-discord-alerts',
+                });
+            }
+        }
+
+        // Fetch tasks with alert_interval set
         const { data: tasks, error } = await supabase
             .from('tasks')
             .select(`
@@ -28,7 +59,7 @@ export async function GET() {
             .neq('status', 'Done');
 
         if (error) {
-            console.error('Error fetching tasks:', error);
+            logger.logApiError('/api/cron/send-discord-alerts', error);
             return NextResponse.json({ error: error.message }, { status: 500 });
         }
 
@@ -69,6 +100,17 @@ export async function GET() {
                 const targetUrl = assignee?.discord_webhook_url || fallbackUrl;
 
                 if (targetUrl) {
+                    // Validate webhook URL before sending
+                    const urlValidation = discordWebhookSchema.safeParse(targetUrl);
+                    if (!urlValidation.success) {
+                        logger.logWarning('Invalid Discord webhook URL for task', {
+                            endpoint: '/api/cron/send-discord-alerts',
+                            taskId: task.id,
+                        });
+                        results.push({ taskId: task.id, status: 'skipped', reason: 'invalid webhook url' });
+                        continue;
+                    }
+
                     try {
                         let mention = '';
                         if (assignee) {
@@ -96,7 +138,10 @@ export async function GET() {
 
                         if (!response.ok) {
                             const errorText = await response.text();
-                            console.error(`Failed to send Discord alert for task ${task.id}: ${response.status} ${errorText}`);
+                            logger.logApiError('/api/cron/send-discord-alerts', new Error(`Discord API error: ${response.status}`), {
+                                taskId: task.id,
+                                statusCode: response.status,
+                            });
                             results.push({ taskId: task.id, status: 'failed', error: `Discord API error: ${response.status} ${errorText}` });
                             continue; // Skip DB update
                         }
@@ -109,7 +154,7 @@ export async function GET() {
 
                         results.push({ taskId: task.id, status: 'sent' });
                     } catch (err) {
-                        console.error(`Failed to send alert for task ${task.id}`, err);
+                        logger.logApiError('/api/cron/send-discord-alerts', err, { taskId: task.id });
                         results.push({ taskId: task.id, status: 'failed', error: err });
                     }
                 } else {
@@ -122,6 +167,8 @@ export async function GET() {
 
         return NextResponse.json({ results });
     } catch (err: any) {
+        logger.logApiError('/api/cron/send-discord-alerts', err);
         return NextResponse.json({ error: err.message }, { status: 500 });
     }
 }
+

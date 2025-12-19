@@ -2,15 +2,16 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { User, Users, Bell, Lock, Globe, Save, Loader2, Calendar, Blocks, Settings, MoreVertical, Trash2, Check } from "lucide-react";
+import { User, Users, Bell, Lock, Globe, Save, Loader2, Calendar, Blocks, Settings, MoreVertical, Trash2, Check, QrCode } from "lucide-react";
 import { LocationAutocomplete } from "./LocationAutocomplete";
+import { QRCodeGenerator } from "@/components/dashboard/marketing/QRCodeGenerator";
 import { createClient } from "@/utils/supabase/client";
 import { updateProfile, updatePassword, saveGoogleCalendarToken, deleteGoogleCalendarToken } from "./actions";
 import { useGoogleLogin } from '@react-oauth/google';
 import { useSearchParams } from 'next/navigation';
 import { getURL } from '@/utils/getURL';
 
-type SettingsTab = "profile" | "notifications" | "security" | "integrations" | "team" | "domain";
+type SettingsTab = "profile" | "marketing" | "notifications" | "security" | "integrations" | "team" | "domain";
 
 export default function SettingsPage() {
     const [activeTab, setActiveTab] = useState<SettingsTab>("profile");
@@ -147,6 +148,7 @@ export default function SettingsPage() {
 
     const tabs = [
         { id: "profile" as SettingsTab, label: "Profile", icon: User },
+        { id: "marketing" as SettingsTab, label: "Marketing", icon: QrCode },
         { id: "notifications" as SettingsTab, label: "Notifications", icon: Bell },
         { id: "security" as SettingsTab, label: "Security", icon: Lock },
         { id: "integrations" as SettingsTab, label: "Integrations", icon: Blocks },
@@ -315,6 +317,17 @@ export default function SettingsPage() {
                                 </button>
                             </div>
                         </form>
+                    )}
+
+                    {/* Marketing Section */}
+                    {activeTab === "marketing" && (
+                        <div className="bg-white/5 border border-white/10 rounded-2xl p-6 space-y-6">
+                            <div className="border-b border-white/10 pb-4">
+                                <h2 className="text-xl font-bold">Marketing & QR Codes</h2>
+                                <p className="text-sm text-white/60 mt-1">Gere códigos QR para os seus cartões de visita e materiais de marketing.</p>
+                            </div>
+                            <QRCodeGenerator />
+                        </div>
                     )}
 
                     {/* Notifications Section */}
