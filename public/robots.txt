@@ -1,0 +1,6 @@
+User-agent: *
+Disallow: /dashboard/
+Disallow: /login/
+Disallow: /portal/
+
+Sitemap: https://www.framaxsolutions.com/sitemap.xml

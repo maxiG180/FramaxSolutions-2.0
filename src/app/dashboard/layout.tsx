@@ -8,6 +8,15 @@ import { createClient } from "@/utils/supabase/client";
 import { Loader2, Menu } from "lucide-react";
 import Link from "next/link";
 
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+    robots: {
+        index: false,
+        follow: false,
+    },
+};
+
 export default function DashboardLayout({
     children,
 }: {
