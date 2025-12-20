@@ -28,22 +28,22 @@ export function Header() {
             )}
         >
             <div className="container mx-auto px-4 flex items-center justify-between">
-                <Link href="#hero" className="text-2xl font-bold tracking-tighter">
+                <Link href="/#hero" className="text-2xl font-bold tracking-tighter">
                     <span className="text-[#2563eb]">Framax</span><span className="text-white">Solutions</span>
                 </Link>
 
                 <nav className="hidden md:flex items-center gap-8">
-                    <Link href="#features" className="text-sm font-medium hover:text-primary transition-colors">
+                    <Link href="/#features" className="text-sm font-medium hover:text-primary transition-colors">
                         {t.header.features}
                     </Link>
-                    <Link href="#portfolio" className="text-sm font-medium hover:text-primary transition-colors">
+                    <Link href="/#portfolio" className="text-sm font-medium hover:text-primary transition-colors">
                         {t.header.portfolio}
                     </Link>
 
-                    <Link href="#process" className="text-sm font-medium hover:text-primary transition-colors">
+                    <Link href="/#process" className="text-sm font-medium hover:text-primary transition-colors">
                         {t.header.process}
                     </Link>
-                    <Link href="#booking" className="bg-primary text-primary-foreground px-5 py-2 rounded-full text-sm font-medium hover:bg-primary/90 transition-all hover:scale-105 active:scale-95">
+                    <Link href="/#booking" className="bg-primary text-primary-foreground px-5 py-2 rounded-full text-sm font-medium hover:bg-primary/90 transition-all hover:scale-105 active:scale-95">
                         {t.header.getStarted}
                     </Link>
                     <LanguageSwitcher />
@@ -66,28 +66,28 @@ export function Header() {
                     className="absolute top-full left-0 right-0 bg-background border-b border-border p-4 md:hidden flex flex-col gap-4 shadow-lg"
                 >
                     <Link
-                        href="#features"
+                        href="/#features"
                         className="text-sm font-medium p-2 hover:bg-muted rounded-md"
                         onClick={() => setIsMobileMenuOpen(false)}
                     >
                         {t.header.features}
                     </Link>
                     <Link
-                        href="#portfolio"
+                        href="/#portfolio"
                         className="text-sm font-medium p-2 hover:bg-muted rounded-md"
                         onClick={() => setIsMobileMenuOpen(false)}
                     >
                         {t.header.portfolio}
                     </Link>
                     <Link
-                        href="#process"
+                        href="/#process"
                         className="text-sm font-medium p-2 hover:bg-muted rounded-md"
                         onClick={() => setIsMobileMenuOpen(false)}
                     >
                         {t.header.process}
                     </Link>
                     <Link
-                        href="#booking"
+                        href="/#booking"
                         className="bg-primary text-primary-foreground w-full py-3 rounded-full text-sm font-medium text-center"
                         onClick={() => setIsMobileMenuOpen(false)}
                     >
