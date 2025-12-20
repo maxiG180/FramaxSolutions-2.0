@@ -24,10 +24,10 @@ export const metadata: Metadata = {
     siteName: "Framax Solutions",
     images: [
       {
-        url: "/logos/framax_icon.png",
-        width: 512,
-        height: 512,
-        alt: "Framax Solutions Logo",
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "Framax Solutions - Digital Transformation",
       },
     ],
     locale: "en_US",
@@ -37,7 +37,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Framax Solutions",
     description: "Empowering businesses through cutting-edge digital solutions.",
-    images: ["/logos/framax_icon.png"],
+    images: ["/og-image.png"],
   },
   icons: {
     icon: "/favicon.ico",
