@@ -16,89 +16,87 @@ interface Project {
 const PROJECTS: Project[] = [
     {
         id: 1,
-        title: "Framax Solutions",
-        category: "Digital Agency",
-        image: "linear-gradient(to bottom right, #2563eb, #1d4ed8)",
-        video: "/videos/framax-scroll.mp4",
-        link: "https://www.framaxsolutions.com/"
+        title: "Project Alpha",
+        category: "Software",
+        image: "https://images.unsplash.com/photo-1551288049-bbda3865cbb7?auto=format&fit=crop&q=60&w=800&blur=100",
+        link: "#"
     },
     {
         id: 2,
-        title: "Velvet & Oak",
+        title: "Project Beta",
         category: "E-commerce",
-        image: "linear-gradient(to bottom right, #f59e0b, #f97316)",
-        link: "https://velvet-oak.example.com"
+        image: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&q=60&w=800&blur=100",
+        link: "#"
     },
     {
         id: 3,
-        title: "Framax Solutions",
-        category: "Digital Agency",
-        image: "linear-gradient(to bottom right, #2563eb, #1d4ed8)",
-        video: "/videos/framax-scroll.mp4",
-        link: "https://www.framaxsolutions.com/"
+        title: "Project Gamma",
+        category: "Mobile",
+        image: "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?auto=format&fit=crop&q=60&w=800&blur=100",
+        link: "#"
     },
     {
         id: 4,
-        title: "Aether Systems",
-        category: "AI Infra",
-        image: "linear-gradient(to bottom right, #8b5cf6, #ec4899)",
-        link: "https://aether.example.com"
+        title: "Project Delta",
+        category: "AI",
+        image: "https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&q=60&w=800&blur=100",
+        link: "#"
     },
     {
         id: 5,
-        title: "Solaris Energy",
-        category: "Clean Tech",
-        image: "linear-gradient(to bottom right, #eab308, #f97316)",
-        link: "https://solaris.example.com"
+        title: "Project Epsilon",
+        category: "SaaS",
+        image: "https://images.unsplash.com/photo-1497435334941-8c899ee9e8e9?auto=format&fit=crop&q=60&w=800&blur=100",
+        link: "#"
     },
     {
         id: 6,
-        title: "Quantum Leap",
-        category: "Research",
-        image: "linear-gradient(to bottom right, #6366f1, #a855f7)",
-        link: "https://quantum.example.com"
+        title: "Project Zeta",
+        category: "Web",
+        image: "https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&q=60&w=800&blur=100",
+        link: "#"
     },
     {
         id: 7,
-        title: "Cyber Shield",
-        category: "Security",
-        image: "linear-gradient(to bottom right, #ef4444, #b91c1c)",
-        link: "https://cybershield.example.com"
+        title: "Project Eta",
+        category: "Platform",
+        image: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&q=60&w=800&blur=100",
+        link: "#"
     },
     {
         id: 8,
-        title: "Eco Pulse",
-        category: "Environment",
-        image: "linear-gradient(to bottom right, #84cc16, #15803d)",
-        link: "https://ecopulse.example.com"
+        title: "Project Theta",
+        category: "Agency",
+        image: "https://images.unsplash.com/photo-1501854140801-50d01674aa3e?auto=format&fit=crop&q=60&w=800&blur=100",
+        link: "#"
     },
     {
         id: 9,
-        title: "Urban Flow",
-        category: "Smart City",
-        image: "linear-gradient(to bottom right, #0ea5e9, #0369a1)",
-        link: "https://urbanflow.example.com"
+        title: "Project Iota",
+        category: "Digital",
+        image: "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?auto=format&fit=crop&q=60&w=800&blur=100",
+        link: "#"
     },
     {
         id: 10,
-        title: "Mindful AI",
-        category: "Wellness",
-        image: "linear-gradient(to bottom right, #f472b6, #db2777)",
-        link: "https://mindful.example.com"
+        title: "Project Kappa",
+        category: "Cloud",
+        image: "https://images.unsplash.com/photo-1507413245164-6160d8298b31?auto=format&fit=crop&q=60&w=800&blur=100",
+        link: "#"
     },
     {
         id: 11,
-        title: "Orbit Logistics",
-        category: "Supply Chain",
-        image: "linear-gradient(to bottom right, #f97316, #c2410c)",
-        link: "https://orbit.example.com"
+        title: "Project Lambda",
+        category: "Interface",
+        image: "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&q=60&w=800&blur=100",
+        link: "#"
     },
     {
         id: 12,
-        title: "Deep Blue",
-        category: "Oceanography",
-        image: "linear-gradient(to bottom right, #1e40af, #1e3a8a)",
-        link: "https://deepblue.example.com"
+        title: "Project Mu",
+        category: "Experience",
+        image: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=60&w=800&blur=100",
+        link: "#"
     }
 ];
 
@@ -122,7 +120,7 @@ const PortfolioItem = ({ project, onClick }: { project: Project; onClick: (link:
             }}
         >
             <div className="block w-full h-full cursor-grab active:cursor-grabbing">
-                {/* Image / Gradient Placeholder / Video */}
+                {/* Image / Video */}
                 {project.video ? (
                     <video
                         ref={videoRef}
@@ -133,9 +131,12 @@ const PortfolioItem = ({ project, onClick }: { project: Project; onClick: (link:
                         className="absolute inset-0 w-full h-full object-cover"
                     />
                 ) : (
-                    <div
-                        className="absolute inset-0"
-                        style={{ background: project.image }}
+                    <img
+                        src={project.image}
+                        alt=""
+                        draggable="false"
+                        onContextMenu={(e) => e.preventDefault()}
+                        className="absolute inset-0 w-full h-full object-cover select-none pointer-events-none"
                     />
                 )}
 
@@ -247,7 +248,7 @@ export function NewPortfolio() {
                     transition={{ delay: 0.1 }}
                     className="text-4xl md:text-6xl font-bold mb-4"
                 >
-                    Made with <span className="text-primary">Passion</span>
+                    Our <span className="text-primary">Portfolio</span>
                 </motion.h2>
 
                 <motion.p
@@ -257,30 +258,39 @@ export function NewPortfolio() {
                     transition={{ delay: 0.2 }}
                     className="text-muted-foreground max-w-2xl mx-auto"
                 >
-                    Explore some of our best creations. Click to visit the live websites.
+                    We're currently finalizing a selection of our most impactful digital experiences. Stay tuned.
                 </motion.p>
             </div>
 
-            <div className="w-full overflow-hidden cursor-grab active:cursor-grabbing py-10">
+            <div className="w-full relative pointer-events-none cursor-default py-10">
                 <motion.div
                     ref={containerRef}
-                    className="flex gap-8 w-max px-4"
+                    className="flex gap-8 w-max px-4 opacity-40 grayscale-[0.3] blur-[12px]"
                     style={{ x }}
-                    drag="x"
-                    dragConstraints={{ left: -contentWidth * 3, right: 0 }}
-                    onDragStart={handleDragStart}
-                    onDragEnd={handleDragEnd}
-                    onHoverStart={() => setIsHovered(true)}
-                    onHoverEnd={() => setIsHovered(false)}
                 >
                     {MARQUEE_PROJECTS.map((project, index) => (
                         <PortfolioItem
                             key={`${project.id}-${index}`}
                             project={project}
-                            onClick={handleCardClick}
+                            onClick={() => { }}
                         />
                     ))}
                 </motion.div>
+
+                {/* Simple Coming Soon Text */}
+                <div className="absolute inset-0 flex items-center justify-center z-20">
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        whileInView={{ opacity: 1, scale: 1 }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 0.6 }}
+                        className="text-center"
+                    >
+                        <h3 className="text-5xl md:text-7xl font-black tracking-tighter text-white/10 uppercase select-none">
+                            Coming Soon
+                        </h3>
+                    </motion.div>
+                </div>
             </div>
 
             <div className="container mx-auto px-4 mt-12 flex justify-center">
