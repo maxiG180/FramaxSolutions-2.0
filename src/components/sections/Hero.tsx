@@ -4,18 +4,18 @@ import { ArrowRight, Sparkles } from "lucide-react";
 
 export function Hero() {
     return (
-        <section id="hero" className="relative flex min-h-[90vh] flex-col items-center justify-center overflow-hidden bg-background px-4 pt-20 text-center md:pt-32">
+        <section id="hero" className="relative flex min-h-[90vh] flex-col items-center justify-center overflow-hidden bg-background px-4 pt-24 text-center md:pt-32">
             {/* Background Gradients */}
             <div className="absolute inset-0 -z-10 h-full w-full bg-background">
-                <div className="absolute top-[-10%] left-[-10%] h-[500px] w-[500px] rounded-full bg-[#2563eb]/20 blur-[120px] animate-pulse-slow" />
-                <div className="absolute bottom-[-10%] right-[-10%] h-[500px] w-[500px] rounded-full bg-[#2563eb]/20 blur-[120px] animate-pulse-slow" style={{ animationDelay: "1.5s" }} />
-                <div className="absolute top-[20%] left-[50%] h-[300px] w-[300px] -translate-x-1/2 rounded-full bg-[#2563eb]/10 blur-[100px]" />
+                <div className="absolute top-[-10%] left-[-10%] h-[300px] w-[300px] sm:h-[500px] sm:w-[500px] rounded-full bg-[#2563eb]/20 blur-[80px] sm:blur-[120px] animate-pulse-slow" />
+                <div className="absolute bottom-[-10%] right-[-10%] h-[300px] w-[300px] sm:h-[500px] sm:w-[500px] rounded-full bg-[#2563eb]/20 blur-[80px] sm:blur-[120px] animate-pulse-slow" style={{ animationDelay: "1.5s" }} />
+                <div className="absolute top-[20%] left-[50%] h-[200px] w-[200px] sm:h-[300px] sm:w-[300px] -translate-x-1/2 rounded-full bg-[#2563eb]/10 blur-[60px] sm:blur-[100px]" />
             </div>
 
             {/* Content */}
             <div className="relative z-10 max-w-5xl space-y-8">
                 {/* Badge */}
-                <div className="animate-fade-in-up mx-auto flex w-fit items-center gap-2 rounded-full border border-white/10 bg-white/5 px-5 py-2 text-sm font-medium backdrop-blur-md transition-all hover:bg-white/10 hover:border-white/20 opacity-0" style={{ animationDelay: "0.1s", animationFillMode: "forwards" }}>
+                <div className="animate-fade-in-up mx-auto flex w-fit items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 sm:px-5 sm:py-2 text-xs sm:text-sm font-medium backdrop-blur-md transition-all hover:bg-white/10 hover:border-white/20 opacity-0" style={{ animationDelay: "0.1s", animationFillMode: "forwards" }}>
                     <span className="relative flex h-2 w-2">
                         <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-500 opacity-75"></span>
                         <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
@@ -23,19 +23,19 @@ export function Hero() {
                     <span className="text-white/90">Turn Visitors into Clients.</span>
                 </div>
 
-                <div className="animate-fade-in-up space-y-6 opacity-0" style={{ animationDelay: "0.2s", animationFillMode: "forwards" }}>
-                    <h1 className="text-5xl font-bold tracking-tight text-foreground sm:text-7xl md:text-8xl leading-[1.1]">
-                        We Build Websites That <br />
+                <div className="animate-fade-in-up space-y-4 sm:space-y-6 opacity-0" style={{ animationDelay: "0.2s", animationFillMode: "forwards" }}>
+                    <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-7xl md:text-8xl leading-[1.1] px-2">
+                        We Build Websites That <br className="hidden sm:block" />
                         <span className="bg-gradient-to-r from-[#2563eb] via-[#2563eb] to-[#3b82f6] bg-clip-text text-transparent">
                             Drive Real Growth
                         </span>
                     </h1>
-                    <p className="mx-auto max-w-2xl text-lg text-muted-foreground sm:text-xl leading-relaxed">
+                    <p className="mx-auto max-w-2xl text-base text-muted-foreground sm:text-xl leading-relaxed px-4">
                         Stop losing customers to outdated design. We craft high-performance, SEO-optimized websites that turn visitors into loyal clients.
                     </p>
                 </div>
 
-                <div className="animate-fade-in-up flex flex-col items-center justify-center gap-4 opacity-0 sm:flex-row" style={{ animationDelay: "0.4s", animationFillMode: "forwards" }}>
+                <div className="animate-fade-in-up flex flex-col items-stretch sm:items-center justify-center gap-4 opacity-0 sm:flex-row px-4 sm:px-0" style={{ animationDelay: "0.4s", animationFillMode: "forwards" }}>
                     <Link
                         href="#booking"
                         className="group relative inline-flex h-12 items-center justify-center overflow-hidden rounded-full bg-foreground px-8 font-medium text-background transition-all hover:scale-105 hover:bg-foreground/90 hover:shadow-lg hover:shadow-primary/20"
@@ -53,31 +53,31 @@ export function Hero() {
                 </div>
 
                 {/* Social Proof / Trust Indicator */}
-                <div className="animate-fade-in-up pt-12 opacity-0" style={{ animationDelay: "0.6s", animationFillMode: "forwards" }}>
-                    <p className="text-sm font-medium text-muted-foreground">
+                <div className="animate-fade-in-up pt-8 sm:pt-12 opacity-0" style={{ animationDelay: "0.6s", animationFillMode: "forwards" }}>
+                    <p className="text-xs sm:text-sm font-medium text-muted-foreground">
                         Trusted by forward-thinking companies
                     </p>
-                    <div className="mt-8 flex flex-wrap items-center justify-center gap-8">
+                    <div className="mt-6 sm:mt-8 flex flex-wrap items-center justify-center gap-6 sm:gap-8 px-4">
                         <Image
                             src="/logos/formCoachAILogo.png"
                             alt="Form Coach AI"
                             width={240}
                             height={80}
-                            className="h-20 w-auto object-contain transition-transform duration-300 hover:scale-110"
+                            className="h-12 sm:h-20 w-auto object-contain transition-transform duration-300 hover:scale-110"
                         />
                         <Image
                             src="/logos/15minutecoachesLogo.png"
                             alt="15 Minute Coaches"
                             width={180}
                             height={60}
-                            className="h-16 w-auto object-contain transition-transform duration-300 hover:scale-110"
+                            className="h-10 sm:h-16 w-auto object-contain transition-transform duration-300 hover:scale-110"
                         />
                         <Image
                             src="/logos/toursphereLogo.png"
                             alt="Toursphere"
                             width={240}
                             height={80}
-                            className="h-20 w-auto object-contain transition-transform duration-300 hover:scale-110"
+                            className="h-12 sm:h-20 w-auto object-contain transition-transform duration-300 hover:scale-110"
                         />
                     </div>
                 </div>

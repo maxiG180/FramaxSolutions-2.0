@@ -33,9 +33,11 @@ const PRODUCTIVITY_ITEMS = [
 interface SidebarProps {
     isCollapsed: boolean;
     onToggle: () => void;
+    isMobileOpen?: boolean;
+    onMobileClose?: () => void;
 }
 
-export function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
+export function Sidebar({ isCollapsed, onToggle, isMobileOpen = false, onMobileClose }: SidebarProps) {
     const pathname = usePathname();
     const [expandedSections, setExpandedSections] = useState<string[]>(["Management", "Finance", "Productivity"]);
 
@@ -63,6 +65,12 @@ export function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
                         isCollapsed && "justify-center px-2"
                     )}
                     title={isCollapsed ? item.name : undefined}
+                    onClick={() => {
+                        // Close sidebar on mobile when a link is clicked
+                        if (onMobileClose && window.innerWidth < 768) {
+                            onMobileClose();
+                        }
+                    }}
                 >
                     <item.icon className={cn("w-5 h-5 flex-shrink-0", !isActive && item.color)} />
                     {!isCollapsed && <span>{item.name}</span>}
@@ -108,89 +116,104 @@ export function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
     };
 
     return (
-        <aside
-            className={cn(
-                "bg-black border-r border-white/10 flex flex-col h-screen fixed left-0 top-0 transition-all duration-300 ease-in-out z-40",
-                isCollapsed ? "w-20" : "w-64"
+        <>
+            {/* Mobile Overlay */}
+            {isMobileOpen && (
+                <div
+                    className="fixed inset-0 bg-black/50 z-40 md:hidden backdrop-blur-sm"
+                    onClick={onMobileClose}
+                />
             )}
-        >
-            <div className={cn("p-6 border-b border-white/10 flex items-center", isCollapsed && "justify-center px-2")}>
-                <Link href="/dashboard" className="text-xl font-bold text-white tracking-tighter overflow-hidden whitespace-nowrap flex items-center justify-center">
-                    <AnimatePresence mode="wait">
-                        {isCollapsed ? (
-                            <motion.img
-                                key="icon"
-                                src="/logos/framax_icon.png"
-                                alt="Framax"
-                                className="w-8 h-8"
-                                initial={{ opacity: 0, scale: 0.8 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                exit={{ opacity: 0, scale: 0.8 }}
-                                transition={{ duration: 0.2 }}
-                            />
-                        ) : (
-                            <motion.div
-                                key="text"
-                                initial={{ opacity: 0, x: -10 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                exit={{ opacity: 0, x: -10 }}
-                                transition={{ duration: 0.2 }}
-                            >
-                                Framax<span className="text-blue-500">Solutions</span><span className="text-white/50">Admin</span>
-                            </motion.div>
-                        )}
-                    </AnimatePresence>
-                </Link>
-            </div>
 
-            <nav className="flex-1 p-4 space-y-6 overflow-y-auto overflow-x-hidden scrollbar-hide">
-                {/* Collapsible Sections */}
-                {renderSection("Management", MANAGEMENT_ITEMS)}
-                {renderSection("Finance", FINANCE_ITEMS)}
-                {renderSection("Productivity", PRODUCTIVITY_ITEMS)}
-            </nav>
-
-            <div className="p-4 border-t border-white/10 space-y-2">
-                <button
-                    onClick={onToggle}
-                    className={cn(
-                        "flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-white/60 hover:text-white hover:bg-white/5 transition-all w-full",
-                        isCollapsed && "justify-center px-2"
-                    )}
-                    title={isCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
-                >
-                    {isCollapsed ? <PanelLeftOpen className="w-5 h-5 flex-shrink-0" /> : <PanelLeftClose className="w-5 h-5 flex-shrink-0" />}
-                    {!isCollapsed && "Collapse"}
-                </button>
-
-                <div className={cn("flex items-center gap-2", isCollapsed && "flex-col")}>
-                    <Link
-                        href="/dashboard/settings"
-                        className={cn(
-                            "flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-white/60 hover:text-white hover:bg-white/5 transition-all",
-                            isCollapsed ? "justify-center w-full px-2" : "flex-1"
-                        )}
-                        title="Settings"
-                    >
-                        <Settings className="w-5 h-5 flex-shrink-0" />
-                        {!isCollapsed && "Settings"}
+            <aside
+                className={cn(
+                    "bg-black border-r border-white/10 flex flex-col h-screen fixed left-0 top-0 transition-transform duration-300 ease-in-out z-50",
+                    // Width handling
+                    isCollapsed ? "w-20" : "w-64",
+                    // Mobile visibility handling
+                    "md:translate-x-0", // Always visible on desktop
+                    isMobileOpen ? "translate-x-0" : "-translate-x-full" // Toggle on mobile
+                )}
+            >
+                <div className={cn("p-6 border-b border-white/10 flex items-center", isCollapsed && "justify-center px-2")}>
+                    <Link href="/dashboard" className="text-xl font-bold text-white tracking-tighter overflow-hidden whitespace-nowrap flex items-center justify-center">
+                        <AnimatePresence mode="wait">
+                            {isCollapsed ? (
+                                <motion.img
+                                    key="icon"
+                                    src="/logos/framax_icon.png"
+                                    alt="Framax"
+                                    className="w-8 h-8"
+                                    initial={{ opacity: 0, scale: 0.8 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    exit={{ opacity: 0, scale: 0.8 }}
+                                    transition={{ duration: 0.2 }}
+                                />
+                            ) : (
+                                <motion.div
+                                    key="text"
+                                    initial={{ opacity: 0, x: -10 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    exit={{ opacity: 0, x: -10 }}
+                                    transition={{ duration: 0.2 }}
+                                >
+                                    Framax<span className="text-blue-500">Solutions</span><span className="text-white/50">Admin</span>
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
                     </Link>
-                    <button
-                        onClick={async () => {
-                            const supabase = createClient();
-                            await supabase.auth.signOut();
-                            window.location.href = "/login";
-                        }}
-                        className={cn(
-                            "flex items-center justify-center rounded-lg text-red-400 hover:bg-red-500/10 transition-all",
-                            isCollapsed ? "w-full py-3" : "w-11 h-11"
-                        )}
-                        title="Logout"
-                    >
-                        <LogOut className="w-5 h-5 flex-shrink-0" />
-                    </button>
                 </div>
-            </div>
-        </aside>
+
+                <nav className="flex-1 p-4 space-y-6 overflow-y-auto overflow-x-hidden scrollbar-hide">
+                    {/* Collapsible Sections */}
+                    {renderSection("Management", MANAGEMENT_ITEMS)}
+                    {renderSection("Finance", FINANCE_ITEMS)}
+                    {renderSection("Productivity", PRODUCTIVITY_ITEMS)}
+                </nav>
+
+                <div className="p-4 border-t border-white/10 space-y-2">
+                    <button
+                        onClick={onToggle}
+                        className={cn(
+                            "flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-white/60 hover:text-white hover:bg-white/5 transition-all w-full",
+                            isCollapsed && "justify-center px-2",
+                            "hidden md:flex" // Hide collapse button on mobile as it doesn't make sense there
+                        )}
+                        title={isCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
+                    >
+                        {isCollapsed ? <PanelLeftOpen className="w-5 h-5 flex-shrink-0" /> : <PanelLeftClose className="w-5 h-5 flex-shrink-0" />}
+                        {!isCollapsed && "Collapse"}
+                    </button>
+
+                    <div className={cn("flex items-center gap-2", isCollapsed && "flex-col")}>
+                        <Link
+                            href="/dashboard/settings"
+                            className={cn(
+                                "flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-white/60 hover:text-white hover:bg-white/5 transition-all",
+                                isCollapsed ? "justify-center w-full px-2" : "flex-1"
+                            )}
+                            title="Settings"
+                        >
+                            <Settings className="w-5 h-5 flex-shrink-0" />
+                            {!isCollapsed && "Settings"}
+                        </Link>
+                        <button
+                            onClick={async () => {
+                                const supabase = createClient();
+                                await supabase.auth.signOut();
+                                window.location.href = "/login";
+                            }}
+                            className={cn(
+                                "flex items-center justify-center rounded-lg text-red-400 hover:bg-red-500/10 transition-all",
+                                isCollapsed ? "w-full py-3" : "w-11 h-11"
+                            )}
+                            title="Logout"
+                        >
+                            <LogOut className="w-5 h-5 flex-shrink-0" />
+                        </button>
+                    </div>
+                </div>
+            </aside>
+        </>
     );
 }
