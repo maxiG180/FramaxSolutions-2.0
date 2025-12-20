@@ -93,6 +93,9 @@ export function Header() {
                     >
                         {t.header.getStarted}
                     </Link>
+                    <div className="p-2">
+                        <LanguageSwitcher />
+                    </div>
                 </motion.div>
             )}
         </header>

@@ -3,8 +3,10 @@
 import { Zap, Search, Palette, Code, Smartphone, Globe } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence, useMotionValue, useTransform, useSpring, useInView, useAnimation } from "framer-motion";
+import { useLanguage } from "@/context/LanguageContext";
 
 export function Features() {
+    const { t } = useLanguage();
     const [score, setScore] = useState(0);
     const [clicks, setClicks] = useState<{ id: number; x: number; y: number }[]>([]);
 
@@ -128,11 +130,11 @@ export function Features() {
                     className="mb-16 text-center"
                 >
                     <h2 className="mb-4 text-3xl font-bold text-foreground sm:text-4xl md:text-5xl">
-                        Everything You Need to <br />
-                        <span className="text-primary">Dominate Your Market</span>
+                        {t.features.title} <br />
+                        <span className="text-primary">{t.features.titleHighlight}</span>
                     </h2>
                     <p className="mx-auto max-w-2xl text-lg text-muted-foreground">
-                        We don't just build websites. We build digital assets that work as hard as you do.
+                        {t.features.subtitle}
                     </p>
                 </motion.div>
 
@@ -151,9 +153,9 @@ export function Features() {
                             <div className="mb-4 inline-flex rounded-lg bg-yellow-500/10 p-3 text-yellow-500">
                                 <Zap className="h-6 w-6" />
                             </div>
-                            <h3 className="mb-2 text-2xl font-bold text-foreground">Blazing Fast Performance</h3>
+                            <h3 className="mb-2 text-2xl font-bold text-foreground">{t.features.speedTitle}</h3>
                             <p className="max-w-md text-muted-foreground">
-                                We optimize every line of code to ensure your site loads instantly. Google loves fast sites, and so do your customers.
+                                {t.features.speedDesc}
                             </p>
                         </div>
 
@@ -193,9 +195,9 @@ export function Features() {
                         <div className="mb-4 inline-flex rounded-lg bg-blue-500/10 p-3 text-blue-500">
                             <Search className="h-6 w-6" />
                         </div>
-                        <h3 className="mb-2 text-xl font-bold text-foreground">SEO Optimized</h3>
+                        <h3 className="mb-2 text-xl font-bold text-foreground">{t.features.seoTitle}</h3>
                         <p className="text-sm text-muted-foreground mb-4">
-                            Built-in best practices to help you rank higher on search engines.
+                            {t.features.seoDesc}
                         </p>
                         {/* Visual: Ranking Animation */}
                         <div className="absolute bottom-0 right-0 w-full h-32 p-4 flex flex-col justify-end gap-2 opacity-80 mask-image-linear-gradient(to top, black, transparent)">
@@ -260,9 +262,9 @@ export function Features() {
                         <div className="mb-4 inline-flex rounded-lg bg-pink-500/10 p-3 text-pink-500" style={{ transform: "translateZ(20px)" }}>
                             <Palette className="h-6 w-6" />
                         </div>
-                        <h3 className="mb-2 text-xl font-bold text-foreground" style={{ transform: "translateZ(20px)" }}>Premium Design</h3>
+                        <h3 className="mb-2 text-xl font-bold text-foreground" style={{ transform: "translateZ(20px)" }}>{t.features.designTitle}</h3>
                         <p className="text-sm text-muted-foreground" style={{ transform: "translateZ(20px)" }}>
-                            Stunning visuals that capture your brand's unique identity.
+                            {t.features.designDesc}
                         </p>
                         {/* Visual: Floating Elements */}
                         <div className="absolute right-[-20px] top-[-20px] h-24 w-24 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 opacity-20 blur-2xl transition-all duration-500 group-hover:scale-150 group-hover:opacity-40" />
@@ -305,9 +307,9 @@ export function Features() {
                                 <div className="mb-4 inline-flex rounded-lg bg-blue-600/10 p-3 text-blue-600">
                                     <Code className="h-6 w-6" />
                                 </div>
-                                <h3 className="mb-2 text-2xl font-bold text-foreground">Clean, Modern Code</h3>
+                                <h3 className="mb-2 text-2xl font-bold text-foreground">{t.features.codeTitle}</h3>
                                 <p className="text-muted-foreground">
-                                    Built with the latest technologies like Next.js and Tailwind CSS for scalability and maintainability. No bloated page builders.
+                                    {t.features.codeDesc}
                                 </p>
                             </div>
                             {/* Visual: Code Snippet */}
@@ -351,9 +353,9 @@ export function Features() {
                         <div className="mb-4 inline-flex rounded-lg bg-orange-500/10 p-3 text-orange-500">
                             <Smartphone className="h-6 w-6" />
                         </div>
-                        <h3 className="mb-2 text-xl font-bold text-foreground">Mobile First</h3>
+                        <h3 className="mb-2 text-xl font-bold text-foreground">{t.features.mobileTitle}</h3>
                         <p className="text-sm text-muted-foreground mb-6">
-                            Perfectly responsive on all devices.
+                            {t.features.mobileDesc}
                         </p>
                         {/* Visual: Phone Mockup */}
                         <div className="absolute bottom-[-20px] right-4 w-24 h-40 bg-gray-900 rounded-[2rem] border-4 border-gray-800 shadow-xl transition-transform duration-500 group-hover:translate-y-[-10px]">

@@ -4,35 +4,19 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 
 type Language = "en" | "pt";
 
+import { en } from "@/locales/en";
+import { pt } from "@/locales/pt";
+import { Translation } from "@/locales/types";
+
 interface LanguageContextType {
     language: Language;
     setLanguage: (lang: Language) => void;
-    t: typeof translations.en;
+    t: Translation;
 }
 
 export const translations = {
-    en: {
-        header: {
-            features: "Features",
-            portfolio: "Portfolio",
-            whyFramax: "Why Framax",
-            process: "Process",
-            faq: "FAQ",
-            getStarted: "Get Started",
-            results: "Results",
-        },
-    },
-    pt: {
-        header: {
-            features: "Funcionalidades",
-            portfolio: "Portfólio",
-            whyFramax: "Porquê Framax",
-            process: "Processo",
-            faq: "Perguntas Frequentes",
-            getStarted: "Começar",
-            results: "Resultados",
-        },
-    },
+    en,
+    pt,
 };
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);

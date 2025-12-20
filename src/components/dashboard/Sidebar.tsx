@@ -7,28 +7,7 @@ import { LayoutDashboard, Users, ShoppingBag, CreditCard, Settings, LogOut, Glob
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/utils/supabase/client";
-
-
-const MANAGEMENT_ITEMS = [
-    { name: "Analytics", icon: BarChart3, href: "/dashboard/analytics" },
-    { name: "Projects", icon: FolderKanban, href: "/dashboard/projects" },
-    { name: "Clients", icon: Users, href: "/dashboard/clients" },
-    { name: "Leads", icon: Target, href: "/dashboard/leads" },
-    { name: "Services", icon: Briefcase, href: "/dashboard/services" }
-];
-
-const FINANCE_ITEMS = [
-    { name: "Invoices", icon: ReceiptText, href: "/dashboard/invoices" },
-    { name: "Payments", icon: CreditCard, href: "/dashboard/payments" },
-    { name: "Orders", icon: ShoppingBag, href: "/dashboard/orders" },
-];
-
-const PRODUCTIVITY_ITEMS = [
-    { name: "Calendar", icon: Calendar, href: "/dashboard/calendar", color: "text-red-500" },
-    { name: "Notes", icon: FileText, href: "/dashboard/notes", color: "text-yellow-500" },
-    { name: "Tasks", icon: CheckSquare, href: "/dashboard/todo", color: "text-blue-500" },
-    { name: "Docs", icon: Folder, href: "/dashboard/docs", color: "text-purple-500" },
-];
+import { useLanguage } from "@/context/LanguageContext";
 
 interface SidebarProps {
     isCollapsed: boolean;
@@ -39,7 +18,31 @@ interface SidebarProps {
 
 export function Sidebar({ isCollapsed, onToggle, isMobileOpen = false, onMobileClose }: SidebarProps) {
     const pathname = usePathname();
-    const [expandedSections, setExpandedSections] = useState<string[]>(["Management", "Finance", "Productivity"]);
+    const { t } = useLanguage();
+    // Default expanded sections should match translated keys or keys used in toggleSection?
+    // Using simple keys for state
+    const [expandedSections, setExpandedSections] = useState<string[]>(["management", "finance", "productivity"]);
+
+    const MANAGEMENT_ITEMS = [
+        { name: t.dashboard.menu.analytics, icon: BarChart3, href: "/dashboard/analytics" },
+        { name: t.dashboard.menu.projects, icon: FolderKanban, href: "/dashboard/projects" },
+        { name: t.dashboard.menu.clients, icon: Users, href: "/dashboard/clients" },
+        { name: t.dashboard.menu.leads, icon: Target, href: "/dashboard/leads" },
+        { name: t.dashboard.menu.services, icon: Briefcase, href: "/dashboard/services" }
+    ];
+
+    const FINANCE_ITEMS = [
+        { name: t.dashboard.menu.invoices, icon: ReceiptText, href: "/dashboard/invoices" },
+        { name: t.dashboard.menu.payments, icon: CreditCard, href: "/dashboard/payments" },
+        { name: t.dashboard.menu.orders, icon: ShoppingBag, href: "/dashboard/orders" },
+    ];
+
+    const PRODUCTIVITY_ITEMS = [
+        { name: t.dashboard.menu.calendar, icon: Calendar, href: "/dashboard/calendar", color: "text-red-500" },
+        { name: t.dashboard.menu.notes, icon: FileText, href: "/dashboard/notes", color: "text-yellow-500" },
+        { name: t.dashboard.menu.tasks, icon: CheckSquare, href: "/dashboard/todo", color: "text-blue-500" },
+        { name: t.dashboard.menu.docs, icon: Folder, href: "/dashboard/docs", color: "text-purple-500" },
+    ];
 
     const toggleSection = (section: string) => {
         if (isCollapsed) return;
@@ -86,8 +89,8 @@ export function Sidebar({ isCollapsed, onToggle, isMobileOpen = false, onMobileC
         });
     };
 
-    const renderSection = (title: string, items: typeof MANAGEMENT_ITEMS) => {
-        const isExpanded = expandedSections.includes(title);
+    const renderSection = (title: string, sectionKey: string, items: typeof MANAGEMENT_ITEMS) => {
+        const isExpanded = expandedSections.includes(sectionKey);
 
         if (isCollapsed) {
             return (
@@ -100,7 +103,7 @@ export function Sidebar({ isCollapsed, onToggle, isMobileOpen = false, onMobileC
         return (
             <div className="space-y-1">
                 <button
-                    onClick={() => toggleSection(title)}
+                    onClick={() => toggleSection(sectionKey)}
                     className="w-full flex items-center justify-between px-4 py-2 text-xs font-bold text-white/30 uppercase tracking-widest hover:text-white/50 transition-colors"
                 >
                     <span>{title}</span>
@@ -166,9 +169,9 @@ export function Sidebar({ isCollapsed, onToggle, isMobileOpen = false, onMobileC
 
                 <nav className="flex-1 p-4 space-y-6 overflow-y-auto overflow-x-hidden scrollbar-hide">
                     {/* Collapsible Sections */}
-                    {renderSection("Management", MANAGEMENT_ITEMS)}
-                    {renderSection("Finance", FINANCE_ITEMS)}
-                    {renderSection("Productivity", PRODUCTIVITY_ITEMS)}
+                    {renderSection(t.dashboard.menu.management, "management", MANAGEMENT_ITEMS)}
+                    {renderSection(t.dashboard.menu.finance, "finance", FINANCE_ITEMS)}
+                    {renderSection(t.dashboard.menu.productivity, "productivity", PRODUCTIVITY_ITEMS)}
                 </nav>
 
                 <div className="p-4 border-t border-white/10 space-y-2">
@@ -192,10 +195,10 @@ export function Sidebar({ isCollapsed, onToggle, isMobileOpen = false, onMobileC
                                 "flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-white/60 hover:text-white hover:bg-white/5 transition-all",
                                 isCollapsed ? "justify-center w-full px-2" : "flex-1"
                             )}
-                            title="Settings"
+                            title={t.dashboard.menu.settings}
                         >
                             <Settings className="w-5 h-5 flex-shrink-0" />
-                            {!isCollapsed && "Settings"}
+                            {!isCollapsed && t.dashboard.menu.settings}
                         </Link>
                         <button
                             onClick={async () => {
@@ -207,7 +210,7 @@ export function Sidebar({ isCollapsed, onToggle, isMobileOpen = false, onMobileC
                                 "flex items-center justify-center rounded-lg text-red-400 hover:bg-red-500/10 transition-all",
                                 isCollapsed ? "w-full py-3" : "w-11 h-11"
                             )}
-                            title="Logout"
+                            title={t.dashboard.menu.logout}
                         >
                             <LogOut className="w-5 h-5 flex-shrink-0" />
                         </button>

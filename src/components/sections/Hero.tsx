@@ -1,8 +1,10 @@
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight, Sparkles } from "lucide-react";
+import { useLanguage } from "@/context/LanguageContext";
 
 export function Hero() {
+    const { t } = useLanguage();
     return (
         <section id="hero" className="relative flex min-h-[90vh] flex-col items-center justify-center overflow-hidden bg-background px-4 pt-24 text-center md:pt-32">
             {/* Background Gradients */}
@@ -20,18 +22,18 @@ export function Hero() {
                         <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-500 opacity-75"></span>
                         <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
                     </span>
-                    <span className="text-white/90">Turn Visitors into Clients.</span>
+                    <span className="text-white/90">{t.hero.badge}</span>
                 </div>
 
                 <div className="animate-fade-in-up space-y-4 sm:space-y-6 opacity-0" style={{ animationDelay: "0.2s", animationFillMode: "forwards" }}>
                     <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-7xl md:text-8xl leading-[1.1] px-2">
-                        We Build Websites That <br className="hidden sm:block" />
+                        {t.hero.titlePre} <br className="hidden sm:block" />
                         <span className="bg-gradient-to-r from-[#2563eb] via-[#2563eb] to-[#3b82f6] bg-clip-text text-transparent">
-                            Drive Real Growth
+                            {t.hero.titleHighlight}
                         </span>
                     </h1>
                     <p className="mx-auto max-w-2xl text-base text-muted-foreground sm:text-xl leading-relaxed px-4">
-                        Stop losing customers to outdated design. We craft high-performance, SEO-optimized websites that turn visitors into loyal clients.
+                        {t.hero.description}
                     </p>
                 </div>
 
@@ -40,7 +42,7 @@ export function Hero() {
                         href="#booking"
                         className="group relative inline-flex h-12 items-center justify-center overflow-hidden rounded-full bg-foreground px-8 font-medium text-background transition-all hover:scale-105 hover:bg-foreground/90 hover:shadow-lg hover:shadow-primary/20"
                     >
-                        <span className="mr-2"></span> Lets Work Together
+                        <span className="mr-2"></span> {t.hero.startProject}
                         <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
                         <div className="absolute inset-0 -z-10 bg-gradient-to-r from-[#2563eb] via-[#2563eb] to-[#3b82f6] opacity-0 transition-opacity group-hover:opacity-10" />
                     </Link>
@@ -48,14 +50,14 @@ export function Hero() {
                         href="#portfolio"
                         className="inline-flex h-12 items-center justify-center rounded-full border border-input bg-background px-8 font-medium text-foreground transition-colors hover:bg-[#2563eb] hover:text-white"
                     >
-                        View Our Work
+                        {t.hero.viewWork}
                     </Link>
                 </div>
 
                 {/* Social Proof / Trust Indicator */}
                 <div className="animate-fade-in-up pt-8 sm:pt-12 opacity-0" style={{ animationDelay: "0.6s", animationFillMode: "forwards" }}>
                     <p className="text-xs sm:text-sm font-medium text-muted-foreground">
-                        Trusted by forward-thinking companies
+                        {t.hero.trustedBy}
                     </p>
                     <div className="mt-6 sm:mt-8 flex flex-wrap items-center justify-center gap-6 sm:gap-8 px-4">
                         <Image
