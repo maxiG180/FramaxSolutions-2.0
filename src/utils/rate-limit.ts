@@ -105,4 +105,8 @@ export const RATE_LIMITS = {
         maxRequests: 10,
         windowMs: 60 * 1000, // 10 per minute
     },
+    BOOKING: {
+        maxRequests: 5,
+        windowMs: 60 * 1000, // 5 per minute
+    },
 } as const;

@@ -20,7 +20,9 @@ interface QuoteModalProps {
 
 export function QuoteModal({ isOpen, onClose }: QuoteModalProps) {
     const [clientName, setClientName] = useState("");
+    const [clientContact, setClientContact] = useState("");
     const [clientEmail, setClientEmail] = useState("");
+    const [clientPhone, setClientPhone] = useState("");
     const [clientAddress, setClientAddress] = useState("");
     const [quoteDate, setQuoteDate] = useState(new Date().toISOString().split('T')[0]);
     const [expiryDate, setExpiryDate] = useState("");
@@ -28,6 +30,53 @@ export function QuoteModal({ isOpen, onClose }: QuoteModalProps) {
     const [items, setItems] = useState<QuoteItem[]>([
         { id: "1", description: "Service / Product", quantity: 1, price: 0 }
     ]);
+
+    const formatPhoneNumber = (value: string) => {
+        // Remove all non-digits
+        const digits = value.replace(/\D/g, '');
+
+        // Basic formatting (Group of 3-3-4 or 3-3-3 depending on length)
+        // This is a simple generic formatter. For robust formatting, would need the Country selector like PhoneInput
+        // but for now we'll do simple spacing
+        if (digits.length <= 9) {
+            return digits.replace(/(\d{3})(\d{3})(\d{3})/, '$1 $2 $3').trim();
+        } else if (digits.length <= 10) {
+            return digits.replace(/(\d{3})(\d{3})(\d{4})/, '$1 $2 $3').trim();
+        } else if (digits.length <= 11) {
+            return digits.replace(/(\d{2})(\d{5})(\d{4})/, '$1 $2 $3').trim();
+        } else {
+            // Fallback for longer numbers: groups of 3
+            return digits.replace(/(\d{3})(?=\d)/g, '$1 ').trim();
+        }
+    };
+
+    const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const input = e.target.value;
+        // If user is deleting, allow it naturally, but if typing, enforce format?
+        // Actually, simple spacing on common lengths is usually safe.
+        // Or we can just set the value and rely on a blur formatter?
+        // User asked "format the phone number so it has spaces". 
+        // Let's formatting it on the fly but preserve user input if it's weird.
+
+        // Simple approach: Allow free typing but try to format known patterns? 
+        // Or just stripping and re-applying format?
+        // The PhoneInput component does: change -> strip -> format.
+
+        // Let's blindly strip non-digits (except maybe +) and format.
+        // Preserving '+' at start if exists
+        const hasPlus = input.startsWith('+');
+        const digits = input.replace(/\D/g, '');
+
+        let formatted = digits;
+        if (digits.length > 0) {
+            if (digits.length <= 9) formatted = digits.replace(/(\d{3})(\d{3})(\d{3})/, '$1 $2 $3');
+            else if (digits.length <= 10) formatted = digits.replace(/(\d{3})(\d{3})(\d{4})/, '$1 $2 $3');
+            else if (digits.length <= 11) formatted = digits.replace(/(\d{2})(\d{5})(\d{4})/, '$1 $2 $3');
+            else formatted = digits.replace(/(\d{3})(?=\d)/g, '$1 '); // Split every 3
+        }
+
+        setClientPhone(hasPlus ? '+' + formatted.trim() : formatted.trim());
+    };
 
     const { clients, loading: loadingClients } = useClients();
     const [showClientDropdown, setShowClientDropdown] = useState(false);
@@ -40,6 +89,8 @@ export function QuoteModal({ isOpen, onClose }: QuoteModalProps) {
     const selectClient = (client: Client) => {
         setClientName(client.name);
         setClientEmail(client.email || "");
+        setClientPhone(client.phone || ""); // Assuming client.phone from DB might already be formatted or raw
+        setClientContact(client.contact_person || "");
         setClientAddress(client.address || client.country || "");
         setShowClientDropdown(false);
     };
@@ -169,6 +220,19 @@ export function QuoteModal({ isOpen, onClose }: QuoteModalProps) {
                                             </div>
                                         </div>
                                         <div className="space-y-2">
+                                            <label className="text-sm text-white/60">Contact Person</label>
+                                            <div className="relative">
+                                                <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
+                                                <input
+                                                    type="text"
+                                                    value={clientContact}
+                                                    onChange={(e) => setClientContact(e.target.value)}
+                                                    className="w-full bg-white/5 border border-white/10 rounded-lg py-2 pl-10 pr-4 text-white placeholder-white/20 focus:outline-none focus:border-blue-500/50 transition-colors"
+                                                    placeholder="Contact person name"
+                                                />
+                                            </div>
+                                        </div>
+                                        <div className="space-y-2">
                                             <label className="text-sm text-white/60">Email</label>
                                             <input
                                                 type="email"
@@ -176,6 +240,16 @@ export function QuoteModal({ isOpen, onClose }: QuoteModalProps) {
                                                 onChange={(e) => setClientEmail(e.target.value)}
                                                 className="w-full bg-white/5 border border-white/10 rounded-lg py-2 px-4 text-white placeholder-white/20 focus:outline-none focus:border-blue-500/50 transition-colors"
                                                 placeholder="client@example.com"
+                                            />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="text-sm text-white/60">Phone</label>
+                                            <input
+                                                type="tel"
+                                                value={clientPhone}
+                                                onChange={handlePhoneChange}
+                                                className="w-full bg-white/5 border border-white/10 rounded-lg py-2 px-4 text-white placeholder-white/20 focus:outline-none focus:border-blue-500/50 transition-colors"
+                                                placeholder="+1 555 000 0000"
                                             />
                                         </div>
                                     </div>
@@ -336,13 +410,15 @@ export function QuoteModal({ isOpen, onClose }: QuoteModalProps) {
                                     <div>
                                         <p className="text-xs font-bold text-gray-400 uppercase mb-2">Bill To</p>
                                         <div className="text-sm text-gray-800 space-y-1">
-                                            {clientName ? <p className="font-bold">{clientName}</p> : <p className="text-gray-300 italic">Client Name</p>}
+                                            {clientName ? <p className="font-bold text-base">{clientName}</p> : <p className="text-gray-300 italic">Client Name</p>}
+                                            {clientContact && <p className="font-medium">{clientContact}</p>}
                                             {clientAddress ? (
                                                 clientAddress.split('\n').map((line, i) => <p key={i}>{line}</p>)
                                             ) : (
                                                 <p className="text-gray-300 italic">Client Address</p>
                                             )}
                                             {clientEmail && <p className="text-blue-600">{clientEmail}</p>}
+                                            {clientPhone && <p className="text-gray-600">{clientPhone}</p>}
                                         </div>
                                     </div>
                                     <div className="text-right space-y-4">

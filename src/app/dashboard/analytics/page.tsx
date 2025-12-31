@@ -3,59 +3,95 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Loader } from "@/components/ui/loader";
-import { ArrowUpRight, ArrowDownRight, Users, DollarSign, Activity, MousePointer2, TrendingUp, MoreHorizontal } from "lucide-react";
+import { ArrowUpRight, ArrowDownRight, Users, DollarSign, Activity, MousePointer2, TrendingUp, MoreHorizontal, QrCode } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { createClient } from "@/utils/supabase/client";
 
 // Mock Data for Charts
 const REVENUE_DATA = [40, 25, 60, 35, 80, 55, 90, 45, 70, 85, 60, 95];
 const VISITORS_DATA = [30, 45, 35, 60, 50, 75, 65, 80, 70, 90, 85, 100];
 
-const METRICS = [
-    {
-        label: "Total Revenue",
-        value: "$124,500",
-        change: "+12.5%",
-        trend: "up",
-        icon: DollarSign,
-        color: "text-emerald-400",
-        bg: "bg-emerald-400/10",
-    },
-    {
-        label: "Active Clients",
-        value: "45",
-        change: "+4",
-        trend: "up",
-        icon: Users,
-        color: "text-blue-400",
-        bg: "bg-blue-400/10",
-    },
-    {
-        label: "Bounce Rate",
-        value: "24.8%",
-        change: "-2.1%",
-        trend: "down", // Good for bounce rate
-        icon: Activity,
-        color: "text-purple-400",
-        bg: "bg-purple-400/10",
-    },
-    {
-        label: "Avg. Session",
-        value: "4m 32s",
-        change: "+12s",
-        trend: "up",
-        icon: MousePointer2,
-        color: "text-orange-400",
-        bg: "bg-orange-400/10",
-    },
-];
-
 export default function AnalyticsPage() {
     const [loading, setLoading] = useState(true);
+    const [qrStats, setQrStats] = useState({ total: 0, last7Days: 0 });
 
     useEffect(() => {
-        const timer = setTimeout(() => setLoading(false), 1000);
+        const fetchData = async () => {
+            const supabase = createClient();
+
+            // Get total scans
+            const { count: totalCount } = await supabase
+                .from("qr_scans")
+                .select("*", { count: "exact", head: true });
+
+            // Get last 7 days scans
+            const sevenDaysAgo = new Date();
+            sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+            const { count: weekCount } = await supabase
+                .from("qr_scans")
+                .select("*", { count: "exact", head: true })
+                .gte("scanned_at", sevenDaysAgo.toISOString());
+
+            setQrStats({
+                total: totalCount || 0,
+                last7Days: weekCount || 0,
+            });
+
+            setLoading(false);
+        };
+
+        const timer = setTimeout(fetchData, 1000);
         return () => clearTimeout(timer);
     }, []);
+
+    const METRICS = [
+        {
+            label: "Total Revenue",
+            value: "$124,500",
+            change: "+12.5%",
+            trend: "up",
+            icon: DollarSign,
+            color: "text-emerald-400",
+            bg: "bg-emerald-400/10",
+        },
+        {
+            label: "Active Clients",
+            value: "45",
+            change: "+4",
+            trend: "up",
+            icon: Users,
+            color: "text-blue-400",
+            bg: "bg-blue-400/10",
+        },
+        {
+            label: "QR Code Scans",
+            value: qrStats.total.toString(),
+            change: `+${qrStats.last7Days}`,
+            trend: "up",
+            icon: QrCode,
+            color: "text-purple-400",
+            bg: "bg-purple-400/10",
+        },
+        {
+            label: "Bounce Rate",
+            value: "24.8%",
+            change: "-2.1%",
+            trend: "down", // Good for bounce rate
+            icon: Activity,
+            color: "text-orange-400",
+            bg: "bg-orange-400/10",
+        },
+        {
+            label: "Avg. Session",
+            value: "4m 32s",
+            change: "+12s",
+            trend: "up",
+            icon: MousePointer2,
+            color: "text-rose-400",
+            bg: "bg-rose-400/10",
+        },
+    ];
 
     if (loading) return <Loader />;
 
@@ -80,7 +116,7 @@ export default function AnalyticsPage() {
             </div>
 
             {/* Metrics Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 2xl:grid-cols-5 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
                 {METRICS.map((metric, index) => (
                     <motion.div
                         key={metric.label}

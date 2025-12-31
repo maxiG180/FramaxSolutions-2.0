@@ -11,73 +11,64 @@ export async function OPTIONS(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
     try {
-        // Rate limiting (use calendar limit since it's similar usage)
-        const rateLimitResponse = rateLimit(request, RATE_LIMITS.CALENDAR);
+        // Rate limiting
+        const rateLimitResponse = rateLimit(request, RATE_LIMITS.BOOKING);
         if (rateLimitResponse) {
             const forwarded = request.headers.get('x-forwarded-for');
             const ip = forwarded ? forwarded.split(',')[0] : 'unknown';
-            logger.logRateLimit('/api/check-availability', ip);
+            logger.logRateLimit('/api/book-meeting', ip);
             return addCorsHeaders(rateLimitResponse, request);
         }
 
         // Parse request body
         const body = await request.json();
-        const { date } = body;
 
-        if (!date) {
-            const response = NextResponse.json(
-                { error: 'Date is required' },
-                { status: 400 }
-            );
-            return addCorsHeaders(response, request);
-        }
+        // Pass the action clearly
+        const payload = {
+            ...body,
+            action: 'bookMeeting'
+        };
 
-        // Call n8n unified webhook
         const BOOKING_WEBHOOK = process.env.NEXT_PUBLIC_BOOKING_WEBHOOK_URL;
 
         if (!BOOKING_WEBHOOK) {
-            // Fail gracefully if not configured
-            return NextResponse.json({ busySlots: [] });
+            logger.logError('Webhook URL not configured', new Error('Webhook URL not configured'), { endpoint: '/api/book-meeting' });
+            return NextResponse.json(
+                { error: 'Configuration error' },
+                { status: 500 }
+            );
         }
-
-        console.log('Sending to n8n:', {
-            url: BOOKING_WEBHOOK,
-            payload: { date, action: 'checkAvailability' }
-        });
 
         const webhookResponse = await fetch(BOOKING_WEBHOOK, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                date,
-                action: 'checkAvailability'
-            }),
+            body: JSON.stringify(payload),
         });
 
         if (!webhookResponse.ok) {
-            logger.logWarning('n8n webhook returned error', {
-                endpoint: '/api/check-availability',
+            logger.logWarning('n8n webhook returned error for booking', {
+                endpoint: '/api/book-meeting',
                 status: webhookResponse.status,
             });
-
-            // Return empty busy slots on error
-            const response = NextResponse.json({ busySlots: [] });
+            const response = NextResponse.json(
+                { error: 'Failed to process booking' },
+                { status: webhookResponse.status }
+            );
             return addCorsHeaders(response, request);
         }
 
         const data = await webhookResponse.json();
 
-        // Return the busy slots data
-        const response = NextResponse.json({
-            busySlots: data.busySlots || []
-        });
+        const response = NextResponse.json(data);
         return addCorsHeaders(response, request);
 
     } catch (error) {
-        logger.logApiError('/api/check-availability', error);
+        logger.logApiError('/api/book-meeting', error);
 
-        // Fail gracefully - return empty busy slots
-        const response = NextResponse.json({ busySlots: [] });
+        const response = NextResponse.json(
+            { error: 'Internal server error' },
+            { status: 500 }
+        );
         return addCorsHeaders(response, request);
     }
 }
