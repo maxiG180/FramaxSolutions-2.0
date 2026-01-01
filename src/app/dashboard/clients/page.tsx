@@ -8,6 +8,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { createClient } from "@/utils/supabase/client";
 import { Loader } from "@/components/ui/loader";
 import { AddressAutocomplete } from "@/components/ui/AddressAutocomplete";
+import { PhoneInput } from "@/components/ui/PhoneInput";
 
 type ClientStatus = "Active" | "Inactive";
 
@@ -35,13 +36,18 @@ export default function ClientsPage() {
 
     const [editingId, setEditingId] = useState<number | null>(null);
 
+    // Multi-step form state
+    const [currentStep, setCurrentStep] = useState(1);
+    const [isTransitioning, setIsTransitioning] = useState(false);
+    const [justAdvanced, setJustAdvanced] = useState(false);
+    const totalSteps = 3;
+
     // Form State
     const [formData, setFormData] = useState<Partial<Client>>({
         name: "",
         email: "",
         phone: "",
         website: "",
-        status: "Active",
         logo: "",
         contact_person: "",
         country: "",
@@ -77,13 +83,15 @@ export default function ClientsPage() {
     });
 
     const resetForm = () => {
-        setFormData({ name: "", email: "", phone: "", website: "", status: "Active", logo: "", contact_person: "", country: "", address: "" });
+        setFormData({ name: "", email: "", phone: "", website: "", logo: "", contact_person: "", country: "", address: "" });
         setEditingId(null);
+        setCurrentStep(1);
         setIsModalOpen(false);
     };
 
     const handleOpenAdd = () => {
         resetForm();
+        setCurrentStep(1);
         setIsModalOpen(true);
     };
 
@@ -93,18 +101,66 @@ export default function ClientsPage() {
             email: client.email,
             phone: client.phone,
             website: client.website,
-            status: client.status,
             logo: client.logo || "",
             contact_person: client.contact_person || "",
             country: client.country || "",
             address: client.address || ""
         });
         setEditingId(client.id);
+        setCurrentStep(1);
+        setIsTransitioning(false);
         setIsModalOpen(true);
+    };
+
+    const handleNextStep = () => {
+        console.log('=== handleNextStep called ===');
+        console.log('isTransitioning:', isTransitioning);
+        console.log('currentStep:', currentStep);
+        console.log('totalSteps:', totalSteps);
+
+        if (isTransitioning || currentStep >= totalSteps) return;
+
+        console.log('Advancing to next step');
+        setJustAdvanced(true);
+        setIsTransitioning(true);
+        setCurrentStep(prev => prev + 1);
+        setTimeout(() => {
+            setIsTransitioning(false);
+            setJustAdvanced(false);
+        }, 500);
+    };
+
+    const handlePreviousStep = () => {
+        if (isTransitioning || currentStep <= 1) return;
+        setIsTransitioning(true);
+        setCurrentStep(prev => prev - 1);
+        setTimeout(() => setIsTransitioning(false), 300);
     };
 
     const handleSaveClient = async (e: React.FormEvent) => {
         e.preventDefault();
+
+        console.log('=== handleSaveClient called ===');
+        console.log('Current step:', currentStep);
+        console.log('Total steps:', totalSteps);
+        console.log('justAdvanced:', justAdvanced);
+        console.log('Event type:', e.type);
+
+        // Prevent submission if just advanced to this step
+        if (justAdvanced) {
+            console.log('Just advanced to step 3 - ignoring auto-submission');
+            return;
+        }
+
+        // Prevent submission if not on final step
+        if (currentStep < totalSteps) {
+            console.log('Not on final step - preventing submission and advancing step');
+            setCurrentStep(prev => Math.min(totalSteps, prev + 1));
+            return;
+        }
+
+        console.log('On final step - proceeding with submission');
+        console.log('Form data:', formData);
 
         if (editingId) {
             // Update existing client
@@ -115,7 +171,7 @@ export default function ClientsPage() {
                     email: formData.email,
                     phone: formData.phone,
                     website: formData.website,
-                    status: formData.status,
+                    status: 'Active',
                     logo: formData.logo,
                     contact_person: formData.contact_person,
                     country: formData.country,
@@ -125,33 +181,40 @@ export default function ClientsPage() {
 
             if (error) {
                 console.error('Error updating client:', error);
-                alert('Error updating client');
+                console.error('Error details:', JSON.stringify(error, null, 2));
+                alert(`Error updating client: ${error.message || 'Unknown error'}`);
             } else {
                 setClients(clients.map(c => c.id === editingId ? { ...c, ...formData } as Client : c));
                 resetForm();
             }
         } else {
             // Create new client
+            console.log('Creating new client with data:', formData);
             const { data, error } = await supabase
                 .from('clients')
                 .insert([{
                     name: formData.name,
-                    email: formData.email,
-                    phone: formData.phone,
-                    website: formData.website,
-                    status: formData.status,
-                    logo: formData.logo,
-                    contact_person: formData.contact_person,
-                    country: formData.country,
-                    address: formData.address
+                    email: formData.email || "",
+                    phone: formData.phone || "",
+                    website: formData.website || "",
+                    status: 'Active',
+                    logo: formData.logo || "",
+                    contact_person: formData.contact_person || "",
+                    country: formData.country || "",
+                    address: formData.address || ""
                 }])
                 .select()
                 .single();
 
             if (error) {
                 console.error('Error adding client:', error);
-                alert('Error adding client');
+                console.error('Error details:', JSON.stringify(error, null, 2));
+                console.error('Error message:', error.message);
+                console.error('Error hint:', error.hint);
+                console.error('Error details object:', error.details);
+                alert(`Error adding client: ${error.message || 'Unknown error. Check console for details.'}`);
             } else {
+                console.log('Client added successfully:', data);
                 setClients([data, ...clients]);
                 resetForm();
             }
@@ -346,7 +409,6 @@ export default function ClientsPage() {
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 1 }}
                                 exit={{ opacity: 0 }}
-                                onClick={() => setIsModalOpen(false)}
                                 className="absolute inset-0 bg-black/80 backdrop-blur-sm"
                             />
                             <motion.div
@@ -356,7 +418,10 @@ export default function ClientsPage() {
                                 className="relative w-full max-w-7xl bg-[#0A0A0A] border border-white/10 rounded-2xl shadow-2xl overflow-hidden z-10"
                             >
                                 <div className="flex items-center justify-between p-6 border-b border-white/10 bg-white/5">
-                                    <h2 className="text-xl font-bold text-white">{editingId ? "Edit Client" : "Add New Client"}</h2>
+                                    <div>
+                                        <h2 className="text-xl font-bold text-white">{editingId ? "Edit Client" : "Add New Client"}</h2>
+                                        <p className="text-sm text-white/40 mt-1">Step {currentStep} of {totalSteps}</p>
+                                    </div>
                                     <button
                                         onClick={() => setIsModalOpen(false)}
                                         className="text-white/40 hover:text-white transition-colors"
@@ -364,192 +429,280 @@ export default function ClientsPage() {
                                         <X className="w-5 h-5" />
                                     </button>
                                 </div>
-                                <form onSubmit={handleSaveClient} className="p-6">
-                                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
 
-                                        {/* Column 1: Visuals (Logo & Status) - Span 3 */}
-                                        <div className="lg:col-span-3 space-y-6">
-                                            <div className="flex flex-col items-center gap-4 p-6 bg-white/5 rounded-xl border border-white/10">
-                                                <div className="relative group">
-                                                    <div className="w-32 h-32 rounded-full bg-black/40 border-2 border-dashed border-white/20 flex items-center justify-center overflow-hidden relative">
-                                                        {formData.logo ? (
-                                                            <img src={formData.logo} alt="Preview" className="w-full h-full object-cover" />
-                                                        ) : (
-                                                            <div className="flex flex-col items-center gap-2 text-white/20">
-                                                                <ImageIcon className="w-8 h-8" />
-                                                                <span className="text-xs uppercase font-medium">No Logo</span>
-                                                            </div>
-                                                        )}
+                                {/* Progress Bar */}
+                                <div className="px-6 pt-4">
+                                    <div className="flex items-center gap-2">
+                                        {[1, 2, 3].map((step) => (
+                                            <div key={step} className="flex-1 flex items-center gap-2">
+                                                <div className="flex-1 h-1 bg-white/10 rounded-full overflow-hidden">
+                                                    <motion.div
+                                                        initial={{ width: 0 }}
+                                                        animate={{ width: currentStep >= step ? "100%" : "0%" }}
+                                                        transition={{ duration: 0.3 }}
+                                                        className="h-full bg-gradient-to-r from-blue-600 to-blue-400"
+                                                    />
+                                                </div>
+                                                {step < 3 && <div className="w-1 h-1 rounded-full bg-white/20" />}
+                                            </div>
+                                        ))}
+                                    </div>
+                                    <div className="flex justify-between mt-3 text-xs">
+                                        <span className={`transition-colors ${currentStep === 1 ? 'text-blue-400 font-medium' : 'text-white/40'}`}>Company</span>
+                                        <span className={`transition-colors ${currentStep === 2 ? 'text-blue-400 font-medium' : 'text-white/40'}`}>Contact</span>
+                                        <span className={`transition-colors ${currentStep === 3 ? 'text-blue-400 font-medium' : 'text-white/40'}`}>Location</span>
+                                    </div>
+                                </div>
 
-                                                        {loading ? (
-                                                            <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
-                                                                <Loader2 className="w-6 h-6 text-white animate-spin" />
-                                                            </div>
-                                                        ) : (
-                                                            <label className="absolute inset-0 flex flex-col items-center justify-center bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
-                                                                <Plus className="w-8 h-8 text-white mb-1" />
-                                                                <span className="text-xs text-white font-medium">Upload</span>
-                                                                <input
-                                                                    type="file"
-                                                                    accept="image/*"
-                                                                    className="hidden"
-                                                                    onChange={async (e) => {
-                                                                        const file = e.target.files?.[0];
-                                                                        if (!file) return;
+                                <form onSubmit={handleSaveClient} className="p-8">
+                                    <AnimatePresence mode="wait">
+                                        {/* Step 1: Company Details */}
+                                        {currentStep === 1 && (
+                                            <motion.div
+                                                key="step1"
+                                                initial={{ opacity: 0, x: 20 }}
+                                                animate={{ opacity: 1, x: 0 }}
+                                                exit={{ opacity: 0, x: -20 }}
+                                                transition={{ duration: 0.3 }}
+                                                className="space-y-6 max-w-2xl mx-auto"
+                                            >
+                                                <div className="text-center mb-8">
+                                                    <h3 className="text-2xl font-bold text-white mb-2">Company Information</h3>
+                                                    <p className="text-white/60">Let's start with the basic company details</p>
+                                                </div>
 
-                                                                        const fileExt = file.name.split('.').pop();
-                                                                        const fileName = `${Math.random()}.${fileExt}`;
-                                                                        const filePath = `${fileName}`;
+                                                {/* Logo Upload */}
+                                                <div className="flex justify-center">
+                                                    <div className="relative group">
+                                                        <div className="w-32 h-32 rounded-full bg-black/40 border-2 border-dashed border-white/20 flex items-center justify-center overflow-hidden relative">
+                                                            {formData.logo ? (
+                                                                <img src={formData.logo} alt="Preview" className="w-full h-full object-cover" />
+                                                            ) : (
+                                                                <div className="flex flex-col items-center gap-2 text-white/20">
+                                                                    <ImageIcon className="w-8 h-8" />
+                                                                    <span className="text-xs uppercase font-medium">Logo</span>
+                                                                </div>
+                                                            )}
 
-                                                                        setLoading(true);
-                                                                        const { error: uploadError } = await supabase.storage
-                                                                            .from('client-logos')
-                                                                            .upload(filePath, file);
+                                                            {loading ? (
+                                                                <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
+                                                                    <Loader2 className="w-6 h-6 text-white animate-spin" />
+                                                                </div>
+                                                            ) : (
+                                                                <label className="absolute inset-0 flex flex-col items-center justify-center bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
+                                                                    <Plus className="w-8 h-8 text-white mb-1" />
+                                                                    <span className="text-xs text-white font-medium">Upload</span>
+                                                                    <input
+                                                                        type="file"
+                                                                        accept="image/*"
+                                                                        className="hidden"
+                                                                        onChange={async (e) => {
+                                                                            const file = e.target.files?.[0];
+                                                                            if (!file) return;
 
-                                                                        if (uploadError) {
-                                                                            console.error('Error uploading image:', uploadError);
-                                                                            alert('Error uploading image. Make sure "client-logos" bucket exists.');
+                                                                            const fileExt = file.name.split('.').pop();
+                                                                            const fileName = `${Math.random()}.${fileExt}`;
+                                                                            const filePath = `${fileName}`;
+
+                                                                            setLoading(true);
+                                                                            const { error: uploadError } = await supabase.storage
+                                                                                .from('client-logos')
+                                                                                .upload(filePath, file);
+
+                                                                            if (uploadError) {
+                                                                                console.error('Error uploading image:', uploadError);
+                                                                                alert('Error uploading image. Make sure "client-logos" bucket exists.');
+                                                                                setLoading(false);
+                                                                                return;
+                                                                            }
+
+                                                                            const { data: { publicUrl } } = supabase.storage
+                                                                                .from('client-logos')
+                                                                                .getPublicUrl(filePath);
+
+                                                                            setFormData({ ...formData, logo: publicUrl });
                                                                             setLoading(false);
-                                                                            return;
-                                                                        }
-
-                                                                        const { data: { publicUrl } } = supabase.storage
-                                                                            .from('client-logos')
-                                                                            .getPublicUrl(filePath);
-
-                                                                        setFormData({ ...formData, logo: publicUrl });
-                                                                        setLoading(false);
-                                                                    }}
-                                                                />
-                                                            </label>
-                                                        )}
+                                                                        }}
+                                                                    />
+                                                                </label>
+                                                            )}
+                                                        </div>
                                                     </div>
                                                 </div>
-                                                <div className="w-full space-y-2">
-                                                    <label className="text-xs font-medium text-white/40 uppercase text-center block">Or Paste URL</label>
+
+                                                <div className="space-y-2">
+                                                    <label className="text-xs font-medium text-white/60 uppercase tracking-wider">Logo URL (Optional)</label>
                                                     <input
                                                         type="url"
-                                                        placeholder="https://..."
-                                                        value={formData.logo}
+                                                        placeholder="https://example.com/logo.png"
+                                                        value={formData.logo || ""}
                                                         onChange={e => setFormData({ ...formData, logo: e.target.value })}
-                                                        className="w-full bg-black border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500/50 text-center"
+                                                        className="w-full bg-black border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-blue-500/50"
                                                     />
                                                 </div>
-                                            </div>
 
-                                            <div className="space-y-2">
-                                                <label className="text-sm font-medium text-white/60">Status</label>
-                                                <select
-                                                    value={formData.status}
-                                                    onChange={e => setFormData({ ...formData, status: e.target.value as ClientStatus })}
-                                                    className="w-full bg-black border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-blue-500/50"
-                                                >
-                                                    <option value="Active">Active</option>
-                                                    <option value="Inactive">Inactive</option>
-                                                </select>
-                                            </div>
-                                        </div>
+                                                <div className="space-y-2">
+                                                    <label className="text-sm font-medium text-white/60">Company Name <span className="text-red-500">*</span></label>
+                                                    <div className="relative">
+                                                        <Building2 className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/20" />
+                                                        <input
+                                                            required
+                                                            type="text"
+                                                            placeholder="e.g. Framax Solutions"
+                                                            value={formData.name}
+                                                            onChange={e => setFormData({ ...formData, name: e.target.value })}
+                                                            className="w-full bg-black border border-white/10 rounded-lg pl-14 pr-4 py-4 text-white text-lg focus:outline-none focus:border-blue-500/50 transition-colors"
+                                                        />
+                                                    </div>
+                                                </div>
 
-                                        {/* Column 2: Company Details - Span 5 */}
-                                        <div className="lg:col-span-5 space-y-4">
-                                            <h3 className="text-sm font-semibold text-white/40 uppercase tracking-wider mb-2">Company Details</h3>
+                                                <div className="space-y-2">
+                                                    <label className="text-sm font-medium text-white/60">Website</label>
+                                                    <div className="relative">
+                                                        <Globe className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/20" />
+                                                        <input
+                                                            type="text"
+                                                            placeholder="company.com"
+                                                            value={formData.website}
+                                                            onChange={e => setFormData({ ...formData, website: e.target.value })}
+                                                            className="w-full bg-black border border-white/10 rounded-lg pl-14 pr-4 py-4 text-white text-lg focus:outline-none focus:border-blue-500/50 transition-colors"
+                                                        />
+                                                    </div>
+                                                </div>
+                                            </motion.div>
+                                        )}
 
-                                            <div className="space-y-2">
-                                                <label className="text-sm font-medium text-white/60">Company Name <span className="text-red-500">*</span></label>
-                                                <div className="relative">
-                                                    <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20" />
-                                                    <input
-                                                        required
-                                                        type="text"
-                                                        placeholder="e.g. Framax Solutions"
-                                                        value={formData.name}
-                                                        onChange={e => setFormData({ ...formData, name: e.target.value })}
-                                                        className="w-full bg-black border border-white/10 rounded-lg pl-10 pr-4 py-3 text-white focus:outline-none focus:border-blue-500/50"
+                                        {/* Step 2: Contact Person */}
+                                        {currentStep === 2 && (
+                                            <motion.div
+                                                key="step2"
+                                                initial={{ opacity: 0, x: 20 }}
+                                                animate={{ opacity: 1, x: 0 }}
+                                                exit={{ opacity: 0, x: -20 }}
+                                                transition={{ duration: 0.3 }}
+                                                className="space-y-6 max-w-2xl mx-auto"
+                                            >
+                                                <div className="text-center mb-8">
+                                                    <h3 className="text-2xl font-bold text-white mb-2">Contact Person</h3>
+                                                    <p className="text-white/60">Who should we reach out to?</p>
+                                                </div>
+
+                                                <div className="space-y-2">
+                                                    <label className="text-sm font-medium text-white/60">Full Name</label>
+                                                    <div className="relative">
+                                                        <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/20" />
+                                                        <input
+                                                            type="text"
+                                                            placeholder="e.g. John Doe"
+                                                            value={formData.contact_person}
+                                                            onChange={e => setFormData({ ...formData, contact_person: e.target.value })}
+                                                            className="w-full bg-black border border-white/10 rounded-lg pl-14 pr-4 py-4 text-white text-lg focus:outline-none focus:border-blue-500/50 transition-colors"
+                                                        />
+                                                    </div>
+                                                </div>
+
+                                                <div className="space-y-2">
+                                                    <label className="text-sm font-medium text-white/60">Email Address</label>
+                                                    <div className="relative">
+                                                        <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/20" />
+                                                        <input
+                                                            type="email"
+                                                            placeholder="contact@company.com"
+                                                            value={formData.email}
+                                                            onChange={e => setFormData({ ...formData, email: e.target.value })}
+                                                            className="w-full bg-black border border-white/10 rounded-lg pl-14 pr-4 py-4 text-white text-lg focus:outline-none focus:border-blue-500/50 transition-colors"
+                                                        />
+                                                    </div>
+                                                </div>
+
+                                                <div className="space-y-2">
+                                                    <label className="text-sm font-medium text-white/60">Phone Number</label>
+                                                    <PhoneInput
+                                                        value={formData.phone || ""}
+                                                        onChange={(value) => setFormData({ ...formData, phone: value })}
+                                                        placeholder="Phone number"
                                                     />
                                                 </div>
-                                            </div>
+                                            </motion.div>
+                                        )}
 
-                                            <div className="space-y-2">
-                                                <label className="text-sm font-medium text-white/60">Website</label>
-                                                <div className="relative">
-                                                    <Globe className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20" />
-                                                    <input
-                                                        type="text"
-                                                        placeholder="company.com"
-                                                        value={formData.website}
-                                                        onChange={e => setFormData({ ...formData, website: e.target.value })}
-                                                        className="w-full bg-black border border-white/10 rounded-lg pl-10 pr-4 py-3 text-white focus:outline-none focus:border-blue-500/50"
+                                        {/* Step 3: Location */}
+                                        {currentStep === 3 && (
+                                            <motion.div
+                                                key="step3"
+                                                initial={{ opacity: 0, x: 20 }}
+                                                animate={{ opacity: 1, x: 0 }}
+                                                exit={{ opacity: 0, x: -20 }}
+                                                transition={{ duration: 0.3 }}
+                                                className="space-y-6"
+                                            >
+                                                <div className="text-center mb-8">
+                                                    <h3 className="text-2xl font-bold text-white mb-2">Location & Address</h3>
+                                                    <p className="text-white/60">Where is this company located?</p>
+                                                </div>
+
+                                                <div className="p-6 bg-white/5 rounded-xl border border-white/10">
+                                                    <AddressAutocomplete
+                                                        defaultValue={formData.address}
+                                                        onSelect={(address, country) => {
+                                                            setFormData(prev => ({ ...prev, address, country }));
+                                                        }}
                                                     />
                                                 </div>
-                                            </div>
+                                            </motion.div>
+                                        )}
+                                    </AnimatePresence>
 
-                                            <div className="space-y-2">
-                                                <label className="text-sm font-medium text-white/60">Address & Location</label>
-                                                <AddressAutocomplete
-                                                    defaultValue={formData.address}
-                                                    onSelect={(address, country) => {
-                                                        setFormData(prev => ({ ...prev, address, country }));
-                                                    }}
-                                                />
-                                            </div>
-                                        </div>
+                                    {/* Navigation Buttons */}
+                                    <div className="flex items-center justify-between mt-8 pt-6 border-t border-white/10">
+                                        <button
+                                            type="button"
+                                            onClick={handlePreviousStep}
+                                            disabled={currentStep === 1 || isTransitioning}
+                                            className="px-6 py-3 rounded-lg font-medium text-white/60 hover:text-white hover:bg-white/5 transition-colors disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent"
+                                        >
+                                            ← Previous
+                                        </button>
 
-                                        {/* Column 3: Contact Info - Span 4 */}
-                                        <div className="lg:col-span-4 space-y-4">
-                                            <h3 className="text-sm font-semibold text-white/40 uppercase tracking-wider mb-2">Contact Person</h3>
-
-                                            <div className="space-y-2">
-                                                <label className="text-sm font-medium text-white/60">Full Name</label>
-                                                <div className="relative">
-                                                    <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20" />
-                                                    <input
-                                                        type="text"
-                                                        placeholder="e.g. John Doe"
-                                                        value={formData.contact_person}
-                                                        onChange={e => setFormData({ ...formData, contact_person: e.target.value })}
-                                                        className="w-full bg-black border border-white/10 rounded-lg pl-10 pr-4 py-3 text-white focus:outline-none focus:border-blue-500/50"
-                                                    />
-                                                </div>
-                                            </div>
-
-                                            <div className="space-y-2">
-                                                <label className="text-sm font-medium text-white/60">Email</label>
-                                                <div className="relative">
-                                                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20" />
-                                                    <input
-                                                        type="email"
-                                                        placeholder="contact@company.com"
-                                                        value={formData.email}
-                                                        onChange={e => setFormData({ ...formData, email: e.target.value })}
-                                                        className="w-full bg-black border border-white/10 rounded-lg pl-10 pr-4 py-3 text-white focus:outline-none focus:border-blue-500/50"
-                                                    />
-                                                </div>
-                                            </div>
-
-                                            <div className="space-y-2">
-                                                <label className="text-sm font-medium text-white/60">Phone</label>
-                                                <div className="relative">
-                                                    <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20" />
-                                                    <input
-                                                        type="tel"
-                                                        placeholder="+351 ..."
-                                                        value={formData.phone}
-                                                        onChange={e => setFormData({ ...formData, phone: e.target.value })}
-                                                        className="w-full bg-black border border-white/10 rounded-lg pl-10 pr-4 py-3 text-white focus:outline-none focus:border-blue-500/50"
-                                                    />
-                                                </div>
-                                            </div>
-
-                                            <div className="pt-8">
+                                        <div className="flex items-center gap-2">
+                                            {[1, 2, 3].map((step) => (
                                                 <button
-                                                    type="submit"
-                                                    disabled={loading}
-                                                    className="w-full bg-blue-600 hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-4 rounded-xl transition-colors shadow-lg shadow-blue-500/20"
-                                                >
-                                                    {editingId ? "Save Changes" : "Add Client"}
-                                                </button>
-                                            </div>
+                                                    key={step}
+                                                    type="button"
+                                                    onClick={() => {
+                                                        if (!isTransitioning) {
+                                                            setIsTransitioning(true);
+                                                            setCurrentStep(step);
+                                                            setTimeout(() => setIsTransitioning(false), 300);
+                                                        }
+                                                    }}
+                                                    disabled={isTransitioning}
+                                                    className={`w-2 h-2 rounded-full transition-all ${currentStep === step
+                                                        ? 'w-8 bg-blue-500'
+                                                        : 'bg-white/20 hover:bg-white/40'
+                                                        }`}
+                                                />
+                                            ))}
                                         </div>
+
+                                        {currentStep < totalSteps ? (
+                                            <button
+                                                type="button"
+                                                onClick={handleNextStep}
+                                                disabled={isTransitioning}
+                                                className="px-8 py-3 rounded-lg font-bold text-white bg-blue-600 hover:bg-blue-500 transition-colors shadow-lg shadow-blue-500/20 disabled:opacity-50 disabled:cursor-not-allowed"
+                                            >
+                                                Next →
+                                            </button>
+                                        ) : (
+                                            <button
+                                                type="submit"
+                                                disabled={loading}
+                                                className="px-8 py-3 rounded-lg font-bold text-white bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-blue-500/20"
+                                            >
+                                                {editingId ? "✓ Save Changes" : "✓ Add Client"}
+                                            </button>
+                                        )}
                                     </div>
                                 </form>
                             </motion.div>

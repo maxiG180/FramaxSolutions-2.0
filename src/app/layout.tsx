@@ -2,6 +2,7 @@ import { Metadata } from "next";
 import { Outfit, Inter } from "next/font/google";
 import "./globals.css";
 import RootClientWrapper from "./RootClientWrapper";
+import { Analytics } from "@vercel/analytics/react";
 
 const outfit = Outfit({
   variable: "--font-sans",
@@ -57,6 +58,7 @@ export default function RootLayout({
         className={`${outfit.variable} ${inter.variable} antialiased font-sans bg-background text-foreground overflow-x-hidden`}
       >
         <RootClientWrapper>{children}</RootClientWrapper>
+        <Analytics />
       </body>
     </html>
   );

@@ -120,20 +120,55 @@ function SearchBox({ onSelect, defaultValue }: { onSelect: any, defaultValue: st
                             styles: [
                                 {
                                     "elementType": "geometry",
-                                    "stylers": [{ "color": "#242f3e" }]
+                                    "stylers": [{ "color": "#1a1a1a" }]
                                 },
                                 {
                                     "elementType": "labels.text.stroke",
-                                    "stylers": [{ "color": "#242f3e" }]
+                                    "stylers": [{ "color": "#000000" }]
                                 },
                                 {
                                     "elementType": "labels.text.fill",
-                                    "stylers": [{ "color": "#746855" }]
+                                    "stylers": [{ "color": "#999999" }]
                                 },
                                 {
                                     "featureType": "administrative.locality",
                                     "elementType": "labels.text.fill",
-                                    "stylers": [{ "color": "#d59563" }]
+                                    "stylers": [{ "color": "#60a5fa" }]
+                                },
+                                {
+                                    "featureType": "poi",
+                                    "elementType": "labels.text.fill",
+                                    "stylers": [{ "color": "#a78bfa" }]
+                                },
+                                {
+                                    "featureType": "road",
+                                    "elementType": "geometry",
+                                    "stylers": [{ "color": "#2d2d2d" }]
+                                },
+                                {
+                                    "featureType": "road",
+                                    "elementType": "geometry.stroke",
+                                    "stylers": [{ "color": "#404040" }]
+                                },
+                                {
+                                    "featureType": "road.highway",
+                                    "elementType": "geometry",
+                                    "stylers": [{ "color": "#3b82f6" }]
+                                },
+                                {
+                                    "featureType": "road.highway",
+                                    "elementType": "geometry.stroke",
+                                    "stylers": [{ "color": "#2563eb" }]
+                                },
+                                {
+                                    "featureType": "water",
+                                    "elementType": "geometry",
+                                    "stylers": [{ "color": "#1e3a5f" }]
+                                },
+                                {
+                                    "featureType": "water",
+                                    "elementType": "labels.text.fill",
+                                    "stylers": [{ "color": "#60a5fa" }]
                                 }
                             ]
                         }}

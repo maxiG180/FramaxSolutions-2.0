@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Calendar, Clock, ArrowRight, Check, Sparkles, ChevronLeft, ChevronRight, Star, ShieldCheck, Users, X } from "lucide-react";
+import { Calendar, Clock, ArrowRight, Check, ChevronLeft, ChevronRight } from "lucide-react";
 import confetti from "canvas-confetti";
 import { cn } from "@/lib/utils";
 
@@ -26,17 +26,6 @@ export function Booking() {
     const [busySlots, setBusySlots] = useState<string[]>([]);
     const [isLoadingAvailability, setIsLoadingAvailability] = useState(false);
     const [titleClicks, setTitleClicks] = useState(0);
-    const [promoCode, setPromoCode] = useState("");
-    const [promoStatus, setPromoStatus] = useState<'idle' | 'validating' | 'valid' | 'invalid'>('idle');
-    const [promoMessage, setPromoMessage] = useState("");
-
-    // Auto-fill promo code from localStorage
-    useEffect(() => {
-        const savedCode = localStorage.getItem("framax_promo_code");
-        if (savedCode) {
-            setPromoCode(savedCode);
-        }
-    }, []);
 
     // Fetch availability when date changes
     useEffect(() => {
@@ -79,6 +68,32 @@ export function Booking() {
         return busySlots.includes(time);
     };
 
+    // Check if a time slot is in the past
+    const isSlotInPast = (time: string) => {
+        if (!selectedDate) return false;
+
+        // Check if selected date is today
+        const today = new Date();
+        const isToday = selectedDate.toDateString() === today.toDateString();
+
+        if (!isToday) return false;
+
+        // Parse the time slot
+        const [timeStr, period] = time.split(' ');
+        const [hours, minutes] = timeStr.split(':');
+        let hour = parseInt(hours);
+
+        if (period === 'PM' && hour !== 12) hour += 12;
+        if (period === 'AM' && hour === 12) hour = 0;
+
+        // Create a date object for the time slot
+        const slotTime = new Date(selectedDate);
+        slotTime.setHours(hour, parseInt(minutes), 0, 0);
+
+        // Compare with current time
+        return slotTime < today;
+    };
+
     // Easter Egg: Party Mode
     const handleTitleClick = () => {
         const newClicks = titleClicks + 1;
@@ -111,35 +126,6 @@ export function Booking() {
         return "";
     };
 
-    const validatePromoCode = async (code: string) => {
-        if (!code) {
-            setPromoStatus('idle');
-            setPromoMessage("");
-            return;
-        }
-
-        setPromoStatus('validating');
-        try {
-            const res = await fetch('/api/validate-discount', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ code })
-            });
-            const data = await res.json();
-
-            if (data.valid) {
-                setPromoStatus('valid');
-                setPromoMessage(data.message);
-            } else {
-                setPromoStatus('invalid');
-                setPromoMessage(data.message);
-            }
-        } catch (error) {
-            setPromoStatus('invalid');
-            setPromoMessage("Error checking code");
-        }
-    };
-
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
@@ -152,7 +138,14 @@ export function Booking() {
 
         setIsSubmitting(true);
 
-        const WEBHOOK_URL = "https://hook.eu1.make.com/acq3mral3fprrpfnqolsrgtr89t2cyah";
+        const WEBHOOK_URL = process.env.NEXT_PUBLIC_BOOKING_WEBHOOK_URL;
+
+        if (!WEBHOOK_URL) {
+            console.error("Webhook URL not configured");
+            alert("Configuration error. Please contact support.");
+            setIsSubmitting(false);
+            return;
+        }
 
         try {
             // Combine date and time
@@ -170,28 +163,14 @@ export function Booking() {
                 ...formData,
                 date: dateTime.toISOString(),
                 time: selectedTime,
-                promoCode: promoCode // Send promo code to webhook
+                action: 'bookMeeting',
             };
 
-            await fetch(WEBHOOK_URL, {
+            await fetch('/api/book-meeting', {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(payload)
             });
-
-            // If there's a valid promo code, redeem it
-            if (promoCode && promoStatus === 'valid') {
-                try {
-                    await fetch('/api/redeem-discount', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ code: promoCode })
-                    });
-                } catch (err) {
-                    console.error("Failed to redeem code:", err);
-                    // Non-blocking error, user booked successfully
-                }
-            }
 
             // Success Confetti
             const duration = 3 * 1000;
@@ -409,6 +388,8 @@ export function Booking() {
                                                 ) : (
                                                     TIME_SLOTS.map((time, i) => {
                                                         const isBusy = isSlotBusy(time);
+                                                        const isPast = isSlotInPast(time);
+                                                        const isDisabled = isBusy || isPast;
                                                         return (
                                                             <motion.button
                                                                 key={time}
@@ -416,16 +397,16 @@ export function Booking() {
                                                                 animate={{ opacity: 1, y: 0 }}
                                                                 transition={{ delay: i * 0.05 }}
                                                                 onClick={() => handleTimeSelect(time)}
-                                                                disabled={isBusy}
+                                                                disabled={isDisabled}
                                                                 className={cn(
                                                                     "py-4 px-4 rounded-xl border border-border transition-all text-sm font-medium flex items-center justify-center gap-2 group bg-background relative overflow-hidden",
-                                                                    isBusy
+                                                                    isDisabled
                                                                         ? "opacity-40 cursor-not-allowed bg-muted/20 border-transparent"
                                                                         : "hover:border-primary hover:bg-primary/5"
                                                                 )}
                                                             >
-                                                                <Clock className={cn("w-4 h-4 transition-colors", isBusy ? "text-muted-foreground/50" : "text-muted-foreground group-hover:text-primary")} />
-                                                                <span className={cn(isBusy && "line-through decoration-muted-foreground/50")}>{time}</span>
+                                                                <Clock className={cn("w-4 h-4 transition-colors", isDisabled ? "text-muted-foreground/50" : "text-muted-foreground group-hover:text-primary")} />
+                                                                <span className={cn(isDisabled && "line-through decoration-muted-foreground/50")}>{time}</span>
                                                             </motion.button>
                                                         );
                                                     })
@@ -436,7 +417,7 @@ export function Booking() {
                                                     <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-green-500/10 text-green-600 text-xs font-medium">
                                                         <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
                                                         {(() => {
-                                                            const availableCount = TIME_SLOTS.filter(slot => !busySlots.includes(slot)).length;
+                                                            const availableCount = TIME_SLOTS.filter(slot => !busySlots.includes(slot) && !isSlotInPast(slot)).length;
                                                             return `${availableCount} ${availableCount === 1 ? 'spot' : 'spots'} left for this day`;
                                                         })()}
                                                     </span>
@@ -528,42 +509,6 @@ export function Booking() {
                                                         placeholder="Tell us a bit about your goals..."
                                                     />
                                                 </div>
-                                                <div className="space-y-1.5">
-                                                    <label className="text-sm font-medium text-foreground ml-1">Promo Code (Optional)</label>
-                                                    <div className="relative">
-                                                        <input
-                                                            type="text"
-                                                            value={promoCode}
-                                                            onChange={e => {
-                                                                setPromoCode(e.target.value.toUpperCase());
-                                                                setPromoStatus('idle');
-                                                                setPromoMessage('');
-                                                            }}
-                                                            onBlur={() => validatePromoCode(promoCode)}
-                                                            className={cn(
-                                                                "w-full px-4 py-3 rounded-xl border border-border bg-zinc-950/50 text-zinc-100 placeholder:text-muted-foreground focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all font-mono",
-                                                                promoStatus === 'valid' && "border-green-500/50 bg-green-500/5",
-                                                                promoStatus === 'invalid' && "border-red-500/50 bg-red-500/5"
-                                                            )}
-                                                            placeholder="FRAMAX-XXXX"
-                                                        />
-                                                        {promoStatus === 'validating' && (
-                                                            <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                                                                <div className="w-4 h-4 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
-                                                            </div>
-                                                        )}
-                                                        {promoStatus === 'valid' && (
-                                                            <div className="absolute right-3 top-1/2 -translate-y-1/2 text-green-500 flex items-center gap-1 text-xs font-medium bg-green-500/10 px-2 py-1 rounded-full">
-                                                                <Check className="w-3 h-3" /> {promoMessage}
-                                                            </div>
-                                                        )}
-                                                        {promoStatus === 'invalid' && (
-                                                            <div className="absolute right-3 top-1/2 -translate-y-1/2 text-red-500 flex items-center gap-1 text-xs font-medium bg-red-500/10 px-2 py-1 rounded-full">
-                                                                <X className="w-3 h-3" /> {promoMessage}
-                                                            </div>
-                                                        )}
-                                                    </div>
-                                                </div>
 
                                                 <button
                                                     type="submit"
@@ -604,9 +549,9 @@ export function Booking() {
                                             </motion.div>
                                             <h3 className="text-3xl font-bold mb-4">You're all set!</h3>
                                             <p className="text-muted-foreground mb-8 max-w-sm mx-auto leading-relaxed">
-                                                We've sent a calendar invitation to <span className="text-foreground font-medium">{formData.email}</span>.
+                                                A calendar invitation and confirmation email have been sent to <span className="text-foreground font-medium">{formData.email}</span>.
                                                 <br />
-                                                Looking forward to our chat!
+                                                We look forward to connecting with you!
                                             </p>
                                             <button
                                                 onClick={() => {

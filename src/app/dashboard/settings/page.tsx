@@ -148,7 +148,7 @@ export default function SettingsPage() {
 
     const tabs = [
         { id: "profile" as SettingsTab, label: "Profile", icon: User },
-        { id: "marketing" as SettingsTab, label: "Marketing", icon: QrCode },
+        { id: "marketing" as SettingsTab, label: "QR Code", icon: QrCode },
         { id: "notifications" as SettingsTab, label: "Notifications", icon: Bell },
         { id: "security" as SettingsTab, label: "Security", icon: Lock },
         { id: "integrations" as SettingsTab, label: "Integrations", icon: Blocks },
@@ -162,14 +162,14 @@ export default function SettingsPage() {
 
     return (
         <div className="space-y-8">
-            <div>
+            <div className="sticky top-0 z-10 bg-[#0A0A0A] pb-6 mb-2">
                 <h1 className="text-3xl font-bold mb-2">Settings</h1>
                 <p className="text-white/60">Manage your agency preferences.</p>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
                 {/* Sidebar Navigation */}
-                <div className="lg:col-span-1 space-y-2">
+                <div className="lg:col-span-1 space-y-2 lg:sticky lg:top-24 lg:self-start lg:h-fit">
                     {tabs.map((tab) => (
                         <button
                             key={tab.id}
@@ -323,7 +323,7 @@ export default function SettingsPage() {
                     {activeTab === "marketing" && (
                         <div className="bg-white/5 border border-white/10 rounded-2xl p-6 space-y-6">
                             <div className="border-b border-white/10 pb-4">
-                                <h2 className="text-xl font-bold">Marketing & QR Codes</h2>
+                                <h2 className="text-xl font-bold">QR Code</h2>
                                 <p className="text-sm text-white/60 mt-1">Gere códigos QR para os seus cartões de visita e materiais de marketing.</p>
                             </div>
                             <QRCodeGenerator />
