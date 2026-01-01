@@ -299,29 +299,22 @@ export default function DashboardPage() {
                     .eq('id', user.id)
                     .single();
 
-                console.log("Dashboard Debug: User ID:", user.id);
-                console.log("Dashboard Debug: Profile fetched:", profile);
-
                 if (profile?.location) {
                     try {
                         // 1. Geocoding
                         // Open-Meteo prefers just the city name. "Amsterdam, NL" might fail, so we extract "Amsterdam".
                         const cityName = profile.location.split(',')[0].trim();
                         const geoUrl = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(cityName)}&count=1&language=en&format=json`;
-                        console.log("Weather Debug: Fetching Geo for:", cityName, geoUrl);
                         const geoRes = await fetch(geoUrl);
                         const geoData = await geoRes.json();
-                        console.log("Weather Debug: Geo Data:", geoData);
 
                         if (geoData.results && geoData.results.length > 0) {
                             const { latitude, longitude, name, country_code } = geoData.results[0];
 
                             // 2. Weather
                             const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m`;
-                            console.log("Weather Debug: Fetching Weather:", weatherUrl);
                             const weatherRes = await fetch(weatherUrl);
                             const weatherData = await weatherRes.json();
-                            console.log("Weather Debug: Weather Data:", weatherData);
                             const current = weatherData.current;
 
                             setWeatherData({

@@ -77,6 +77,11 @@ $RECYCLE.BIN/
 # Logs
 logs
 *.log
+build_*.log
+build_*.txt
+compile_*.txt
+tsc_*.txt
+lint.log
 
 # Runtime data
 pids

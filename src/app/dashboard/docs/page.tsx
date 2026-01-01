@@ -148,7 +148,6 @@ export default function DocsPage() {
     };
 
     const processFileUpload = async (file: File) => {
-        console.log('Starting client-side upload:', file.name, file.size);
 
         try {
             // Optimistic update
@@ -176,16 +175,13 @@ export default function DocsPage() {
             const folderId = currentFolder?.id || null;
             const storagePath = `${user.id}/${folderId || 'unsorted'}/${timestamp}_${file.name}`;
 
-            console.log('Uploading to storage path:', storagePath);
             const { error: uploadError } = await supabase.storage
                 .from('documents')
                 .upload(storagePath, file);
 
             if (uploadError) throw uploadError;
-            console.log('Storage upload successful');
 
             // 2. Create DB Record (Server Action)
-            console.log('Creating DB record...');
             const result = await createFileRecord({
                 name: file.name,
                 type: getFileType(file.name),
@@ -195,7 +191,6 @@ export default function DocsPage() {
             });
 
             if (result.file) {
-                console.log('DB record created, updating UI');
                 // Replace temp file with real one
                 setFiles(prev => [result.file!, ...prev.filter(f => f.id !== tempId)]);
 
