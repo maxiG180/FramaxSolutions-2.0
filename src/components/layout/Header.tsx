@@ -40,9 +40,7 @@ export function Header() {
                         {t.header.portfolio}
                     </Link>
 
-                    <Link href="/#process" className="text-sm font-medium hover:text-primary transition-colors">
-                        {t.header.process}
-                    </Link>
+
                     <Link href="/#booking" className="bg-primary text-primary-foreground px-5 py-2 rounded-full text-sm font-medium hover:bg-primary/90 transition-all hover:scale-105 active:scale-95">
                         {t.header.getStarted}
                     </Link>
@@ -79,13 +77,7 @@ export function Header() {
                     >
                         {t.header.portfolio}
                     </Link>
-                    <Link
-                        href="/#process"
-                        className="text-sm font-medium p-2 hover:bg-muted rounded-md"
-                        onClick={() => setIsMobileMenuOpen(false)}
-                    >
-                        {t.header.process}
-                    </Link>
+
                     <Link
                         href="/#booking"
                         className="bg-primary text-primary-foreground w-full py-3 rounded-full text-sm font-medium text-center"

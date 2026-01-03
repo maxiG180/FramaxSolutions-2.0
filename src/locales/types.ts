@@ -48,12 +48,18 @@ export interface Translation {
         speedDesc: string;
         seoTitle: string;
         seoDesc: string;
-        designTitle: string;
-        designDesc: string;
+        automationTitle: string;
+        automationDesc: string;
+        websitesTitle: string;
+        websitesDesc: string;
+        systemsTitle: string;
+        systemsDesc: string;
         codeTitle: string;
         codeDesc: string;
         mobileTitle: string;
         mobileDesc: string;
+        globalTitle: string;
+        globalDesc: string;
     };
     legal: {
         lastUpdated: string;

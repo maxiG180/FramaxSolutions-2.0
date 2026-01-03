@@ -1,5 +1,6 @@
 import { Metadata } from "next";
 import { Outfit, Inter } from "next/font/google";
+import Script from "next/script";
 import "./globals.css";
 import RootClientWrapper from "./RootClientWrapper";
 import { Analytics } from "@vercel/analytics/react";
@@ -59,6 +60,23 @@ export default function RootLayout({
       >
         <RootClientWrapper>{children}</RootClientWrapper>
         <Analytics />
+
+        {/* Plerdy Analytics */}
+        <Script
+          id="plerdy-analytics"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `
+              var _protocol="https:"==document.location.protocol?"https://":"http://";
+              _site_hash_code = "a46e1a6ed345c493b7ada52b389bae24",_suid=71280, plerdyScript=document.createElement("script");
+              plerdyScript.setAttribute("defer",""),plerdyScript.dataset.plerdymainscript="plerdymainscript",
+              plerdyScript.src="https://a.plerdy.com/public/js/click/main.js?v="+Math.random();
+              var plerdymainscript=document.querySelector("[data-plerdymainscript='plerdymainscript']");
+              plerdymainscript&&plerdymainscript.parentNode.removeChild(plerdymainscript);
+              try{document.head.appendChild(plerdyScript)}catch(t){console.log(t,"unable add script tag")}
+            `,
+          }}
+        />
       </body>
     </html>
   );

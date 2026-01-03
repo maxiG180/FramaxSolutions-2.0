@@ -162,24 +162,42 @@ export default function SettingsPage() {
 
     return (
         <div className="space-y-8">
-            <div className="sticky top-0 z-10 bg-[#0A0A0A] pb-6 mb-2">
+            <div className="sticky top-0 z-20 bg-[#0A0A0A]/95 backdrop-blur-xl pb-6 pt-1">
                 <h1 className="text-3xl font-bold mb-2">Settings</h1>
                 <p className="text-white/60">Manage your agency preferences.</p>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
                 {/* Sidebar Navigation */}
-                <div className="lg:col-span-1 space-y-2 lg:sticky lg:top-24 lg:self-start lg:h-fit">
+                <div className="lg:col-span-1 space-y-2 hidden lg:block">
+                    <div className="fixed top-32 w-64 space-y-2">
+                        {tabs.map((tab) => (
+                            <button
+                                key={tab.id}
+                                onClick={() => setActiveTab(tab.id)}
+                                className={`w-full text-left px-4 py-2.5 rounded-xl font-medium flex items-center gap-3 transition-colors ${activeTab === tab.id
+                                    ? "bg-white/10 text-white"
+                                    : "hover:bg-white/5 text-white/60 hover:text-white"
+                                    }`}
+                            >
+                                <tab.icon className="w-5 h-5" /> {tab.label}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+
+                {/* Mobile Sidebar (Dropdown or similar - kept simple for now) */}
+                <div className="lg:hidden col-span-1 overflow-x-auto flex gap-2 pb-4">
                     {tabs.map((tab) => (
                         <button
                             key={tab.id}
                             onClick={() => setActiveTab(tab.id)}
-                            className={`w-full text-left px-4 py-2.5 rounded-xl font-medium flex items-center gap-3 transition-colors ${activeTab === tab.id
+                            className={`whitespace-nowrap px-4 py-2 rounded-xl font-medium flex items-center gap-2 transition-colors ${activeTab === tab.id
                                 ? "bg-white/10 text-white"
-                                : "hover:bg-white/5 text-white/60 hover:text-white"
+                                : "bg-white/5 text-white/60"
                                 }`}
                         >
-                            <tab.icon className="w-5 h-5" /> {tab.label}
+                            <tab.icon className="w-4 h-4" /> {tab.label}
                         </button>
                     ))}
                 </div>

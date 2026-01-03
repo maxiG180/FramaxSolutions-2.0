@@ -246,23 +246,7 @@ export function Booking() {
                                     </p>
                                 </div>
 
-                                {/* Quick Stats - Hidden on mobile, shown on desktop */}
-                                <div className="hidden lg:grid grid-cols-2 gap-6 pt-8">
-                                    <div className="space-y-2">
-                                        <div className="flex items-baseline gap-2">
-                                            <span className="text-4xl font-bold text-foreground">50+</span>
-                                            <span className="text-sm text-muted-foreground">projects</span>
-                                        </div>
-                                        <p className="text-sm text-muted-foreground">delivered successfully</p>
-                                    </div>
-                                    <div className="space-y-2">
-                                        <div className="flex items-baseline gap-2">
-                                            <span className="text-4xl font-bold text-foreground">24h</span>
-                                            <span className="text-sm text-muted-foreground">response</span>
-                                        </div>
-                                        <p className="text-sm text-muted-foreground">average reply time</p>
-                                    </div>
-                                </div>
+
 
 
                             </motion.div>
@@ -275,7 +259,7 @@ export function Booking() {
                                 whileInView={{ opacity: 1, scale: 1 }}
                                 viewport={{ once: true }}
                                 transition={{ delay: 0.2 }}
-                                className="bg-card/50 backdrop-blur-xl border border-border/50 rounded-3xl shadow-2xl overflow-hidden relative min-h-[600px] flex flex-col"
+                                className="bg-card/50 backdrop-blur-xl border border-border/50 rounded-3xl shadow-2xl overflow-hidden relative md:min-h-[600px] flex flex-col"
                             >
                                 {/* Progress Bar */}
                                 <div className="h-1 bg-muted w-full">
@@ -296,9 +280,9 @@ export function Booking() {
                                             initial={{ opacity: 0, x: 20 }}
                                             animate={{ opacity: 1, x: 0 }}
                                             exit={{ opacity: 0, x: -20 }}
-                                            className="p-8 flex-1 flex flex-col"
+                                            className="p-4 md:p-8 flex-1 flex flex-col"
                                         >
-                                            <div className="flex items-center justify-between mb-8">
+                                            <div className="flex flex-col sm:flex-row items-center justify-between mb-6 md:mb-8 gap-4 sm:gap-0">
                                                 <h3 className="text-xl font-semibold">Select a Date</h3>
                                                 <div className="flex items-center gap-2 bg-muted/50 rounded-full px-3 py-1.5 border border-border/50">
                                                     <button
@@ -325,7 +309,7 @@ export function Booking() {
                                                 ))}
                                             </div>
 
-                                            <div className="grid grid-cols-7 gap-2">
+                                            <div className="grid grid-cols-7 gap-1 md:gap-2">
                                                 {getDaysInMonth(currentDate).map((date, i) => (
                                                     <div key={i} className="aspect-square">
                                                         {date ? (
@@ -351,7 +335,7 @@ export function Booking() {
                                                 ))}
                                             </div>
 
-                                            <div className="mt-auto pt-8 flex items-center justify-center gap-2 text-xs text-muted-foreground">
+                                            <div className="mt-auto pt-4 md:pt-8 flex items-center justify-center gap-2 text-xs text-muted-foreground">
                                                 <div className="w-2 h-2 rounded-full bg-primary" />
                                                 <span>Times are in your local timezone</span>
                                             </div>

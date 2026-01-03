@@ -1,0 +1,325 @@
+{
+    "name": "N8N V6 - Full HTTP Bypass",
+    "nodes": [
+        {
+            "parameters": {
+                "httpMethod": "POST",
+                "path": "booking",
+                "responseMode": "responseNode",
+                "options": {}
+            },
+            "name": "Webhook",
+            "type": "n8n-nodes-base.webhook",
+            "typeVersion": 1,
+            "position": [
+                -200,
+                0
+            ],
+            "id": "webhook-node",
+            "webhookId": "booking-webhook"
+        },
+        {
+            "parameters": {
+                "keepOnlySet": true,
+                "values": {
+                    "string": [
+                        {
+                            "name": "email",
+                            "value": "={{ $json.body.email.trim() }}"
+                        },
+                        {
+                            "name": "name",
+                            "value": "={{ $json.body.name.trim() }}"
+                        },
+                        {
+                            "name": "action",
+                            "value": "={{ $json.body.action }}"
+                        },
+                        {
+                            "name": "date",
+                            "value": "={{ $json.body.date }}"
+                        },
+                        {
+                            "name": "notes",
+                            "value": "={{ $json.body.notes }}"
+                        },
+                        {
+                            "name": "time",
+                            "value": "={{ $json.body.time }}"
+                        }
+                    ]
+                },
+                "options": {}
+            },
+            "name": "Standardize Data",
+            "type": "n8n-nodes-base.set",
+            "typeVersion": 2,
+            "position": [
+                60,
+                0
+            ],
+            "id": "standardize-node"
+        },
+        {
+            "parameters": {
+                "dataType": "string",
+                "value1": "={{ $json.action }}",
+                "rules": {
+                    "rules": [
+                        {
+                            "value2": "checkAvailability"
+                        },
+                        {
+                            "value2": "bookMeeting",
+                            "output": 1
+                        }
+                    ]
+                },
+                "fallbackOutput": 2
+            },
+            "name": "Switch Action",
+            "type": "n8n-nodes-base.switch",
+            "typeVersion": 1,
+            "position": [
+                300,
+                0
+            ],
+            "id": "switch-node"
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "=https://www.googleapis.com/calendar/v3/calendars/primary/events?conferenceDataVersion=1",
+                "authentication": "predefinedCredentialType",
+                "nodeCredentialType": "googleCalendarOAuth2Api",
+                "sendBody": true,
+                "specifyBody": "json",
+                "jsonBody": "={{ JSON.stringify({\n  summary: 'Discovery Call: ' + $json.name,\n  description: 'Client: ' + $json.name + '\\nEmail: ' + $json.email + '\\nNotes: ' + $json.notes,\n  start: {\n    dateTime: $json.date,\n    timeZone: 'America/New_York'\n  },\n  end: {\n    dateTime: DateTime.fromISO($json.date).plus({ minutes: 30 }).toISO(),\n    timeZone: 'America/New_York'\n  },\n  attendees: [\n    { email: $json.email }\n  ],\n  conferenceData: {\n    createRequest: {\n      requestId: $json.name.replace(/\\s/g, '') + '-' + DateTime.now().toMillis(),\n      conferenceSolutionKey: {\n        type: 'hangoutsMeet'\n      }\n    }\n  }\n}) }}",
+                "options": {}
+            },
+            "name": "Create Event via API",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.1,
+            "position": [
+                600,
+                340
+            ],
+            "id": "create-event-api-node",
+            "credentials": {
+                "googleCalendarOAuth2Api": {
+                    "id": "IvDwA3nEmMdwWJ13",
+                    "name": "Google Calendar account"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "jsCode": "const clientEmail = $('Standardize Data').first().json.email;\nconst clientName = $('Standardize Data').first().json.name;\nconst meetingDate = $('Standardize Data').first().json.date;\nconst meetingTime = $('Standardize Data').first().json.time;\nconst meetLink = $json.hangoutLink || '';\n\nconst htmlBody = `<!DOCTYPE html><html><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1.0\"></head><body style=\"margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;background-color:#f5f5f5\"><table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" style=\"background-color:#f5f5f5;padding:40px 20px\"><tr><td align=\"center\"><table width=\"600\" cellpadding=\"0\" cellspacing=\"0\" style=\"background-color:#ffffff;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,0.1)\"><tr><td style=\"background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);padding:40px;text-align:center;border-radius:8px 8px 0 0\"><h1 style=\"margin:0;color:#ffffff;font-size:28px;font-weight:600\">Booking Confirmed!</h1></td></tr><tr><td style=\"padding:40px\"><p style=\"margin:0 0 20px 0;font-size:16px;color:#333333;line-height:1.6\">Hi ${clientName},</p><p style=\"margin:0 0 30px 0;font-size:16px;color:#333333;line-height:1.6\">Thank you for booking a discovery call with <strong>Framax Solutions</strong>. We're excited to connect with you!</p><table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" style=\"background-color:#f8f9fa;border-radius:6px;margin-bottom:30px\"><tr><td style=\"padding:24px\"><h2 style=\"margin:0 0 16px 0;font-size:18px;color:#333333;font-weight:600\">Meeting Details</h2><p style=\"margin:0 0 8px 0;font-size:15px;color:#555555\"><strong>Date:</strong> ${new Date(meetingDate).toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'})}</p><p style=\"margin:0;font-size:15px;color:#555555\"><strong>Time:</strong> ${meetingTime}</p></td></tr></table>${meetLink?`<table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" style=\"margin-bottom:30px\"><tr><td align=\"center\"><a href=\"${meetLink}\" style=\"display:inline-block;padding:16px 40px;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:#ffffff;text-decoration:none;border-radius:6px;font-size:16px;font-weight:600;box-shadow:0 4px 12px rgba(102,126,234,0.4)\">Join Google Meet</a></td></tr></table>`:''}<p style=\"margin:0 0 20px 0;font-size:14px;color:#666666;line-height:1.6\">A calendar invitation has been sent to your email.</p><hr style=\"border:none;border-top:1px solid #e0e0e0;margin:30px 0\"><p style=\"margin:0 0 8px 0;font-size:14px;color:#333333\">Best regards,</p><p style=\"margin:0 0 4px 0;font-size:14px;color:#333333;font-weight:600\">The Framax Solutions Team</p><p style=\"margin:0;font-size:14px\"><a href=\"https://framaxsolutions.com\" style=\"color:#667eea;text-decoration:none\">framaxsolutions.com</a></p></td></tr><tr><td style=\"padding:20px;text-align:center;background-color:#f8f9fa;border-radius:0 0 8px 8px\"><p style=\"margin:0;font-size:12px;color:#999999\">© 2025 Framax Solutions. All rights reserved.</p></td></tr></table></td></tr></table></body></html>`;\n\nconst emailLines = [`To: ${clientEmail}`,`Subject: Booking Confirmed: Discovery Call with Framax Solutions`,`MIME-Version: 1.0`,`Content-Type: text/html; charset=utf-8`,``,htmlBody];\nconst rawEmail = emailLines.join('\\r\\n');\nconst base64 = Buffer.from(rawEmail,'utf-8').toString('base64').replace(/\\+/g,'-').replace(/\\//g,'_').replace(/=+$/,'');\nreturn {json:{raw:base64}};"
+            },
+            "name": "Prepare Email Message",
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                820,
+                340
+            ],
+            "id": "prepare-email-node"
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "https://gmail.googleapis.com/gmail/v1/users/me/messages/send",
+                "authentication": "predefinedCredentialType",
+                "nodeCredentialType": "gmailOAuth2",
+                "sendBody": true,
+                "specifyBody": "json",
+                "jsonBody": "={{ JSON.stringify($json) }}",
+                "options": {}
+            },
+            "name": "Send Email via API",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.1,
+            "position": [
+                1040,
+                340
+            ],
+            "id": "send-email-node",
+            "credentials": {
+                "gmailOAuth2": {
+                    "id": "EU7CxPiZpDbpNeXX",
+                    "name": "Gmail account"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "operation": "getAll",
+                "calendar": {
+                    "__rl": true,
+                    "mode": "list",
+                    "value": "primary"
+                },
+                "options": {
+                    "singleEvents": true,
+                    "timeMin": "={{ DateTime.fromISO($json.date).minus({ days: 2 }).toISO() }}",
+                    "timeMax": "={{ DateTime.fromISO($json.date).plus({ days: 2 }).toISO() }}"
+                }
+            },
+            "name": "Get Calendar Events",
+            "type": "n8n-nodes-base.googleCalendar",
+            "typeVersion": 1,
+            "position": [
+                600,
+                -180
+            ],
+            "id": "get-calendar-node",
+            "alwaysOutputData": true,
+            "credentials": {
+                "googleCalendarOAuth2Api": {
+                    "id": "IvDwA3nEmMdwWJ13",
+                    "name": "Google Calendar account"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "jsCode": "const busySlots=[];const events=$input.all();let targetDateStr='';try{if($('Standardize Data')&&$('Standardize Data').first()){const stdData=$('Standardize Data').first().json;targetDateStr=stdData.date.split('T')[0];}else if($json.date){targetDateStr=$json.date.split('T')[0];}}catch(e){}for(const event of events){const jsonData=event.json;if(!jsonData.start||(!jsonData.start.dateTime&&!jsonData.start.date))continue;const dateTimeStr=jsonData.start.dateTime||jsonData.start.date;if(targetDateStr&&dateTimeStr.startsWith(targetDateStr)){const timePart=dateTimeStr.split('T')[1];if(timePart){const timeHHMM=timePart.substring(0,5);let[hours,minutes]=timeHHMM.split(':').map(Number);const ampm=hours>=12?'PM':'AM';hours=hours%12;hours=hours?hours:12;const strMinutes=minutes<10?'0'+minutes:minutes;const strHours=hours<10?'0'+hours:hours;busySlots.push(`${strHours}:${strMinutes} ${ampm}`);}}}return[{json:{busySlots:busySlots}}];"
+            },
+            "name": "Calculate Busy Slots",
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                820,
+                -180
+            ],
+            "id": "calc-busy-node"
+        },
+        {
+            "parameters": {
+                "respondWith": "json",
+                "responseBody": "={{ JSON.stringify($json) }}",
+                "options": {}
+            },
+            "name": "Return Busy Slots",
+            "type": "n8n-nodes-base.respondToWebhook",
+            "typeVersion": 1,
+            "position": [
+                1040,
+                -180
+            ],
+            "id": "return-busy-node"
+        },
+        {
+            "parameters": {
+                "respondWith": "json",
+                "responseBody": "{\n  \"status\": \"success\",\n  \"message\": \"Booking confirmed\"\n}",
+                "options": {}
+            },
+            "name": "Return Success",
+            "type": "n8n-nodes-base.respondToWebhook",
+            "typeVersion": 1,
+            "position": [
+                1260,
+                340
+            ],
+            "id": "return-success-node"
+        }
+    ],
+    "connections": {
+        "Webhook": {
+            "main": [
+                [
+                    {
+                        "node": "Standardize Data",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Standardize Data": {
+            "main": [
+                [
+                    {
+                        "node": "Switch Action",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Switch Action": {
+            "main": [
+                [
+                    {
+                        "node": "Get Calendar Events",
+                        "type": "main",
+                        "index": 0
+                    }
+                ],
+                [
+                    {
+                        "node": "Create Event via API",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Create Event via API": {
+            "main": [
+                [
+                    {
+                        "node": "Prepare Email Message",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Prepare Email Message": {
+            "main": [
+                [
+                    {
+                        "node": "Send Email via API",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Send Email via API": {
+            "main": [
+                [
+                    {
+                        "node": "Return Success",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Get Calendar Events": {
+            "main": [
+                [
+                    {
+                        "node": "Calculate Busy Slots",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Calculate Busy Slots": {
+            "main": [
+                [
+                    {
+                        "node": "Return Busy Slots",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    }
+}
