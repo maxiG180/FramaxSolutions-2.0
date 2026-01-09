@@ -3,7 +3,6 @@
 import { motion, useAnimationFrame, useMotionValue } from "framer-motion";
 import { ExternalLink, Play } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { useLanguage } from "@/context/LanguageContext";
 
 interface Project {
     id: number;
@@ -170,7 +169,6 @@ const PortfolioItem = ({ project, onClick }: { project: Project; onClick: (link:
 };
 
 export function NewPortfolio() {
-    const { t } = useLanguage();
     const containerRef = useRef<HTMLDivElement>(null);
     const [contentWidth, setContentWidth] = useState(0);
     const [isHovered, setIsHovered] = useState(false);
@@ -240,7 +238,7 @@ export function NewPortfolio() {
                     viewport={{ once: true }}
                     className="inline-block px-3 py-1 mb-4 text-xs font-medium tracking-wider text-primary uppercase bg-primary/10 rounded-full border border-primary/20"
                 >
-                    {t.portfolio.badge}
+                    Showcase
                 </motion.div>
 
                 <motion.h2
@@ -250,7 +248,7 @@ export function NewPortfolio() {
                     transition={{ delay: 0.1 }}
                     className="text-4xl md:text-6xl font-bold mb-4"
                 >
-                    {t.portfolio.title} <span className="text-primary">{t.portfolio.titleHighlight}</span>
+                    Our <span className="text-primary">Portfolio</span>
                 </motion.h2>
 
                 <motion.p
@@ -260,7 +258,7 @@ export function NewPortfolio() {
                     transition={{ delay: 0.2 }}
                     className="text-muted-foreground max-w-2xl mx-auto"
                 >
-                    {t.portfolio.subtitle}
+                    We're currently finalizing a selection of our most impactful digital experiences. Stay tuned.
                 </motion.p>
             </div>
 
@@ -289,7 +287,7 @@ export function NewPortfolio() {
                         className="text-center"
                     >
                         <h3 className="text-5xl md:text-7xl font-black tracking-tighter text-white/10 uppercase select-none">
-                            {t.portfolio.comingSoon}
+                            Coming Soon
                         </h3>
                     </motion.div>
                 </div>
@@ -297,7 +295,7 @@ export function NewPortfolio() {
 
             <div className="container mx-auto px-4 mt-12 flex justify-center">
                 <a href="#booking" className="inline-flex items-center justify-center px-6 py-3 text-sm font-medium transition-colors rounded-full bg-primary text-primary-foreground hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background">
-                    {t.portfolio.startProject}
+                    Start your project
                 </a>
             </div>
         </section>
