@@ -3,36 +3,38 @@
 import { motion } from "framer-motion";
 import { ArrowUpRight, ExternalLink } from "lucide-react";
 import { useState } from "react";
-
-const PROJECTS = [
-    {
-        id: 1,
-        title: "Lumina Finance",
-        category: "Fintech Platform",
-        description: "A next-gen dashboard for crypto asset management. Real-time data visualization with 0ms latency.",
-        color: "from-blue-500 to-cyan-400",
-        link: "#"
-    },
-    {
-        id: 2,
-        title: "Velvet & Oak",
-        category: "E-commerce",
-        description: "Luxury furniture store with 3D product previews and AI-driven recommendations.",
-        color: "from-amber-500 to-orange-400",
-        link: "#"
-    },
-    {
-        id: 3,
-        title: "Nexus Health",
-        category: "SaaS Application",
-        description: "Patient management system streamlining workflow for over 500+ clinics worldwide.",
-        color: "from-emerald-500 to-green-400",
-        link: "#"
-    }
-];
+import { useLanguage } from "@/context/LanguageContext";
 
 export function Portfolio() {
+    const { t } = useLanguage();
     const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+
+    const PROJECTS = [
+        {
+            id: 1,
+            title: t.portfolio.project1Title,
+            category: t.portfolio.project1Category,
+            description: t.portfolio.project1Description,
+            color: "from-blue-500 to-cyan-400",
+            link: "#"
+        },
+        {
+            id: 2,
+            title: t.portfolio.project2Title,
+            category: t.portfolio.project2Category,
+            description: t.portfolio.project2Description,
+            color: "from-amber-500 to-orange-400",
+            link: "#"
+        },
+        {
+            id: 3,
+            title: t.portfolio.project3Title,
+            category: t.portfolio.project3Category,
+            description: t.portfolio.project3Description,
+            color: "from-emerald-500 to-green-400",
+            link: "#"
+        }
+    ];
 
     return (
         <section id="portfolio" className="py-32 bg-background relative overflow-hidden">
@@ -44,7 +46,7 @@ export function Portfolio() {
                         viewport={{ once: true }}
                         className="text-4xl md:text-6xl font-bold mb-6"
                     >
-                        Selected <span className="text-primary">Work</span>
+                        {t.portfolio.title} <span className="text-primary">{t.portfolio.titleHighlight}</span>
                     </motion.h2>
                     <motion.p
                         initial={{ opacity: 0, y: 20 }}
@@ -53,7 +55,7 @@ export function Portfolio() {
                         transition={{ delay: 0.1 }}
                         className="text-xl text-muted-foreground max-w-2xl"
                     >
-                        We don't just write code. We build digital empires that scale, convert, and impress.
+                        {t.portfolio.subtitle}
                     </motion.p>
                 </div>
 

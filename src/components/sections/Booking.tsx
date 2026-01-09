@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Calendar, Clock, ArrowRight, Check, ChevronLeft, ChevronRight } from "lucide-react";
 import confetti from "canvas-confetti";
 import { cn } from "@/lib/utils";
+import { useLanguage } from "@/context/LanguageContext";
 
 const TIME_SLOTS = [
     "09:00 AM", "09:30 AM", "10:00 AM", "10:30 AM",
@@ -12,10 +13,12 @@ const TIME_SLOTS = [
     "02:00 PM", "02:30 PM", "03:00 PM", "03:30 PM"
 ];
 
-const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
 export function Booking() {
+    const { t } = useLanguage();
+
+    const DAYS = [t.booking.sun, t.booking.mon, t.booking.tue, t.booking.wed, t.booking.thu, t.booking.fri, t.booking.sat];
     const [step, setStep] = useState<"date" | "time" | "form" | "success">("date");
     const [selectedDate, setSelectedDate] = useState<Date | null>(null);
     const [selectedTime, setSelectedTime] = useState<string | null>(null);
@@ -227,13 +230,13 @@ export function Booking() {
                                 {/* Main Headline */}
                                 <div>
                                     <h2 className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-[1.1] mb-6">
-                                        Book your
+                                        {t.booking.title}
                                         <span className="block bg-gradient-to-r from-primary via-blue-500 to-blue-400 bg-clip-text text-transparent">
-                                            free call
+                                            {t.booking.titleHighlight}
                                         </span>
                                     </h2>
                                     <p className="text-xl text-muted-foreground leading-relaxed max-w-md">
-                                        30 minutes to discuss your project. Zero commitment, maximum value.
+                                        {t.booking.subtitle}
                                     </p>
                                 </div>
 
@@ -274,7 +277,7 @@ export function Booking() {
                                             className="p-4 md:p-8 flex-1 flex flex-col"
                                         >
                                             <div className="flex flex-col sm:flex-row items-center justify-between mb-6 md:mb-8 gap-4 sm:gap-0">
-                                                <h3 className="text-xl font-semibold">Select a Date</h3>
+                                                <h3 className="text-xl font-semibold">{t.booking.selectDate}</h3>
                                                 <div className="flex items-center gap-2 bg-muted/50 rounded-full px-3 py-1.5 border border-border/50">
                                                     <button
                                                         onClick={() => setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1))}
@@ -328,7 +331,7 @@ export function Booking() {
 
                                             <div className="mt-auto pt-4 md:pt-8 flex items-center justify-center gap-2 text-xs text-muted-foreground">
                                                 <div className="w-2 h-2 rounded-full bg-primary" />
-                                                <span>Times are in your local timezone</span>
+                                                <span>{t.booking.timezoneNote}</span>
                                             </div>
                                         </motion.div>
                                     )}
@@ -347,7 +350,7 @@ export function Booking() {
                                                     <ChevronLeft className="w-4 h-4" />
                                                 </button>
                                                 <div>
-                                                    <h3 className="text-xl font-semibold">Select a Time</h3>
+                                                    <h3 className="text-xl font-semibold">{t.booking.selectTime}</h3>
                                                     <p className="text-sm text-muted-foreground">
                                                         {selectedDate?.toLocaleDateString("en-US", { weekday: 'long', month: 'long', day: 'numeric' })}
                                                     </p>
@@ -358,7 +361,7 @@ export function Booking() {
                                                 {isLoadingAvailability ? (
                                                     <div className="col-span-full flex flex-col items-center justify-center py-12 text-muted-foreground">
                                                         <div className="w-8 h-8 border-4 border-primary/30 border-t-primary rounded-full animate-spin mb-2" />
-                                                        <p>Checking availability...</p>
+                                                        <p>{t.booking.checkingAvailability}</p>
                                                     </div>
                                                 ) : (
                                                     TIME_SLOTS.map((time, i) => {
@@ -393,7 +396,7 @@ export function Booking() {
                                                         <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
                                                         {(() => {
                                                             const availableCount = TIME_SLOTS.filter(slot => !busySlots.includes(slot) && !isSlotInPast(slot)).length;
-                                                            return `${availableCount} ${availableCount === 1 ? 'spot' : 'spots'} left for this day`;
+                                                            return `${availableCount} ${availableCount === 1 ? t.booking.spot : t.booking.spots} ${t.booking.spotsLeft}`;
                                                         })()}
                                                     </span>
                                                 </div>
@@ -414,7 +417,7 @@ export function Booking() {
                                                 <button onClick={() => setStep("time")} className="p-2 hover:bg-muted rounded-full transition-colors border border-border/50">
                                                     <ChevronLeft className="w-4 h-4" />
                                                 </button>
-                                                <h3 className="text-xl font-semibold">Final Details</h3>
+                                                <h3 className="text-xl font-semibold">{t.booking.finalDetails}</h3>
                                             </div>
 
                                             <div className="bg-primary/5 border border-primary/10 p-4 rounded-xl mb-8 flex items-center justify-between">
@@ -430,13 +433,13 @@ export function Booking() {
                                                     </div>
                                                 </div>
                                                 <button onClick={() => setStep("date")} className="text-xs font-medium text-primary hover:underline">
-                                                    Change
+                                                    {t.booking.change}
                                                 </button>
                                             </div>
 
                                             <form onSubmit={handleSubmit} className="space-y-5">
                                                 <div className="space-y-1.5">
-                                                    <label className="text-sm font-medium text-foreground ml-1">Full Name</label>
+                                                    <label className="text-sm font-medium text-foreground ml-1">{t.booking.fullName}</label>
                                                     <input
                                                         required
                                                         type="text"
@@ -447,7 +450,7 @@ export function Booking() {
                                                     />
                                                 </div>
                                                 <div className="space-y-1.5">
-                                                    <label className="text-sm font-medium text-foreground ml-1">Work Email</label>
+                                                    <label className="text-sm font-medium text-foreground ml-1">{t.booking.workEmail}</label>
                                                     <input
                                                         required
                                                         type="email"
@@ -476,12 +479,12 @@ export function Booking() {
                                                     )}
                                                 </div>
                                                 <div className="space-y-1.5">
-                                                    <label className="text-sm font-medium text-foreground ml-1">Project Notes (Optional)</label>
+                                                    <label className="text-sm font-medium text-foreground ml-1">{t.booking.projectNotes}</label>
                                                     <textarea
                                                         value={formData.notes}
                                                         onChange={e => setFormData({ ...formData, notes: e.target.value })}
                                                         className="w-full px-4 py-3 rounded-xl border border-border bg-zinc-950/50 text-zinc-100 placeholder:text-muted-foreground focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all resize-none h-24"
-                                                        placeholder="Tell us a bit about your goals..."
+                                                        placeholder={t.booking.projectNotesPlaceholder}
                                                     />
                                                 </div>
 
@@ -491,10 +494,10 @@ export function Booking() {
                                                     className="w-full bg-primary text-primary-foreground py-4 rounded-xl font-medium hover:bg-primary/90 transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2 mt-2 disabled:opacity-70 disabled:cursor-not-allowed shadow-lg shadow-primary/25"
                                                 >
                                                     {isSubmitting ? (
-                                                        "Confirming..."
+                                                        t.booking.confirming
                                                     ) : (
                                                         <>
-                                                            Confirm Booking <ArrowRight className="w-4 h-4" />
+                                                            {t.booking.confirmBooking} <ArrowRight className="w-4 h-4" />
                                                         </>
                                                     )}
                                                 </button>
@@ -522,11 +525,11 @@ export function Booking() {
                                             >
                                                 <Check className="w-12 h-12" />
                                             </motion.div>
-                                            <h3 className="text-3xl font-bold mb-4">You're all set!</h3>
+                                            <h3 className="text-3xl font-bold mb-4">{t.booking.allSet}</h3>
                                             <p className="text-muted-foreground mb-8 max-w-sm mx-auto leading-relaxed">
-                                                A calendar invitation and confirmation email have been sent to <span className="text-foreground font-medium">{formData.email}</span>.
+                                                {t.booking.confirmationSent} <span className="text-foreground font-medium">{formData.email}</span>.
                                                 <br />
-                                                We look forward to connecting with you!
+                                                {t.booking.lookForward}
                                             </p>
                                             <button
                                                 onClick={() => {
@@ -537,7 +540,7 @@ export function Booking() {
                                                 }}
                                                 className="text-primary hover:underline text-sm font-medium"
                                             >
-                                                Book another call
+                                                {t.booking.bookAnother}
                                             </button>
                                         </motion.div>
                                     )}

@@ -39,6 +39,81 @@ export interface Translation {
         startProject: string;
         viewWork: string;
         trustedBy: string;
+        // New Hero Section
+        title: string;
+        subtitle: string;
+        bookMeeting: string;
+        couldBeYou: string;
+        moreClients: string;
+        alwaysOpen: string;
+        alwaysOnline: string;
+        growth: string;
+        reviews: string;
+        yourBusiness: string;
+        yourWebsite: string;
+        learnMore: string;
+        reviewsCount: string;
+        // Review names and texts
+        review1Name: string;
+        review1Text: string;
+        review2Name: string;
+        review2Text: string;
+        review3Name: string;
+        review3Text: string;
+    };
+    portfolio: {
+        badge: string;
+        title: string;
+        titleHighlight: string;
+        subtitle: string;
+        comingSoon: string;
+        startProject: string;
+        // Project 1
+        project1Title: string;
+        project1Category: string;
+        project1Description: string;
+        // Project 2
+        project2Title: string;
+        project2Category: string;
+        project2Description: string;
+        // Project 3
+        project3Title: string;
+        project3Category: string;
+        project3Description: string;
+    };
+    booking: {
+        title: string;
+        titleHighlight: string;
+        subtitle: string;
+        selectDate: string;
+        selectTime: string;
+        finalDetails: string;
+        fullName: string;
+        workEmail: string;
+        projectNotes: string;
+        projectNotesPlaceholder: string;
+        confirmBooking: string;
+        confirming: string;
+        change: string;
+        checkingAvailability: string;
+        spotsLeft: string;
+        spot: string;
+        spots: string;
+        timezoneNote: string;
+        allSet: string;
+        confirmationSent: string;
+        lookForward: string;
+        bookAnother: string;
+        sun: string;
+        mon: string;
+        tue: string;
+        wed: string;
+        thu: string;
+        fri: string;
+        sat: string;
+    };
+    techStack: {
+        poweredBy: string;
     };
     features: {
         title: string;
