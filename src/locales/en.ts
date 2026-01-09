@@ -68,6 +68,14 @@ export const en: Translation = {
         privacyTitle: "Privacy Policy",
         termsTitle: "Terms of Service",
     },
+    portfolio: {
+        badge: "Showcase",
+        title: "Our",
+        titleHighlight: "Portfolio",
+        subtitle: "We're currently finalizing a selection of our most impactful digital experiences. Stay tuned.",
+        comingSoon: "Coming Soon",
+        startProject: "Start your project",
+    },
     dashboard: {
         menu: {
             management: "Management",

@@ -68,6 +68,14 @@ export const pt: Translation = {
         privacyTitle: "Política de Privacidade",
         termsTitle: "Termos de Serviço",
     },
+    portfolio: {
+        badge: "Portfólio",
+        title: "Nosso",
+        titleHighlight: "Portfólio",
+        subtitle: "Estamos a finalizar uma seleção das nossas experiências digitais mais impactantes. Fique atento.",
+        comingSoon: "Em Breve",
+        startProject: "Iniciar o seu projeto",
+    },
     dashboard: {
         menu: {
             management: "Gestão",

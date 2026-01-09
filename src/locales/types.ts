@@ -66,6 +66,14 @@ export interface Translation {
         privacyTitle: string;
         termsTitle: string;
     };
+    portfolio: {
+        badge: string;
+        title: string;
+        titleHighlight: string;
+        subtitle: string;
+        comingSoon: string;
+        startProject: string;
+    };
     dashboard: {
         menu: {
             management: string;
