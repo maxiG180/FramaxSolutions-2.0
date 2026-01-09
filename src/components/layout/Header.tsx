@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { motion, useScroll, useMotionValueEvent } from "framer-motion";
 import { useLanguage } from "@/context/LanguageContext";
 import { cn } from "@/lib/utils";
@@ -28,31 +29,43 @@ export function Header() {
             )}
         >
             <div className="container mx-auto px-4 flex items-center justify-between">
-                <Link href="/#hero" className="text-2xl font-bold tracking-tighter">
-                    <span className="text-[#2563eb]">Framax</span><span className="text-white">Solutions</span>
+                {/* Left - Logo */}
+                <Link href="/#hero" className="flex items-center z-10">
+                    <Image
+                        src="/logos/framax-logo-white.png"
+                        alt="Framax Solutions"
+                        width={200}
+                        height={200}
+                        className="h-auto w-48"
+                    />
                 </Link>
 
-                <nav className="hidden md:flex items-center gap-8">
+                {/* Center - Navigation (Desktop) */}
+                <nav className="hidden md:flex items-center gap-8 absolute left-1/2 -translate-x-1/2">
                     <Link href="/#features" className="text-sm font-medium hover:text-primary transition-colors">
                         {t.header.features}
                     </Link>
                     <Link href="/#portfolio" className="text-sm font-medium hover:text-primary transition-colors">
                         {t.header.portfolio}
                     </Link>
-
-
                     <Link href="/#booking" className="bg-primary text-primary-foreground px-5 py-2 rounded-full text-sm font-medium hover:bg-primary/90 transition-all hover:scale-105 active:scale-95">
                         {t.header.getStarted}
                     </Link>
-                    <LanguageSwitcher />
                 </nav>
 
-                <button
-                    className="md:hidden p-2"
-                    onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                >
-                    {isMobileMenuOpen ? <X /> : <Menu />}
-                </button>
+                {/* Right - Language Switcher & Mobile Menu Button */}
+                <div className="flex items-center gap-4">
+                    <div className="hidden md:block">
+                        <LanguageSwitcher />
+                    </div>
+
+                    <button
+                        className="md:hidden p-2"
+                        onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                    >
+                        {isMobileMenuOpen ? <X /> : <Menu />}
+                    </button>
+                </div>
             </div>
 
             {/* Mobile Menu */}

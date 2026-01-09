@@ -6,6 +6,7 @@ import { InvoiceList } from "@/components/dashboard/invoices/InvoiceList";
 import { QuoteModal } from "@/components/dashboard/invoices/QuoteModal";
 import { Plus, FileText, AlertCircle, CheckCircle, ChevronDown, Receipt, FileSignature } from "lucide-react";
 import { Loader } from "@/components/ui/loader";
+import { useLanguage } from "@/context/LanguageContext";
 
 type DocumentType = "all" | "invoice" | "quote";
 
@@ -18,31 +19,50 @@ interface Document {
     type: "invoice" | "quote";
 }
 
-const DOCUMENTS: Document[] = [
-
-    { id: "#INV-2024-001", client: "Fashion Nova", amount: "$2,500.00", date: "Nov 25, 2025", status: "paid" as const, type: "invoice" as const },
-    { id: "#INV-2024-002", client: "TechCorp Inc.", amount: "$1,200.00", date: "Nov 28, 2025", status: "pending" as const, type: "invoice" as const },
-    { id: "#INV-2024-003", client: "FitLife", amount: "$850.00", date: "Nov 15, 2025", status: "overdue" as const, type: "invoice" as const },
-    { id: "#INV-2024-004", client: "Green Earth", amount: "$3,000.00", date: "Nov 10, 2025", status: "paid" as const, type: "invoice" as const },
-    { id: "#INV-2024-005", client: "Speedy Motors", amount: "$1,500.00", date: "Dec 01, 2025", status: "pending" as const, type: "invoice" as const },
-    { id: "#QTE-2024-001", client: "Urban Fitness", amount: "$4,200.00", date: "Dec 05, 2025", status: "sent" as const, type: "quote" as const },
-    { id: "#QTE-2024-002", client: "Cafe Luxe", amount: "$1,800.00", date: "Dec 08, 2025", status: "draft" as const, type: "quote" as const },
-    { id: "#QTE-2024-003", client: "Digital Dreams", amount: "$5,500.00", date: "Dec 10, 2025", status: "accepted" as const, type: "quote" as const },
-    { id: "#QTE-2024-004", client: "Metro Bank", amount: "$2,100.00", date: "Nov 20, 2025", status: "declined" as const, type: "quote" as const },
-];
 
 export default function InvoicesPage() {
+    const { t } = useLanguage();
     const [mounted, setMounted] = useState(false);
     const [loading, setLoading] = useState(true);
     const [activeTab, setActiveTab] = useState<DocumentType>("all");
     const [showCreateDropdown, setShowCreateDropdown] = useState(false);
     const [isQuoteModalOpen, setIsQuoteModalOpen] = useState(false);
-    const [documents, setDocuments] = useState(DOCUMENTS);
+    const [documents, setDocuments] = useState<Document[]>([]);
+    const [error, setError] = useState<string>("");
+
+    // Fetch documents from API
+    const fetchDocuments = async () => {
+        try {
+            setLoading(true);
+            setError("");
+            // TODO: Replace with actual API endpoint when backend is ready
+            // For now, we'll use an empty array until the API is implemented
+            const response = await fetch('/api/documents');
+
+            if (!response.ok) {
+                // If the endpoint doesn't exist yet, just use empty array
+                if (response.status === 404) {
+                    setDocuments([]);
+                    return;
+                }
+                throw new Error('Failed to fetch documents');
+            }
+
+            const data = await response.json();
+            setDocuments(data);
+        } catch (err: any) {
+            console.error('Error fetching documents:', err);
+            // Set empty array instead of showing error if API doesn't exist yet
+            setDocuments([]);
+            // setError(err.message);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     useEffect(() => {
         setMounted(true);
-        const timer = setTimeout(() => setLoading(false), 1000);
-        return () => clearTimeout(timer);
+        fetchDocuments();
     }, []);
 
     const filteredDocuments = documents.filter(doc => {
@@ -92,8 +112,8 @@ export default function InvoicesPage() {
         <div className="flex flex-col h-full">
             <div className="flex items-center justify-between mb-8 flex-shrink-0">
                 <div>
-                    <h1 className="text-3xl font-bold mb-2">Documents</h1>
-                    <p className="text-white/60">Manage your invoices, quotes, and billing.</p>
+                    <h1 className="text-3xl font-bold mb-2">{t.invoices.title}</h1>
+                    <p className="text-white/60">{t.invoices.subtitle}</p>
                 </div>
                 <div className="relative">
                     <button
@@ -101,7 +121,7 @@ export default function InvoicesPage() {
                         className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-medium transition-all shadow-lg shadow-blue-500/20"
                     >
                         <Plus className="w-5 h-5" />
-                        Create New
+                        {t.invoices.createNew}
                         <ChevronDown className={`w-4 h-4 transition-transform ${showCreateDropdown ? 'rotate-180' : ''}`} />
                     </button>
                     {showCreateDropdown && (
@@ -114,8 +134,8 @@ export default function InvoicesPage() {
                                     <Receipt className="w-4 h-4 text-blue-400" />
                                 </div>
                                 <div>
-                                    <p className="font-medium text-white">Create Invoice</p>
-                                    <p className="text-xs text-white/60">Bill your client</p>
+                                    <p className="font-medium text-white">{t.invoices.createInvoice}</p>
+                                    <p className="text-xs text-white/60">{t.invoices.createInvoiceDesc}</p>
                                 </div>
                             </button>
                             <button
@@ -126,8 +146,8 @@ export default function InvoicesPage() {
                                     <FileSignature className="w-4 h-4 text-purple-400" />
                                 </div>
                                 <div>
-                                    <p className="font-medium text-white">Create Quote</p>
-                                    <p className="text-xs text-white/60">Send a proposal</p>
+                                    <p className="font-medium text-white">{t.invoices.createQuote}</p>
+                                    <p className="text-xs text-white/60">{t.invoices.createQuoteDesc}</p>
                                 </div>
                             </button>
                         </div>
@@ -135,7 +155,11 @@ export default function InvoicesPage() {
                 </div>
             </div>
 
-            <QuoteModal isOpen={isQuoteModalOpen} onClose={() => setIsQuoteModalOpen(false)} />
+            <QuoteModal
+                isOpen={isQuoteModalOpen}
+                onClose={() => setIsQuoteModalOpen(false)}
+                onQuoteSaved={fetchDocuments}
+            />
 
 
             {/* Tab Navigation */}
@@ -147,7 +171,7 @@ export default function InvoicesPage() {
                         : "text-white/60 hover:text-white/80"
                         }`}
                 >
-                    All Documents
+                    {t.invoices.allDocuments}
                     {activeTab === "all" && (
                         <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-400" />
                     )}
@@ -159,7 +183,7 @@ export default function InvoicesPage() {
                         : "text-white/60 hover:text-white/80"
                         }`}
                 >
-                    Invoices
+                    {t.invoices.invoices}
                     {activeTab === "invoice" && (
                         <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-400" />
                     )}
@@ -171,12 +195,18 @@ export default function InvoicesPage() {
                         : "text-white/60 hover:text-white/80"
                         }`}
                 >
-                    Quotes
+                    {t.invoices.quotes}
                     {activeTab === "quote" && (
                         <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-400" />
                     )}
                 </button>
             </div>
+
+            {error && (
+                <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 rounded-lg text-red-400">
+                    {error}
+                </div>
+            )}
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 flex-shrink-0">
                 <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
@@ -186,7 +216,7 @@ export default function InvoicesPage() {
                         </div>
                         <div>
                             <p className="text-white/60 text-sm">
-                                {activeTab === "quote" ? "Total Quoted" : activeTab === "invoice" ? "Total Invoiced" : "Total Value"}
+                                {activeTab === "quote" ? t.invoices.totalQuoted : activeTab === "invoice" ? t.invoices.totalInvoiced : t.invoices.totalValue}
                             </p>
                             <p className="text-2xl font-bold">{stats.total}</p>
                         </div>
@@ -199,7 +229,7 @@ export default function InvoicesPage() {
                         </div>
                         <div>
                             <p className="text-white/60 text-sm">
-                                {activeTab === "quote" ? "Declined" : "Overdue Amount"}
+                                {activeTab === "quote" ? t.invoices.declined : t.invoices.overdueAmount}
                             </p>
                             <p className="text-2xl font-bold">{stats.overdue}</p>
                         </div>
@@ -212,7 +242,7 @@ export default function InvoicesPage() {
                         </div>
                         <div>
                             <p className="text-white/60 text-sm">
-                                {activeTab === "quote" ? "Accepted" : "Paid This Month"}
+                                {activeTab === "quote" ? t.invoices.accepted : t.invoices.paidThisMonth}
                             </p>
                             <p className="text-2xl font-bold">{stats.completed}</p>
                         </div>
@@ -221,7 +251,23 @@ export default function InvoicesPage() {
             </div>
 
             <div className="flex-1 overflow-hidden min-h-0">
-                <InvoiceList invoices={filteredDocuments} onConvertToInvoice={handleConvertToInvoice} />
+                {filteredDocuments.length === 0 ? (
+                    <div className="flex items-center justify-center h-full">
+                        <div className="text-center py-12">
+                            <div className="p-4 bg-white/5 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
+                                <FileText className="w-8 h-8 text-white/40" />
+                            </div>
+                            <p className="text-white/40 mb-2">
+                                {activeTab === "all" ? t.invoices.noDocuments : activeTab === "invoice" ? t.invoices.noInvoices : t.invoices.noQuotes}
+                            </p>
+                            <p className="text-white/20 text-sm">
+                                {activeTab === "all" ? t.invoices.createFirst : activeTab === "invoice" ? t.invoices.createFirstInvoice : t.invoices.createFirstQuote}
+                            </p>
+                        </div>
+                    </div>
+                ) : (
+                    <InvoiceList invoices={filteredDocuments} onConvertToInvoice={handleConvertToInvoice} />
+                )}
             </div>
         </div>
     );

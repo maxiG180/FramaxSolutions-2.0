@@ -3,6 +3,7 @@ import type { NextRequest } from 'next/server';
 import { rateLimit, RATE_LIMITS } from '@/utils/rate-limit';
 import { addCorsHeaders, handleCorsPreFlight } from '@/utils/cors';
 import { logger } from '@/utils/logger';
+import { validateRequest, bookMeetingSchema } from '@/utils/validation';
 
 export async function OPTIONS(request: NextRequest) {
     const preflightResponse = handleCorsPreFlight(request);
@@ -20,16 +21,27 @@ export async function POST(request: NextRequest) {
             return addCorsHeaders(rateLimitResponse, request);
         }
 
-        // Parse request body
+        // Parse and validate request body
         const body = await request.json();
+        const validation = validateRequest(bookMeetingSchema, body);
 
-        // Pass the action clearly
-        const payload = {
-            ...body,
-            action: 'bookMeeting'
-        };
+        if (!validation.success) {
+            logger.logInvalidInput(
+                '/api/book-meeting',
+                validation.error,
+                request.headers.get('x-forwarded-for') || undefined
+            );
+            const response = NextResponse.json(
+                { error: validation.error },
+                { status: 400 }
+            );
+            return addCorsHeaders(response, request);
+        }
 
-        const BOOKING_WEBHOOK = process.env.NEXT_PUBLIC_BOOKING_WEBHOOK_URL;
+        // Use validated data (action is already included via schema)
+        const validatedPayload = validation.data;
+
+        const BOOKING_WEBHOOK = process.env.BOOKING_WEBHOOK_URL;
 
         if (!BOOKING_WEBHOOK) {
             logger.logError('Webhook URL not configured', new Error('Webhook URL not configured'), { endpoint: '/api/book-meeting' });
@@ -42,7 +54,7 @@ export async function POST(request: NextRequest) {
         const webhookResponse = await fetch(BOOKING_WEBHOOK, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload),
+            body: JSON.stringify(validatedPayload),
         });
 
         if (!webhookResponse.ok) {

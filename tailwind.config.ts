@@ -11,6 +11,7 @@ const config: Config = {
             fontFamily: {
                 sans: ["var(--font-sans)"],
                 mono: ["var(--font-mono)"],
+                display: ["var(--font-display)", "Georgia", "serif"],
             },
             colors: {
                 background: "var(--background)",

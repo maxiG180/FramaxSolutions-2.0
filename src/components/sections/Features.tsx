@@ -130,9 +130,25 @@ export function Features() {
 
     return (
         <section id="features" className="py-24 bg-background relative overflow-hidden">
-            {/* Background Decoration */}
-            <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]" />
-            <div className="absolute left-0 right-0 top-0 -z-10 m-auto h-[310px] w-[310px] rounded-full bg-primary/20 opacity-20 blur-[100px]" />
+            {/* Background Elements - Matching Hero */}
+            <div className="absolute inset-0 pointer-events-none">
+                {/* Grid Pattern */}
+                <div
+                    className="absolute inset-0 opacity-[0.07] dark:opacity-[0.08]"
+                    style={{
+                        backgroundImage: `
+                            linear-gradient(to right, currentColor 1px, transparent 1px),
+                            linear-gradient(to bottom, currentColor 1px, transparent 1px)
+                        `,
+                        backgroundSize: '80px 80px'
+                    }}
+                />
+
+                {/* Subtle Radial Accent */}
+                <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] opacity-[0.12] dark:opacity-[0.06]">
+                    <div className="absolute inset-0 bg-primary/20 rounded-full blur-[100px]" />
+                </div>
+            </div>
 
             <div className="container mx-auto px-4 relative z-10" ref={containerRef}>
                 <motion.div
@@ -241,7 +257,7 @@ export function Features() {
                     {/* Card New 2: Systems (Wide) */}
                     <motion.div
                         variants={itemVariants}
-                        className="group relative col-span-1 overflow-hidden rounded-3xl border border-border bg-card p-8 md:col-span-3 transition-all hover:shadow-xl"
+                        className="group relative col-span-1 overflow-hidden rounded-3xl border border-border bg-card p-8 pb-52 md:pb-8 md:col-span-3 transition-all hover:shadow-xl"
                     >
                         <div className="relative z-10 w-full md:w-3/5">
                             <div className="mb-4 inline-flex rounded-lg bg-emerald-500/10 p-3 text-emerald-500">
@@ -254,7 +270,7 @@ export function Features() {
                         </div>
 
                         {/* Visual: Realistic Tablet Dashboard */}
-                        <div className="absolute -right-12 top-12 w-[380px] h-[280px] perspective-[1000px] group-hover:scale-[1.02] transition-transform duration-500">
+                        <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 md:left-auto md:translate-x-0 md:-right-12 md:top-12 md:bottom-auto w-[320px] md:w-[380px] h-[240px] md:h-[280px] perspective-[1000px] group-hover:scale-[1.02] transition-transform duration-500">
                             {/* Tablet Frame */}
                             <div className="relative w-full h-full bg-[#0f172a] rounded-[20px] border-[4px] border-[#1e293b] shadow-2xl skew-y-[-5deg] rotate-[-5deg] group-hover:rotate-0 group-hover:skew-y-0 transition-all duration-500 origin-center">
                                 {/* Screen Bezel */}

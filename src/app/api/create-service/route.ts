@@ -2,37 +2,41 @@ import { createClient } from "@/utils/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
 import { rateLimit, RATE_LIMITS } from '@/utils/rate-limit';
 import { addCorsHeaders, handleCorsPreFlight } from '@/utils/cors';
-import { validateRequest, updateQrCodeSchema, sanitizeString } from '@/utils/validation';
+import { validateRequest, createServiceSchema, sanitizeString } from '@/utils/validation';
 import { logger } from '@/utils/logger';
 
+/**
+ * Handle CORS preflight requests
+ */
 export async function OPTIONS(request: NextRequest) {
     const preflightResponse = handleCorsPreFlight(request);
     return preflightResponse || new NextResponse(null, { status: 200 });
 }
 
 /**
- * Update an existing QR code
- * Rate limited: 10 requests per minute per IP
- * Authentication: Required + Ownership verification
+ * Create a new service
+ * Rate limited: 5 requests per minute per IP
+ * Authentication: Required (Supabase session)
+ * Validation: Strict Zod schema with input sanitization
  */
-export async function PUT(request: NextRequest) {
+export async function POST(request: NextRequest) {
     try {
-        // 1. Rate limiting
-        const rateLimitResponse = rateLimit(request, RATE_LIMITS.QR_CODE_UPDATE);
+        // 1. Rate limiting (IP-based)
+        const rateLimitResponse = rateLimit(request, RATE_LIMITS.QR_CODE_CREATE);
         if (rateLimitResponse) {
             const forwarded = request.headers.get('x-forwarded-for');
             const ip = forwarded ? forwarded.split(',')[0] : 'unknown';
-            logger.logRateLimit('/api/update-qr-code', ip);
+            logger.logRateLimit('/api/create-service', ip);
             return addCorsHeaders(rateLimitResponse, request);
         }
 
-        // 2. Authentication
+        // 2. Authentication check (CSRF protection via Supabase session)
         const supabase = await createClient();
         const { data: { user } } = await supabase.auth.getUser();
 
         if (!user) {
             logger.logUnauthorizedAccess(
-                '/api/update-qr-code',
+                '/api/create-service',
                 request.headers.get('x-forwarded-for') || undefined
             );
             const response = NextResponse.json(
@@ -42,13 +46,13 @@ export async function PUT(request: NextRequest) {
             return addCorsHeaders(response, request);
         }
 
-        // 3. Validate request body
+        // 3. Parse and validate request body with strict Zod schema
         const body = await request.json();
-        const validation = validateRequest(updateQrCodeSchema, body);
+        const validation = validateRequest(createServiceSchema, body);
 
         if (!validation.success) {
             logger.logInvalidInput(
-                '/api/update-qr-code',
+                '/api/create-service',
                 validation.error,
                 request.headers.get('x-forwarded-for') || undefined
             );
@@ -59,56 +63,50 @@ export async function PUT(request: NextRequest) {
             return addCorsHeaders(response, request);
         }
 
-        const { id, name, targetUrl } = validation.data;
+        const { title, description, billing_type, price_type, base_price, recurring_interval, currency, category } = validation.data;
 
-        // 4. Sanitize name
-        const sanitizedName = sanitizeString(name);
+        // 4. Sanitize string inputs for XSS protection
+        const sanitizedTitle = sanitizeString(title);
+        const sanitizedDescription = description ? sanitizeString(description) : null;
+        const sanitizedCategory = category ? sanitizeString(category) : null;
 
-        // 5. Update with ownership verification (RLS handles this, but explicit check is better)
+        // 5. Insert service into database
         const { data, error } = await supabase
-            .from("qr_codes")
-            .update({
-                name: sanitizedName,
-                target_url: targetUrl,
+            .from("services")
+            .insert({
+                user_id: user.id,
+                title: sanitizedTitle,
+                description: sanitizedDescription,
+                billing_type,
+                price_type,
+                base_price: base_price ?? null,
+                recurring_interval: recurring_interval ?? null,
+                currency: currency || 'EUR',
+                category: sanitizedCategory,
             })
-            .eq("id", id)
-            .eq("user_id", user.id) // Ownership check
             .select()
             .single();
 
         if (error) {
-            // Check if it's a not found error (user doesn't own this QR code)
-            if (error.code === 'PGRST116') {
-                logger.logUnauthorizedAccess('/api/update-qr-code',
-                    request.headers.get('x-forwarded-for') || undefined,
-                    { userId: user.id, qrCodeId: id }
-                );
-                const response = NextResponse.json(
-                    { error: 'QR code not found or access denied' },
-                    { status: 404 }
-                );
-                return addCorsHeaders(response, request);
-            }
-
-            logger.logApiError('/api/update-qr-code', error, { userId: user.id });
+            logger.logApiError('/api/create-service', error, { userId: user.id });
             const response = NextResponse.json(
-                { error: 'Failed to update QR code' },
+                { error: 'Failed to create service' },
                 { status: 500 }
             );
             return addCorsHeaders(response, request);
         }
 
-        logger.logInfo('QR code updated successfully', {
-            endpoint: '/api/update-qr-code',
+        logger.logInfo('Service created successfully', {
+            endpoint: '/api/create-service',
             userId: user.id,
-            qrCodeId: id,
+            serviceId: data.id,
         });
 
         const response = NextResponse.json(data);
         return addCorsHeaders(response, request);
 
     } catch (error: any) {
-        logger.logApiError('/api/update-qr-code', error);
+        logger.logApiError('/api/create-service', error);
         const response = NextResponse.json(
             { error: 'Internal server error' },
             { status: 500 }

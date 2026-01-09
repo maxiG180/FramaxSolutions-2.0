@@ -3,6 +3,7 @@ import type { NextRequest } from 'next/server';
 import { rateLimit, RATE_LIMITS } from '@/utils/rate-limit';
 import { addCorsHeaders, handleCorsPreFlight } from '@/utils/cors';
 import { logger } from '@/utils/logger';
+import { validateRequest, checkAvailabilitySchema } from '@/utils/validation';
 
 export async function OPTIONS(request: NextRequest) {
     const preflightResponse = handleCorsPreFlight(request);
@@ -20,20 +21,27 @@ export async function POST(request: NextRequest) {
             return addCorsHeaders(rateLimitResponse, request);
         }
 
-        // Parse request body
+        // Parse and validate request body
         const body = await request.json();
-        const { date } = body;
+        const validation = validateRequest(checkAvailabilitySchema, body);
 
-        if (!date) {
+        if (!validation.success) {
+            logger.logInvalidInput(
+                '/api/check-availability',
+                validation.error,
+                request.headers.get('x-forwarded-for') || undefined
+            );
             const response = NextResponse.json(
-                { error: 'Date is required' },
+                { error: validation.error },
                 { status: 400 }
             );
             return addCorsHeaders(response, request);
         }
 
-        // Call n8n unified webhook
-        const BOOKING_WEBHOOK = process.env.NEXT_PUBLIC_BOOKING_WEBHOOK_URL;
+        const { date } = validation.data;
+
+        // Call n8n unified webhook (server-side only)
+        const BOOKING_WEBHOOK = process.env.BOOKING_WEBHOOK_URL;
 
         if (!BOOKING_WEBHOOK) {
             // Fail gracefully if not configured

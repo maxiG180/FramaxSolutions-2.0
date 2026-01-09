@@ -138,15 +138,6 @@ export function Booking() {
 
         setIsSubmitting(true);
 
-        const WEBHOOK_URL = process.env.NEXT_PUBLIC_BOOKING_WEBHOOK_URL;
-
-        if (!WEBHOOK_URL) {
-            console.error("Webhook URL not configured");
-            alert("Configuration error. Please contact support.");
-            setIsSubmitting(false);
-            return;
-        }
-
         try {
             // Combine date and time
             const [timeStr, period] = selectedTime!.split(' ');

@@ -109,4 +109,26 @@ export const RATE_LIMITS = {
         maxRequests: 5,
         windowMs: 60 * 1000, // 5 per minute
     },
+    // QR Code Management - IP-based rate limiting
+    QR_CODE_CREATE: {
+        maxRequests: 5,
+        windowMs: 60 * 1000, // 5 QR codes per minute per IP
+    },
+    QR_CODE_UPDATE: {
+        maxRequests: 10,
+        windowMs: 60 * 1000, // 10 updates per minute per IP
+    },
+    QR_CODE_DELETE: {
+        maxRequests: 10,
+        windowMs: 60 * 1000, // 10 deletes per minute per IP
+    },
+    QR_CODE_LIST: {
+        maxRequests: 20,
+        windowMs: 60 * 1000, // 20 list requests per minute per IP
+    },
+    // Generic API calls
+    API_CALL: {
+        maxRequests: 20,
+        windowMs: 60 * 1000, // 20 requests per minute per IP
+    },
 } as const;

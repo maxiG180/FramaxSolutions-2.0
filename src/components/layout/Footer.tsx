@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { Twitter, Github, Linkedin, Heart } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 
@@ -12,8 +13,14 @@ export function Footer() {
             <div className="container mx-auto px-4">
                 <div className="grid grid-cols-1 md:grid-cols-5 gap-8 mb-12">
                     <div className="col-span-1 md:col-span-2">
-                        <Link href="/" className="text-2xl font-bold tracking-tighter mb-4 block">
-                            <span className="text-[#2563eb]">Framax</span><span className="text-white">Solutions</span>
+                        <Link href="/" className="mb-4 block">
+                            <Image
+                                src="/logos/framax-logo-white.png"
+                                alt="Framax Solutions"
+                                width={160}
+                                height={160}
+                                className="h-auto w-40"
+                            />
                         </Link>
                         <p className="text-muted-foreground max-w-sm">
                             {t.footer.tagline}
