@@ -181,15 +181,12 @@ export async function getFiles(folderId?: string): Promise<{ files: File[], erro
 
 // Upload a file
 export async function uploadFile(formData: FormData): Promise<{ file?: File, error?: string }> {
-    console.log('Server Action: uploadFile started');
     const supabase = await createClient()
 
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) {
-        console.error('Server Action: Not authenticated');
         return { error: 'Not authenticated' }
     }
-    console.log('Server Action: User authenticated', user.id);
 
     const uploadedFile = formData.get('file')
     const folderId = formData.get('folderId') as string | null
@@ -201,7 +198,6 @@ export async function uploadFile(formData: FormData): Promise<{ file?: File, err
 
     // Get file name
     const fileName = uploadedFile instanceof File ? uploadedFile.name : 'unknown'
-    console.log('Server Action: Processing file', fileName, 'size:', uploadedFile.size);
 
     // Determine file type
     const fileType = getFileType(fileName)
@@ -209,7 +205,6 @@ export async function uploadFile(formData: FormData): Promise<{ file?: File, err
     // Create storage path
     const timestamp = Date.now()
     const storagePath = `${user.id}/${folderId || 'unsorted'}/${timestamp}_${fileName}`
-    console.log('Server Action: Storage path', storagePath);
 
     // Upload to storage
     const { error: uploadError } = await supabase.storage
@@ -220,7 +215,6 @@ export async function uploadFile(formData: FormData): Promise<{ file?: File, err
         console.error('Server Action: Error uploading file to storage:', uploadError)
         return { error: uploadError.message }
     }
-    console.log('Server Action: Storage upload successful');
 
     // Get folder name if applicable
     let folderName = 'Unsorted'
@@ -237,7 +231,6 @@ export async function uploadFile(formData: FormData): Promise<{ file?: File, err
     }
 
     // Create database record
-    console.log('Server Action: Creating database record');
     const { data: fileRecord, error: dbError } = await supabase
         .from('files')
         .insert({
@@ -257,7 +250,6 @@ export async function uploadFile(formData: FormData): Promise<{ file?: File, err
         await supabase.storage.from('documents').remove([storagePath])
         return { error: dbError.message }
     }
-    console.log('Server Action: Database record created', fileRecord.id);
 
     // Get public URL
     const { data: { publicUrl } } = supabase.storage

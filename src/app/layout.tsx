@@ -70,7 +70,7 @@ export default function RootLayout({
         {/* Plerdy Analytics */}
         <Script
           id="plerdy-analytics"
-          strategy="afterInteractive"
+          strategy="lazyOnload"
           dangerouslySetInnerHTML={{
             __html: `
               var _protocol="https:"==document.location.protocol?"https://":"http://";

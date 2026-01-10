@@ -113,14 +113,8 @@ export default function ClientsPage() {
     };
 
     const handleNextStep = () => {
-        console.log('=== handleNextStep called ===');
-        console.log('isTransitioning:', isTransitioning);
-        console.log('currentStep:', currentStep);
-        console.log('totalSteps:', totalSteps);
-
         if (isTransitioning || currentStep >= totalSteps) return;
 
-        console.log('Advancing to next step');
         setJustAdvanced(true);
         setIsTransitioning(true);
         setCurrentStep(prev => prev + 1);
@@ -140,27 +134,16 @@ export default function ClientsPage() {
     const handleSaveClient = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        console.log('=== handleSaveClient called ===');
-        console.log('Current step:', currentStep);
-        console.log('Total steps:', totalSteps);
-        console.log('justAdvanced:', justAdvanced);
-        console.log('Event type:', e.type);
-
         // Prevent submission if just advanced to this step
         if (justAdvanced) {
-            console.log('Just advanced to step 3 - ignoring auto-submission');
             return;
         }
 
         // Prevent submission if not on final step
         if (currentStep < totalSteps) {
-            console.log('Not on final step - preventing submission and advancing step');
             setCurrentStep(prev => Math.min(totalSteps, prev + 1));
             return;
         }
-
-        console.log('On final step - proceeding with submission');
-        console.log('Form data:', formData);
 
         if (editingId) {
             // Update existing client
@@ -189,7 +172,6 @@ export default function ClientsPage() {
             }
         } else {
             // Create new client
-            console.log('Creating new client with data:', formData);
             const { data, error } = await supabase
                 .from('clients')
                 .insert([{
@@ -214,7 +196,6 @@ export default function ClientsPage() {
                 console.error('Error details object:', error.details);
                 alert(`Error adding client: ${error.message || 'Unknown error. Check console for details.'}`);
             } else {
-                console.log('Client added successfully:', data);
                 setClients([data, ...clients]);
                 resetForm();
             }

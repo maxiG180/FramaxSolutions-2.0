@@ -1,9 +1,20 @@
+import dynamic from 'next/dynamic';
 import Hero from "@/components/Hero";
-import { Features } from "@/components/sections/Features";
-import { NewPortfolio } from "@/components/sections/NewPortfolio";
-import { TechStack } from "@/components/sections/TechStack";
 import { Booking } from "@/components/sections/Booking";
 import { DiscountOffer } from "@/components/ui/DiscountOffer";
+
+// Dynamically import non-critical components to reduce initial bundle
+const Features = dynamic(() => import('@/components/sections/Features').then(mod => ({ default: mod.Features })), {
+  loading: () => <div className="min-h-[400px] animate-pulse bg-white/5" />,
+});
+
+const NewPortfolio = dynamic(() => import('@/components/sections/NewPortfolio').then(mod => ({ default: mod.NewPortfolio })), {
+  loading: () => <div className="min-h-[400px] animate-pulse bg-white/5" />,
+});
+
+const TechStack = dynamic(() => import('@/components/sections/TechStack').then(mod => ({ default: mod.TechStack })), {
+  loading: () => <div className="min-h-[400px] animate-pulse bg-white/5" />,
+});
 
 
 export default function Home() {
