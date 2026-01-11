@@ -34,6 +34,21 @@ const nextConfig: NextConfig = {
   experimental: {
     optimizePackageImports: ['lucide-react'],
   },
+
+  // Webpack configuration to suppress Supabase realtime warnings in Edge Runtime
+  webpack: (config, { isServer, nextRuntime }) => {
+    // Suppress false positive warnings about Node.js APIs in Supabase realtime
+    // These APIs are not actually used in Edge Runtime contexts
+    if (!config.ignoreWarnings) {
+      config.ignoreWarnings = [];
+    }
+    config.ignoreWarnings.push({
+      module: /node_modules\/@supabase\/(realtime-js|supabase-js)/,
+      message: /.*process\.(versions|version).*/,
+    });
+
+    return config;
+  },
 };
 
 export default nextConfig;
