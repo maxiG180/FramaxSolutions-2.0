@@ -80,9 +80,12 @@ export async function PUT(request: NextRequest) {
             // Check if it's a not found error (user doesn't own this QR code)
             if (error.code === 'PGRST116') {
                 logger.logUnauthorizedAccess('/api/update-qr-code',
-                    request.headers.get('x-forwarded-for') || undefined,
-                    { userId: user.id, qrCodeId: id }
+                    request.headers.get('x-forwarded-for') || undefined
                 );
+                logger.logInfo('QR code access denied - ownership check failed', {
+                    userId: user.id,
+                    qrCodeId: id
+                });
                 const response = NextResponse.json(
                     { error: 'QR code not found or access denied' },
                     { status: 404 }

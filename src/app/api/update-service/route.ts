@@ -106,7 +106,8 @@ export async function PUT(request: NextRequest) {
         if (error) {
             // Check if service doesn't exist or user doesn't own it
             if (error.code === 'PGRST116') {
-                logger.logUnauthorizedAccess('/api/update-service', undefined, {
+                logger.logUnauthorizedAccess('/api/update-service', undefined);
+                logger.logInfo('Service access denied - ownership check failed', {
                     userId: user.id,
                     serviceId: id,
                 });
