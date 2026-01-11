@@ -30,6 +30,17 @@ export async function updateSession(request: NextRequest) {
                     )
                 },
             },
+            // Disable realtime to avoid Edge Runtime compatibility issues
+            global: {
+                fetch: fetch.bind(globalThis),
+            },
+            db: {
+                schema: 'public',
+            },
+            auth: {
+                persistSession: false,
+                autoRefreshToken: false,
+            },
         }
     )
 
