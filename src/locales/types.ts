@@ -60,7 +60,14 @@ export interface Translation {
         review2Name: string;
         review2Text: string;
         review3Name: string;
+
         review3Text: string;
+        // Visuals
+        heroVisuals: {
+            activeGrowth: string;
+            recentActivity: string;
+            revenueScale: string;
+        };
     };
     portfolio: {
         badge: string;

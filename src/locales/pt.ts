@@ -68,7 +68,13 @@ export const pt: Translation = {
         review2Name: "João Costa",
         review2Text: "Muito profissional!",
         review3Name: "Ana Pereira",
+
         review3Text: "Recomendo!",
+        heroVisuals: {
+            activeGrowth: "Crescimento Ativo",
+            recentActivity: "Atividade Recente",
+            revenueScale: "Escala de Receita"
+        }
     },
     portfolio: {
         badge: "Vitrine",

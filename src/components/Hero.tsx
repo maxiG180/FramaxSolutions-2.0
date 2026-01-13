@@ -3,7 +3,7 @@
 import React, { useRef } from "react";
 import Link from "next/link";
 import { motion, useInView, useMotionValue, useTransform, useSpring } from "framer-motion";
-import { ArrowRight, TrendingUp, ShoppingCart, Users, Zap } from "lucide-react";
+import { ArrowRight, TrendingUp, ShoppingCart, Users, Zap, Bell, FileText, Calendar } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 
 const Typewriter = ({ text }: { text: string[] }) => {
@@ -200,8 +200,8 @@ const Hero = () => {
                 className="relative bg-gradient-to-br from-blue-500/10 to-blue-500/5 backdrop-blur-xl rounded-xl border border-blue-500/20 p-4 overflow-hidden"
               >
                 <TrendingUp className="w-8 h-8 text-blue-500 mb-2" />
-                <div className="text-xs font-semibold text-white mb-1">{t.hero.moreClients}</div>
-                <div className="text-xl font-bold text-blue-400">+127%</div>
+                <div className="text-xl font-bold text-white mb-1">{t.hero.heroVisuals.activeGrowth}</div>
+                <div className="text-xs text-blue-400 font-medium">Trending Up</div>
 
                 {/* Simple arrow going up */}
                 <div className="absolute bottom-2 right-2 w-12 h-12">
@@ -245,53 +245,51 @@ const Hero = () => {
                 transition={{ delay: 0.8 }}
                 className="row-span-2 relative bg-slate-900/90 backdrop-blur-xl rounded-xl border border-white/10 overflow-hidden"
               >
+                {/* Notification Hub Mobile */}
                 <div className="absolute inset-0 bg-gradient-to-br from-slate-950 to-slate-900 p-3 flex flex-col">
-                  {/* Browser header */}
-                  <div className="flex items-center gap-1.5 mb-3">
-                    <div className="flex gap-1">
-                      <div className="w-1.5 h-1.5 rounded-full bg-red-500/60" />
-                      <div className="w-1.5 h-1.5 rounded-full bg-yellow-500/60" />
-                      <div className="w-1.5 h-1.5 rounded-full bg-green-500/60" />
-                    </div>
-                    <div className="flex-1 h-3 bg-slate-800/50 rounded text-[7px] text-slate-500 flex items-center px-1.5">
-                      seunegocio.com
+                  {/* Header */}
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-1.5">
+                      <div className="p-1 bg-primary/20 rounded">
+                        <Bell className="w-3 h-3 text-primary" />
+                      </div>
+                      <span className="text-[10px] font-semibold text-white">{t.hero.heroVisuals.recentActivity}</span>
                     </div>
                   </div>
 
-                  {/* Hero mockup */}
-                  <div className="flex-1 space-y-2">
-                    <div className="text-center space-y-1.5">
-                      <div className="text-[10px] font-bold text-white">{t.hero.yourBusiness}</div>
-                      <div className="w-full h-1.5 bg-gradient-to-r from-transparent via-slate-600 to-transparent rounded" />
-                    </div>
-
-                    {/* CTA Button */}
+                  {/* Notifications List */}
+                  <div className="space-y-2">
+                    {/* Item 1 */}
                     <motion.div
-                      className="mx-auto w-20 h-6 bg-primary rounded-md shadow-lg shadow-primary/30 flex items-center justify-center"
-                      animate={{ scale: [1, 1.05, 1] }}
-                      transition={{ duration: 2, repeat: Infinity }}
+                      initial={{ opacity: 0, x: 20 }}
+                      animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: 20 }}
+                      transition={{ delay: 1 }}
+                      className="flex items-center gap-2 p-2 bg-white/5 rounded-lg border border-white/5"
                     >
-                      <div className="text-[8px] font-bold text-white">{t.hero.learnMore}</div>
+                      <div className="p-1.5 bg-blue-500/20 rounded">
+                        <Users className="w-3 h-3 text-blue-400" />
+                      </div>
+                      <div>
+                        <div className="text-[8px] font-medium text-white">{t.features.notificationLead}</div>
+                        <div className="text-[7px] text-slate-400">John • {t.features.time2m}</div>
+                      </div>
                     </motion.div>
 
-                    {/* Image placeholders */}
-                    <div className="grid grid-cols-2 gap-1.5 mt-3">
-                      {[...Array(4)].map((_, i) => (
-                        <motion.div
-                          key={i}
-                          initial={{ opacity: 0 }}
-                          animate={isInView ? { opacity: 1 } : { opacity: 0 }}
-                          transition={{ delay: 1 + i * 0.1 }}
-                          className="aspect-square bg-slate-800/50 rounded-md"
-                        />
-                      ))}
-                    </div>
-
-                    {/* Info section */}
-                    <div className="space-y-1 pt-2">
-                      <div className="h-1 bg-slate-800/60 rounded w-3/4" />
-                      <div className="h-1 bg-slate-800/60 rounded w-1/2" />
-                    </div>
+                    {/* Item 2 */}
+                    <motion.div
+                      initial={{ opacity: 0, x: 20 }}
+                      animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: 20 }}
+                      transition={{ delay: 1.2 }}
+                      className="flex items-center gap-2 p-2 bg-white/5 rounded-lg border border-white/5"
+                    >
+                      <div className="p-1.5 bg-green-500/20 rounded">
+                        <FileText className="w-3 h-3 text-green-400" />
+                      </div>
+                      <div>
+                        <div className="text-[8px] font-medium text-white">{t.features.notificationInvoice}</div>
+                        <div className="text-[7px] text-slate-400">#1024 • {t.features.time15m}</div>
+                      </div>
+                    </motion.div>
                   </div>
                 </div>
               </motion.div>
@@ -304,8 +302,8 @@ const Hero = () => {
                 className="relative bg-gradient-to-br from-orange-500/10 to-orange-500/5 backdrop-blur-xl rounded-xl border border-orange-500/20 p-4 overflow-hidden"
               >
                 <TrendingUp className="w-8 h-8 text-orange-500 mb-2" />
-                <div className="text-xs font-semibold text-white mb-1">{t.hero.growth}</div>
-                <div className="text-xl font-bold text-orange-400">+250%</div>
+                <div className="text-xs font-semibold text-white mb-1">{t.hero.heroVisuals.revenueScale}</div>
+                <div className="text-xl font-bold text-orange-400">Scale</div>
 
                 {/* Growth chart */}
                 <div className="absolute bottom-0 left-0 right-0 h-8 flex items-end gap-0.5 px-2 pb-2">
@@ -411,8 +409,8 @@ const Hero = () => {
                 <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                 <TrendingUp className="w-10 h-10 text-blue-500 mb-2 relative z-10" />
                 <div className="relative z-10">
-                  <div className="text-sm font-semibold text-white mb-1">{t.hero.moreClients}</div>
-                  <div className="text-2xl font-bold text-blue-400">+127%</div>
+                  <div className="text-lg font-bold text-white mb-1">{t.hero.heroVisuals.activeGrowth}</div>
+                  <div className="text-sm font-medium text-blue-400">Trending Up</div>
                 </div>
 
                 {/* Simple arrow going up */}
@@ -437,53 +435,72 @@ const Hero = () => {
                 className="row-span-2 relative bg-slate-900/90 backdrop-blur-xl rounded-2xl border border-white/10 overflow-hidden group"
               >
                 {/* Website Preview */}
-                <div className="absolute inset-0 bg-gradient-to-br from-slate-950 to-slate-900 p-4 flex flex-col">
-                  {/* Browser header */}
-                  <div className="flex items-center gap-2 mb-4">
+                {/* Notification Hub */}
+                <div className="absolute inset-0 bg-gradient-to-br from-slate-950 to-slate-900 p-6 flex flex-col">
+                  {/* Header */}
+                  <div className="flex items-center justify-between mb-6">
+                    <div className="flex items-center gap-2">
+                      <div className="p-1.5 bg-primary/20 rounded-lg">
+                        <Bell className="w-4 h-4 text-primary" />
+                      </div>
+                      <span className="text-sm font-semibold text-white">{t.hero.heroVisuals.recentActivity}</span>
+                    </div>
                     <div className="flex gap-1">
                       <div className="w-2 h-2 rounded-full bg-red-500/60" />
                       <div className="w-2 h-2 rounded-full bg-yellow-500/60" />
                       <div className="w-2 h-2 rounded-full bg-green-500/60" />
                     </div>
-                    <div className="flex-1 h-4 bg-slate-800/50 rounded text-[8px] text-slate-500 flex items-center px-2">
-                      seunegocio.com
-                    </div>
                   </div>
 
-                  {/* Hero mockup */}
-                  <div className="flex-1 space-y-3">
-                    <div className="text-center space-y-2">
-                      <div className="text-xs font-bold text-white">{t.hero.yourBusiness}</div>
-                      <div className="w-full h-2 bg-gradient-to-r from-transparent via-slate-600 to-transparent rounded" />
-                    </div>
-
-                    {/* CTA Button */}
+                  {/* Notifications List */}
+                  <div className="space-y-3">
+                    {/* Item 1 */}
                     <motion.div
-                      className="mx-auto w-32 h-9 bg-primary rounded-lg shadow-lg shadow-primary/30 flex items-center justify-center"
-                      animate={{ scale: [1, 1.05, 1] }}
-                      transition={{ duration: 2, repeat: Infinity }}
+                      initial={{ opacity: 0, x: 20 }}
+                      animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: 20 }}
+                      transition={{ delay: 1 }}
+                      className="flex items-center gap-3 p-3 bg-white/5 rounded-xl border border-white/5"
                     >
-                      <div className="text-[10px] font-bold text-white">{t.hero.learnMore}</div>
+                      <div className="p-2 bg-blue-500/20 rounded-lg">
+                        <Users className="w-4 h-4 text-blue-400" />
+                      </div>
+                      <div>
+                        <div className="text-xs font-medium text-white">{t.features.notificationLead}</div>
+                        <div className="text-[10px] text-slate-400">John Doe • {t.features.time2m}</div>
+                      </div>
                     </motion.div>
 
-                    {/* Image placeholders */}
-                    <div className="grid grid-cols-3 gap-2 mt-4">
-                      {[...Array(3)].map((_, i) => (
-                        <motion.div
-                          key={i}
-                          initial={{ opacity: 0 }}
-                          animate={isInView ? { opacity: 1 } : { opacity: 0 }}
-                          transition={{ delay: 1 + i * 0.1 }}
-                          className="aspect-square bg-slate-800/50 rounded-lg"
-                        />
-                      ))}
-                    </div>
+                    {/* Item 2 */}
+                    <motion.div
+                      initial={{ opacity: 0, x: 20 }}
+                      animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: 20 }}
+                      transition={{ delay: 1.2 }}
+                      className="flex items-center gap-3 p-3 bg-white/5 rounded-xl border border-white/5"
+                    >
+                      <div className="p-2 bg-green-500/20 rounded-lg">
+                        <FileText className="w-4 h-4 text-green-400" />
+                      </div>
+                      <div>
+                        <div className="text-xs font-medium text-white">{t.features.notificationInvoice}</div>
+                        <div className="text-[10px] text-slate-400">#1024 • {t.features.time15m}</div>
+                      </div>
+                    </motion.div>
 
-                    {/* Info section */}
-                    <div className="space-y-1.5 pt-2">
-                      <div className="h-1.5 bg-slate-800/60 rounded w-3/4" />
-                      <div className="h-1.5 bg-slate-800/60 rounded w-1/2" />
-                    </div>
+                    {/* Item 3 */}
+                    <motion.div
+                      initial={{ opacity: 0, x: 20 }}
+                      animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: 20 }}
+                      transition={{ delay: 1.4 }}
+                      className="flex items-center gap-3 p-3 bg-white/5 rounded-xl border border-white/5"
+                    >
+                      <div className="p-2 bg-purple-500/20 rounded-lg">
+                        <Calendar className="w-4 h-4 text-purple-400" />
+                      </div>
+                      <div>
+                        <div className="text-xs font-medium text-white">{t.features.notificationMeeting}</div>
+                        <div className="text-[10px] text-slate-400">{t.features.time2h}</div>
+                      </div>
+                    </motion.div>
                   </div>
                 </div>
               </motion.div>
@@ -521,8 +538,8 @@ const Hero = () => {
                 <div className="absolute inset-0 bg-gradient-to-br from-orange-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                 <TrendingUp className="w-10 h-10 text-orange-500 mb-2 relative z-10" />
                 <div className="relative z-10">
-                  <div className="text-sm font-semibold text-white mb-1">{t.hero.growth}</div>
-                  <div className="text-2xl font-bold text-orange-400">+250%</div>
+                  <div className="text-sm font-semibold text-white mb-1">{t.hero.heroVisuals.revenueScale}</div>
+                  <div className="text-2xl font-bold text-orange-400">Scale</div>
                 </div>
                 {/* Growth chart */}
                 <div className="absolute bottom-0 left-0 right-0 h-10 flex items-end gap-0.5 px-3 pb-3">

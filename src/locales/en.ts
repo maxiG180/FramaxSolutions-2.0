@@ -68,7 +68,13 @@ export const en: Translation = {
         review2Name: "John Smith",
         review2Text: "Very professional!",
         review3Name: "Emma Davis",
+
         review3Text: "Highly recommend!",
+        heroVisuals: {
+            activeGrowth: "Active Growth",
+            recentActivity: "Recent Activity",
+            revenueScale: "Revenue Scale"
+        }
     },
     portfolio: {
         badge: "Showcase",
