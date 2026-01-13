@@ -50,7 +50,7 @@ export const pt: Translation = {
         trustedBy: "Empresas inovadoras confiam em nós",
         // New Hero Section
         title: "Sites que vendem mais",
-        subtitle: "O seu site antigo está a impedir crescimento. Criamos soluções web que entendem o seu negócio e trazem resultados reais.",
+        subtitle: "Criamos soluções de software que entendem o seu negócio e trazem resultados REAIS.",
         bookMeeting: "Marcar reunião gratuita",
         couldBeYou: "Este Poderia Ser Você",
         moreClients: "Mais Clientes",

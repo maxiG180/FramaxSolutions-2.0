@@ -50,7 +50,7 @@ export const en: Translation = {
         trustedBy: "Trusted by innovative companies",
         // New Hero Section
         title: "Websites that sell more",
-        subtitle: "Your old website is holding back growth. We create web solutions that understand your business and bring real results.",
+        subtitle: "We create software solutions that understand your business and bring REAL results.",
         bookMeeting: "Book free meeting",
         couldBeYou: "This Could Be You",
         moreClients: "More Clients",
