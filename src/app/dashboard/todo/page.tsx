@@ -33,7 +33,7 @@ export default function TodoPage() {
     const [newTask, setNewTask] = useState("");
     const [selectedAssignee, setSelectedAssignee] = useState<string | null>("me");
     const [loading, setLoading] = useState(true);
-    const [activeFilter, setActiveFilter] = useState<FilterType>('me');
+    const [activeFilter, setActiveFilter] = useState<FilterType>('all');
     const [showFilters, setShowFilters] = useState(false);
     const taskInputRef = useRef<HTMLInputElement>(null);
 
