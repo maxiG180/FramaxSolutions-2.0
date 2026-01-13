@@ -38,11 +38,11 @@ export const en: Translation = {
         titlePre: "Websites that",
         titleHighlight: "sell more",
         dynamicKeywords: [
-            "sell more",
             "save time",
             "automate work",
             "scale faster",
-            "build trust"
+            "build trust",
+            "drive results"
         ],
         description: "Stop losing customers to outdated design. We craft high-performance, SEO-optimized websites that turn visitors into loyal clients.",
         startProject: "Start Your Project",
