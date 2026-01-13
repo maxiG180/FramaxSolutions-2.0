@@ -6,6 +6,18 @@ export const metadata: Metadata = {
         index: false,
         follow: false,
     },
+    manifest: "/manifest.json",
+    appleWebApp: {
+        capable: true,
+        statusBarStyle: "black-translucent",
+        title: "Framax Admin",
+    },
+    viewport: {
+        width: "device-width",
+        initialScale: 1,
+        maximumScale: 1,
+        userScalable: false,
+    },
 };
 
 export default function DashboardLayout({

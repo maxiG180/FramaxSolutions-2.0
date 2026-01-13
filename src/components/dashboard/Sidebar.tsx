@@ -38,9 +38,9 @@ export function Sidebar({ isCollapsed, onToggle, isMobileOpen = false, onMobileC
     ];
 
     const PRODUCTIVITY_ITEMS = [
+        { name: t.dashboard.menu.tasks, icon: CheckSquare, href: "/dashboard/todo", color: "text-blue-500" },
         { name: t.dashboard.menu.calendar, icon: Calendar, href: "/dashboard/calendar", color: "text-red-500" },
         { name: t.dashboard.menu.notes, icon: FileText, href: "/dashboard/notes", color: "text-yellow-500" },
-        { name: t.dashboard.menu.tasks, icon: CheckSquare, href: "/dashboard/todo", color: "text-blue-500" },
         { name: t.dashboard.menu.docs, icon: Folder, href: "/dashboard/docs", color: "text-purple-500" },
     ];
 

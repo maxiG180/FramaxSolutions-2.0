@@ -91,7 +91,15 @@ Check back soon for the full visual showcase!`,
 
     team: `👥 **About Us:**
 
-Framax Solutions is a digital studio focused on business growth. We aren't just coders; we are partners in your success, combining design, technology, and strategy to build digital assets that meaningful results.`,
+We're a team of software developers from **Portugal**, also based in the **Netherlands**. 
+
+We build custom solutions based on your actual business needs:
+- Automation systems
+- Management dashboards
+- Booking platforms
+- Business tools
+
+Real people, real code, real results.`,
 
     hiring: `🚀 **Join the Team:**
 

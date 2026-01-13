@@ -1,0 +1,52 @@
+{
+    "name": "Framax Solutions Admin",
+    "short_name": "Framax Admin",
+    "description": "Admin dashboard for Framax Solutions",
+    "start_url": "/dashboard",
+    "display": "standalone",
+    "background_color": "#0a0a0a",
+    "theme_color": "#7c3aed",
+    "orientation": "portrait-primary",
+    "icons": [
+        {
+            "src": "/logos/framax_icon.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "/logos/framax_icon.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any maskable"
+        }
+    ],
+    "shortcuts": [
+        {
+            "name": "To-Do List",
+            "short_name": "Tasks",
+            "description": "Quick access to your to-do list",
+            "url": "/dashboard/todo",
+            "icons": [
+                {
+                    "src": "/logos/framax_icon.png",
+                    "sizes": "192x192",
+                    "type": "image/png"
+                }
+            ]
+        },
+        {
+            "name": "Calendar",
+            "short_name": "Calendar",
+            "description": "View your calendar",
+            "url": "/dashboard/calendar",
+            "icons": [
+                {
+                    "src": "/logos/framax_icon.png",
+                    "sizes": "192x192",
+                    "type": "image/png"
+                }
+            ]
+        }
+    ]
+}
