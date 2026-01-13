@@ -215,7 +215,7 @@ export default function Chatbot() {
                Let's put them in a scrollable container above the input.
             */}
                         {!isTyping && messages[messages.length - 1]?.role === 'bot' && (
-                            <div className="px-4 pb-2">
+                            <div className="px-4 pb-2 hidden md:block">
                                 <p className="text-xs text-white/40 mb-2 font-medium uppercase tracking-wider">Suggested questions</p>
                                 <div className="flex flex-wrap gap-2">
                                     {PRESET_QUESTIONS.slice(0, 4).map((q) => (
