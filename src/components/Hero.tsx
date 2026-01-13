@@ -125,7 +125,8 @@ const Hero = () => {
               transition={{ duration: 0.6, delay: 0.2 }}
             >
               <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold tracking-tight leading-[1.05] text-foreground">
-                {t.hero.titlePre}{" "}
+                {t.hero.titlePre}
+                <br />
                 <Typewriter text={t.hero.dynamicKeywords || [t.hero.titleHighlight]} />
               </h1>
             </motion.div>
