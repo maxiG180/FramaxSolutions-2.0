@@ -63,13 +63,12 @@ export const en: Translation = {
         learnMore: "Learn More",
         reviewsCount: "+50 reviews",
         // Review names and texts
-        review1Name: "Sarah Johnson",
-        review1Text: "Excellent service!",
-        review2Name: "John Smith",
-        review2Text: "Very professional!",
-        review3Name: "Emma Davis",
-
-        review3Text: "Highly recommend!",
+        review1Name: "Pedro Alves",
+        review1Text: "Incredible results. Our leads tripled in the first month.",
+        review2Name: "Sofia Martins",
+        review2Text: "Very professional team. They understood exactly what we needed.",
+        review3Name: "Ricardo Costa",
+        review3Text: "The new website is faster and converts much better. Highly recommend!",
         heroVisuals: {
             activeGrowth: "Active Growth",
             recentActivity: "Recent Activity",

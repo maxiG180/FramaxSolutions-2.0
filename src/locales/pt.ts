@@ -63,13 +63,12 @@ export const pt: Translation = {
         learnMore: "Saber Mais",
         reviewsCount: "+50 avaliações",
         // Review names and texts
-        review1Name: "Maria Silva",
-        review1Text: "Excelente serviço!",
-        review2Name: "João Costa",
-        review2Text: "Muito profissional!",
-        review3Name: "Ana Pereira",
-
-        review3Text: "Recomendo!",
+        review1Name: "Pedro Alves",
+        review1Text: "Resultados incríveis. Os nossos contactos triplicaram no primeiro mês.",
+        review2Name: "Sofia Martins",
+        review2Text: "Equipa muito profissional. Perceberam exatamente o que precisávamos.",
+        review3Name: "Ricardo Costa",
+        review3Text: "O novo site é mais rápido e converte muito melhor. Recomendo muito!",
         heroVisuals: {
             activeGrowth: "Crescimento Ativo",
             recentActivity: "Atividade Recente",
