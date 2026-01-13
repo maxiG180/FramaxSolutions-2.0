@@ -201,7 +201,7 @@ const Hero = () => {
               >
                 <TrendingUp className="w-8 h-8 text-blue-500 mb-2" />
                 <div className="text-xl font-bold text-white mb-1">{t.hero.heroVisuals.activeGrowth}</div>
-                <div className="text-xs text-blue-400 font-medium">Trending Up</div>
+                <div className="text-xs text-blue-400 font-medium">{t.hero.heroVisuals.trendingUp}</div>
 
                 {/* Simple arrow going up */}
                 <div className="absolute bottom-2 right-2 w-12 h-12">
@@ -217,7 +217,7 @@ const Hero = () => {
                 </div>
               </motion.div>
 
-              {/* Card 2: Always Online */}
+              {/* Card 2: Lightning Fast */}
               <motion.div
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={isInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.8 }}
@@ -226,15 +226,25 @@ const Hero = () => {
               >
                 <Zap className="w-8 h-8 text-yellow-500 mb-2" />
                 <div className="text-xs font-semibold text-white mb-1">{t.hero.alwaysOpen}</div>
-                <div className="text-[10px] text-slate-400">{t.hero.alwaysOnline}</div>
+                <div className="text-[10px] text-yellow-400 font-mono font-bold">{t.hero.alwaysOnline}</div>
 
-                {/* Pulsing dot */}
-                <div className="absolute bottom-2 right-2">
-                  <motion.div
-                    animate={{ scale: [1, 1.3, 1], opacity: [1, 0.5, 1] }}
-                    transition={{ duration: 2, repeat: Infinity }}
-                    className="w-3 h-3 rounded-full bg-yellow-500"
-                  />
+                {/* Speed bars animation */}
+                <div className="absolute bottom-2 right-2 flex items-end gap-0.5 h-6">
+                  {[40, 70, 55, 85, 60].map((height, i) => (
+                    <motion.div
+                      key={i}
+                      className="w-1 bg-gradient-to-t from-yellow-500 to-yellow-300 rounded-full"
+                      initial={{ height: '20%' }}
+                      animate={{ height: `${height}%` }}
+                      transition={{
+                        duration: 0.8,
+                        delay: 0.8 + i * 0.1,
+                        repeat: Infinity,
+                        repeatType: 'reverse',
+                        repeatDelay: 0.5
+                      }}
+                    />
+                  ))}
                 </div>
               </motion.div>
 
@@ -303,7 +313,7 @@ const Hero = () => {
               >
                 <TrendingUp className="w-8 h-8 text-orange-500 mb-2" />
                 <div className="text-xs font-semibold text-white mb-1">{t.hero.heroVisuals.revenueScale}</div>
-                <div className="text-xl font-bold text-orange-400">Scale</div>
+                <div className="text-xl font-bold text-orange-400">{t.hero.heroVisuals.scaleStatus}</div>
 
                 {/* Growth chart */}
                 <div className="absolute bottom-0 left-0 right-0 h-8 flex items-end gap-0.5 px-2 pb-2">
@@ -410,7 +420,7 @@ const Hero = () => {
                 <TrendingUp className="w-10 h-10 text-blue-500 mb-2 relative z-10" />
                 <div className="relative z-10">
                   <div className="text-lg font-bold text-white mb-1">{t.hero.heroVisuals.activeGrowth}</div>
-                  <div className="text-sm font-medium text-blue-400">Trending Up</div>
+                  <div className="text-sm font-medium text-blue-400">{t.hero.heroVisuals.trendingUp}</div>
                 </div>
 
                 {/* Simple arrow going up */}
@@ -505,7 +515,7 @@ const Hero = () => {
                 </div>
               </motion.div>
 
-              {/* Card 3: Always Online - Middle Left */}
+              {/* Card 3: Lightning Fast - Middle Left */}
               <motion.div
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={isInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.8 }}
@@ -516,15 +526,25 @@ const Hero = () => {
                 <Zap className="w-10 h-10 text-yellow-500 mb-2 relative z-10" />
                 <div className="relative z-10">
                   <div className="text-sm font-semibold text-white mb-1">{t.hero.alwaysOpen}</div>
-                  <div className="text-xs text-slate-400">{t.hero.alwaysOnline}</div>
+                  <div className="text-xs text-yellow-400 font-mono font-bold">{t.hero.alwaysOnline}</div>
                 </div>
-                {/* Pulsing dot */}
-                <div className="absolute bottom-4 right-4">
-                  <motion.div
-                    animate={{ scale: [1, 1.3, 1], opacity: [1, 0.5, 1] }}
-                    transition={{ duration: 2, repeat: Infinity }}
-                    className="w-4 h-4 rounded-full bg-yellow-500"
-                  />
+                {/* Speed bars animation */}
+                <div className="absolute bottom-4 right-4 flex items-end gap-1 h-10">
+                  {[45, 75, 60, 90, 65].map((height, i) => (
+                    <motion.div
+                      key={i}
+                      className="w-1.5 bg-gradient-to-t from-yellow-500 to-yellow-300 rounded-full"
+                      initial={{ height: '30%' }}
+                      animate={{ height: `${height}%` }}
+                      transition={{
+                        duration: 0.8,
+                        delay: 0.9 + i * 0.1,
+                        repeat: Infinity,
+                        repeatType: 'reverse',
+                        repeatDelay: 0.5
+                      }}
+                    />
+                  ))}
                 </div>
               </motion.div>
 
@@ -539,7 +559,7 @@ const Hero = () => {
                 <TrendingUp className="w-10 h-10 text-orange-500 mb-2 relative z-10" />
                 <div className="relative z-10">
                   <div className="text-sm font-semibold text-white mb-1">{t.hero.heroVisuals.revenueScale}</div>
-                  <div className="text-2xl font-bold text-orange-400">Scale</div>
+                  <div className="text-2xl font-bold text-orange-400">{t.hero.heroVisuals.scaleStatus}</div>
                 </div>
                 {/* Growth chart */}
                 <div className="absolute bottom-0 left-0 right-0 h-10 flex items-end gap-0.5 px-3 pb-3">

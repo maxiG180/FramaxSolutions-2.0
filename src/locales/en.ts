@@ -54,8 +54,8 @@ export const en: Translation = {
         bookMeeting: "Book free meeting",
         couldBeYou: "This Could Be You",
         moreClients: "More Clients",
-        alwaysOpen: "Open 24/7",
-        alwaysOnline: "Always online",
+        alwaysOpen: "Lightning Fast",
+        alwaysOnline: "< 1s Load Time",
         growth: "Growth",
         reviews: "Reviews",
         yourBusiness: "Your Business",
@@ -70,9 +70,11 @@ export const en: Translation = {
         review3Name: "Ricardo Costa",
         review3Text: "The new website is faster and converts much better. Highly recommend!",
         heroVisuals: {
-            activeGrowth: "Active Growth",
+            activeGrowth: "Lead Generation",
             recentActivity: "Recent Activity",
-            revenueScale: "Revenue Scale"
+            revenueScale: "Revenue Growth",
+            trendingUp: "Increasing Daily",
+            scaleStatus: "Optimized"
         }
     },
     portfolio: {

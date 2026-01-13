@@ -67,6 +67,8 @@ export interface Translation {
             activeGrowth: string;
             recentActivity: string;
             revenueScale: string;
+            trendingUp: string;
+            scaleStatus: string;
         };
     };
     portfolio: {
