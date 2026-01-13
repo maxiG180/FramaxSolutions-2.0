@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/utils/supabase/client";
-import { Loader2, Menu } from "lucide-react";
+import { Loader2, Menu, CheckSquare } from "lucide-react";
 import Link from "next/link";
 
 export default function DashboardClientLayout({
@@ -49,12 +49,21 @@ export default function DashboardClientLayout({
                     <img src="/logos/framax_icon.png" alt="Framax" className="w-8 h-8" />
                     <span className="font-bold text-lg">Framax<span className="text-blue-500">Solutions</span></span>
                 </Link>
-                <button
-                    onClick={() => setIsMobileMenuOpen(true)}
-                    className="p-2 text-white/70 hover:text-white hover:bg-white/10 rounded-md"
-                >
-                    <Menu className="w-6 h-6" />
-                </button>
+                <div className="flex items-center gap-2">
+                    <Link
+                        href="/dashboard/todo"
+                        className="p-2 text-blue-500 hover:text-blue-400 hover:bg-blue-500/10 rounded-md transition-colors"
+                        title="Tasks"
+                    >
+                        <CheckSquare className="w-6 h-6" />
+                    </Link>
+                    <button
+                        onClick={() => setIsMobileMenuOpen(true)}
+                        className="p-2 text-white/70 hover:text-white hover:bg-white/10 rounded-md"
+                    >
+                        <Menu className="w-6 h-6" />
+                    </button>
+                </div>
             </div>
 
             <Sidebar
