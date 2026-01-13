@@ -37,6 +37,13 @@ export const en: Translation = {
         badge: "Turn Visitors into Clients.",
         titlePre: "Websites that",
         titleHighlight: "sell more",
+        dynamicKeywords: [
+            "sell more",
+            "save time",
+            "automate work",
+            "scale faster",
+            "build trust"
+        ],
         description: "Stop losing customers to outdated design. We craft high-performance, SEO-optimized websites that turn visitors into loyal clients.",
         startProject: "Start Your Project",
         viewWork: "View Our Work",
@@ -113,6 +120,12 @@ export const en: Translation = {
         thu: "Thu",
         fri: "Fri",
         sat: "Sat",
+        // Days and Months
+        months: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
+        // Validation & Errors
+        validationEmail: "Please enter a valid email address.",
+        validationRealEmail: "Please use a real email address.",
+        alertError: "Something went wrong. Please try again.",
     },
     techStack: {
         poweredBy: "Powered by modern technologies",
@@ -137,11 +150,72 @@ export const en: Translation = {
         mobileDesc: "Perfectly responsive on all devices.",
         globalTitle: "Global Reach",
         globalDesc: "Infrastructure that scales with your business.",
+        // Notifications
+        notificationLead: "New Lead",
+        notificationInvoice: "Invoice Sent",
+        notificationMeeting: "Meeting Scheduled",
+        notificationEmail: "Email Opened",
+        timeNow: "Just now",
+        time2m: "2m ago",
+        time15m: "15m ago",
+        time2h: "2h ago",
+        // Dashboard
+        monthlyRevenue: "Monthly Revenue",
+        newClients: "New Clients",
+        // Other
+        thisCouldBeYou: "This could be you!",
+        searchYourBusiness: "Your Business",
     },
     legal: {
         lastUpdated: "Last updated",
         privacyTitle: "Privacy Policy",
         termsTitle: "Terms of Service",
+    },
+    faqSection: {
+        title: "Frequently Asked Questions",
+        subtitle: "Have a different question? Contact us and we'll be happy to help.",
+        questions: [
+            {
+                question: "How long does a typical project take?",
+                answer: "For a standard landing page, we typically deliver within 1 week. Larger corporate sites take 2-3 weeks, while custom web applications can take 4-8 weeks depending on complexity."
+            },
+            {
+                question: "Do you offer hosting and maintenance?",
+                answer: "Yes! We offer managed hosting plans that include daily backups, security updates, and 24/7 monitoring. We handle the technical side so you can focus on your business."
+            },
+            {
+                question: "What is your payment structure?",
+                answer: "We typically require a 50% deposit to start the project, with the remaining 50% due upon completion and launch. For larger projects, we can discuss milestone-based payments."
+            },
+            {
+                question: "Can you update my existing website?",
+                answer: "Absolutely. We can audit your current site and propose a redesign or migration plan to modern technologies like Next.js for better performance and SEO."
+            },
+            {
+                question: "Will my website be mobile-friendly?",
+                answer: "100%. We take a mobile-first approach, ensuring your site looks and performs perfectly on smartphones, tablets, and desktops."
+            }
+        ]
+    },
+    mobileSEO: {
+        badge: "Dominant Visibility",
+        title: "Imagine",
+        titleHighlight: "Your Business",
+        description: "Most customers don't scroll. We engineer your digital presence to secure the top spot in local searches, turning \"near me\" queries into loyal customers.",
+        withoutSEO: "Without SEO",
+        withFramax: "With Framax",
+        provenResults: "Proven Results",
+        ranking: "#1",
+        rankingLabel: "Detailed Ranking",
+        traffic: "3.5x",
+        trafficLabel: "More Traffic",
+        yours: "Your Business",
+        yourBrand: "YOUR BRAND",
+        open24: "Open 24 hours",
+        call: "Call",
+        route: "Route",
+        web: "Web",
+        page2: "Ranking on page 2..."
     },
     dashboard: {
         menu: {

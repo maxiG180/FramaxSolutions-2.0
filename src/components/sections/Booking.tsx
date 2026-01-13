@@ -13,7 +13,7 @@ const TIME_SLOTS = [
     "02:00 PM", "02:30 PM", "03:00 PM", "03:30 PM"
 ];
 
-const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
 
 export function Booking() {
     const { t } = useLanguage();
@@ -124,8 +124,8 @@ export function Booking() {
 
     const validateEmail = (email: string) => {
         const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-        if (!emailRegex.test(email)) return "Please enter a valid email address.";
-        if (email.endsWith("@test.com") || email.endsWith("@example.com")) return "Please use a real email address.";
+        if (!emailRegex.test(email)) return t.booking.validationEmail;
+        if (email.endsWith("@test.com") || email.endsWith("@example.com")) return t.booking.validationRealEmail;
         return "";
     };
 
@@ -188,7 +188,7 @@ export function Booking() {
             setStep("success");
         } catch (error) {
             console.error("Booking failed:", error);
-            alert("Something went wrong. Please try again.");
+            alert(t.booking.alertError);
         } finally {
             setIsSubmitting(false);
         }
@@ -287,7 +287,7 @@ export function Booking() {
                                                         <ChevronLeft className="w-4 h-4" />
                                                     </button>
                                                     <span className="text-sm font-medium w-28 text-center">
-                                                        {MONTHS[currentDate.getMonth()]} {currentDate.getFullYear()}
+                                                        {t.booking.months[currentDate.getMonth()]} {currentDate.getFullYear()}
                                                     </span>
                                                     <button onClick={() => setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1))} className="p-1 hover:text-primary transition-colors">
                                                         <ChevronRight className="w-4 h-4" />

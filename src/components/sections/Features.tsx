@@ -12,10 +12,10 @@ export function Features() {
     const { t } = useLanguage();
 
     const NOTIFICATIONS = [
-        { icon: Users, text: "Novo Lead", subtext: "Agora mesmo", color: "bg-blue-500" },
-        { icon: FileText, text: "Fatura Enviada", subtext: "Há 2m", color: "bg-green-500" },
-        { icon: Calendar, text: "Reunião Agendada", subtext: "Há 15m", color: "bg-purple-500" },
-        { icon: Mail, text: "Email Aberto", subtext: "Há 2h", color: "bg-pink-500" },
+        { icon: Users, text: t.features.notificationLead, subtext: t.features.timeNow, color: "bg-blue-500" },
+        { icon: FileText, text: t.features.notificationInvoice, subtext: t.features.time2m, color: "bg-green-500" },
+        { icon: Calendar, text: t.features.notificationMeeting, subtext: t.features.time15m, color: "bg-purple-500" },
+        { icon: Mail, text: t.features.notificationEmail, subtext: t.features.time2h, color: "bg-pink-500" },
     ];
 
     const [visibleNotifications, setVisibleNotifications] = useState([0, 1]);
@@ -305,14 +305,14 @@ export function Features() {
                                             {/* KPIs */}
                                             <div className="grid grid-cols-2 gap-3">
                                                 <div className="bg-[#1e293b]/50 rounded-xl p-3 border border-white/5">
-                                                    <div className="text-[10px] text-slate-400 mb-1">Receita Mensal</div>
+                                                    <div className="text-[10px] text-slate-400 mb-1">{t.features.monthlyRevenue}</div>
                                                     <div className="text-lg font-bold text-white mb-1">€12.450</div>
                                                     <div className="h-1 w-full bg-white/5 rounded-full overflow-hidden">
                                                         <div className="h-full w-[70%] bg-emerald-500 rounded-full" />
                                                     </div>
                                                 </div>
                                                 <div className="bg-[#1e293b]/50 rounded-xl p-3 border border-white/5">
-                                                    <div className="text-[10px] text-slate-400 mb-1">Novos Clientes</div>
+                                                    <div className="text-[10px] text-slate-400 mb-1">{t.features.newClients}</div>
                                                     <div className="text-lg font-bold text-white mb-1">+124</div>
                                                     <div className="h-1 w-full bg-white/5 rounded-full overflow-hidden">
                                                         <div className="h-full w-[45%] bg-blue-500 rounded-full" />
@@ -369,7 +369,7 @@ export function Features() {
                                 {/* Search Bar */}
                                 <div className="mx-3 mb-3 h-7 bg-white rounded-full shadow-sm flex items-center px-2 gap-1.5 border border-gray-100">
                                     <Search className="w-3 h-3 text-gray-400" />
-                                    <span className="text-[10px] text-gray-400 font-medium ml-1">Your Business</span>
+                                    <span className="text-[10px] text-gray-400 font-medium ml-1">{t.features.searchYourBusiness}</span>
                                 </div>
 
                                 {/* Results */}
@@ -388,7 +388,7 @@ export function Features() {
                                             transition={{ delay: 0.8, type: "spring" }}
                                             className="absolute -top-8 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground text-[8px] font-bold px-2 py-1 rounded-full whitespace-nowrap shadow-xl z-30 flex items-center gap-1"
                                         >
-                                            This could be you!
+                                            {t.features.thisCouldBeYou}
                                             <div className="absolute bottom-[-4px] left-1/2 -translate-x-1/2 border-x-4 border-x-transparent border-t-4 border-t-primary" />
                                         </motion.div>
 

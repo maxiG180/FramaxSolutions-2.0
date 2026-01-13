@@ -6,6 +6,67 @@ import { motion, useInView, useMotionValue, useTransform, useSpring } from "fram
 import { ArrowRight, TrendingUp, ShoppingCart, Users, Zap } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 
+const Typewriter = ({ text }: { text: string[] }) => {
+  const [index, setIndex] = React.useState(0);
+  const [subIndex, setSubIndex] = React.useState(0);
+  const [reverse, setReverse] = React.useState(false);
+  const [blink, setBlink] = React.useState(true);
+
+  React.useEffect(() => {
+    if (index >= text.length) {
+      setIndex(0); // Loop back
+      return;
+    }
+
+    if (subIndex === text[index].length + 1 && !reverse) {
+      setTimeout(() => setReverse(true), 2000); // Wait before deleting
+      return;
+    }
+
+    if (subIndex === 0 && reverse) {
+      setReverse(false);
+      setIndex((prev) => (prev + 1) % text.length);
+      return;
+    }
+
+    const timeout = setTimeout(() => {
+      setSubIndex((prev) => prev + (reverse ? -1 : 1));
+    }, Math.max(reverse ? 75 : subIndex === text[index].length ? 2000 : 150, Math.floor(Math.random() * 350)));
+
+    return () => clearTimeout(timeout);
+  }, [subIndex, index, reverse, text]);
+
+  // Cursor blink
+  React.useEffect(() => {
+    const timeout2 = setInterval(() => {
+      setBlink((prev) => !prev);
+    }, 500);
+    return () => clearInterval(timeout2);
+  }, []);
+
+  return (
+    <span className="relative inline-block text-blue-500">
+      {`${text[index].substring(0, subIndex)}`}
+      <span className={`${blink ? "opacity-100" : "opacity-0"} absolute top-0 -right-2 text-blue-500`}>|</span>
+      <svg
+        className="absolute w-full h-3 sm:h-4 -bottom-1 sm:-bottom-2 left-0 text-blue-500"
+        viewBox="0 0 100 10"
+        preserveAspectRatio="none"
+      >
+        <motion.path
+          d="M0 5 L100 5"
+          fill="transparent"
+          strokeWidth="8"
+          stroke="currentColor"
+          initial={{ pathLength: 0 }}
+          animate={{ pathLength: 1 }}
+          transition={{ duration: 0.8, delay: 1, ease: "easeOut" }}
+        />
+      </svg>
+    </span>
+  );
+};
+
 const Hero = () => {
   const { t } = useLanguage();
   const containerRef = useRef(null);
@@ -65,24 +126,7 @@ const Hero = () => {
             >
               <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold tracking-tight leading-[1.05] text-foreground">
                 {t.hero.titlePre}{" "}
-                <span className="relative inline-block text-blue-500">
-                  {t.hero.titleHighlight}
-                  <svg
-                    className="absolute w-full h-3 sm:h-4 -bottom-1 sm:-bottom-2 left-0 text-blue-500"
-                    viewBox="0 0 100 10"
-                    preserveAspectRatio="none"
-                  >
-                    <motion.path
-                      d="M0 5 L100 5"
-                      fill="transparent"
-                      strokeWidth="8"
-                      stroke="currentColor"
-                      initial={{ pathLength: 0 }}
-                      animate={isInView ? { pathLength: 1 } : { pathLength: 0 }}
-                      transition={{ duration: 0.8, delay: 1, ease: "easeOut" }}
-                    />
-                  </svg>
-                </span>
+                <Typewriter text={t.hero.dynamicKeywords || [t.hero.titleHighlight]} />
               </h1>
             </motion.div>
 
@@ -591,5 +635,7 @@ const Hero = () => {
     </section>
   );
 };
+
+
 
 export default Hero;

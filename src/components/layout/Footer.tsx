@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { Twitter, Github, Linkedin, Heart } from "lucide-react";
+import { Twitter, Github, Linkedin, Heart, Facebook, Mail } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 
 export function Footer() {
@@ -59,14 +59,11 @@ export function Footer() {
                     </p>
 
                     <div className="flex items-center gap-4">
-                        <Link href="#" className="text-muted-foreground hover:text-primary transition-colors hover:scale-110 transform duration-200">
-                            <Twitter size={20} />
+                        <Link href="https://www.facebook.com/profile.php?id=61575606540556" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary transition-colors hover:scale-110 transform duration-200">
+                            <Facebook size={20} />
                         </Link>
-                        <Link href="#" className="text-muted-foreground hover:text-primary transition-colors hover:scale-110 transform duration-200">
-                            <Github size={20} />
-                        </Link>
-                        <Link href="#" className="text-muted-foreground hover:text-primary transition-colors hover:scale-110 transform duration-200">
-                            <Linkedin size={20} />
+                        <Link href="mailto:contact@framaxsolutions.com" className="text-muted-foreground hover:text-primary transition-colors hover:scale-110 transform duration-200">
+                            <Mail size={20} />
                         </Link>
                     </div>
                 </div>

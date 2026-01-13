@@ -48,7 +48,7 @@ export const metadata: Metadata = {
     images: ["/og-image.png"],
   },
   icons: {
-    icon: "/favicon.ico",
+    icon: "/logos/framax_icon.png",
     apple: "/logos/framax_icon.png",
   },
 };

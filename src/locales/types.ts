@@ -35,6 +35,7 @@ export interface Translation {
         badge: string;
         titlePre: string;
         titleHighlight: string;
+        dynamicKeywords?: string[];
         description: string;
         startProject: string;
         viewWork: string;
@@ -81,6 +82,42 @@ export interface Translation {
         project3Category: string;
         project3Description: string;
     };
+    features: {
+        title: string;
+        titleHighlight: string;
+        subtitle: string;
+        speedTitle: string;
+        speedDesc: string;
+        seoTitle: string;
+        seoDesc: string;
+        automationTitle: string;
+        automationDesc: string;
+        websitesTitle: string;
+        websitesDesc: string;
+        systemsTitle: string;
+        systemsDesc: string;
+        codeTitle: string;
+        codeDesc: string;
+        mobileTitle: string;
+        mobileDesc: string;
+        globalTitle: string;
+        globalDesc: string;
+        // Notifications
+        notificationLead: string;
+        notificationInvoice: string;
+        notificationMeeting: string;
+        notificationEmail: string;
+        timeNow: string;
+        time2m: string;
+        time15m: string;
+        time2h: string;
+        // Dashboard
+        monthlyRevenue: string;
+        newClients: string;
+        // Other
+        thisCouldBeYou: string;
+        searchYourBusiness: string;
+    };
     booking: {
         title: string;
         titleHighlight: string;
@@ -111,36 +148,51 @@ export interface Translation {
         thu: string;
         fri: string;
         sat: string;
+        // Days and Months
+        months: string[];
+        // Validation & Errors
+        validationEmail: string;
+        validationRealEmail: string;
+        alertError: string;
     };
     techStack: {
         poweredBy: string;
-    };
-    features: {
-        title: string;
-        titleHighlight: string;
-        subtitle: string;
-        speedTitle: string;
-        speedDesc: string;
-        seoTitle: string;
-        seoDesc: string;
-        automationTitle: string;
-        automationDesc: string;
-        websitesTitle: string;
-        websitesDesc: string;
-        systemsTitle: string;
-        systemsDesc: string;
-        codeTitle: string;
-        codeDesc: string;
-        mobileTitle: string;
-        mobileDesc: string;
-        globalTitle: string;
-        globalDesc: string;
     };
     legal: {
         lastUpdated: string;
         privacyTitle: string;
         termsTitle: string;
     };
+    faqSection: {
+        title: string;
+        subtitle: string;
+        questions: {
+            question: string;
+            answer: string;
+        }[];
+    };
+    mobileSEO: {
+        badge: string;
+        title: string;
+        titleHighlight: string;
+        description: string;
+        withoutSEO: string;
+        withFramax: string;
+        provenResults: string;
+        ranking: string;
+        rankingLabel: string;
+        traffic: string;
+        trafficLabel: string;
+        // Mock UI
+        yours: string;
+        yourBrand: string;
+        open24: string;
+        call: string;
+        route: string;
+        web: string;
+        page2: string;
+    };
+
     dashboard: {
         menu: {
             management: string;

@@ -72,10 +72,36 @@ We also offer **Domain & Hosting** for 29€/month.`,
     contact: `📞 **Let's connect:**
 - Email: contact@framaxsolutions.com
 - Book a discovery call on our website
+- Facebook: Framax Solutions
 
 How else can I help you?`,
 
-    default: `I can help you with questions about our services, pricing, timelines, or maintenance. What would you like to know?`
+
+
+    portfolio: `🎨 **Our Work:**
+
+Our portfolio section is currently under maintenance as we curate our latest projects. 
+However, here are some of our recent high-impact solutions:
+
+- **Lumina Finance** (Fintech Dashboard)
+- **Velvet & Oak** (Luxury E-commerce)
+- **Nexus Health** (SaaS Platform)
+
+Check back soon for the full visual showcase!`,
+
+    team: `👥 **About Us:**
+
+Framax Solutions is a digital studio focused on business growth. We aren't just coders; we are partners in your success, combining design, technology, and strategy to build digital assets that meaningful results.`,
+
+    hiring: `🚀 **Join the Team:**
+
+We are primarily looking for creative **Marketing Specialists** and **Designers** to help our clients grow. 
+
+We are also open to talented Developers, though our current focus is on growth and design roles.
+
+Please send your portfolio/CV to: careers@framaxsolutions.com`,
+
+    default: `I can help you with questions about our **Services**, **Pricing**, **Timelines**, or **Maintenance**. What would you like to know?`
 };
 
 type QuestionMatcher = {
@@ -95,7 +121,7 @@ export const QUESTION_MATCHERS: QuestionMatcher[] = [
             /turnaround/i,
             /time.*take/i
         ],
-        keywords: ['timeline', 'schedule', 'deadline']
+        keywords: ['timeline', 'schedule', 'deadline', 'date']
     },
     {
         id: 'pricing',
@@ -108,9 +134,11 @@ export const QUESTION_MATCHERS: QuestionMatcher[] = [
             /budget/i,
             /rates/i,
             /payment/i,
-            /deposit/i
+            /deposit/i,
+            /expensive/i,
+            /cheap/i
         ],
-        keywords: ['money', 'expense', 'bill', 'invoice']
+        keywords: ['money', 'expense', 'bill', 'invoice', 'euro', 'dollar']
     },
     {
         id: 'maintenance',
@@ -124,7 +152,7 @@ export const QUESTION_MATCHERS: QuestionMatcher[] = [
             /bugs/i,
             /help/i
         ],
-        keywords: ['care', 'monthly', 'plan']
+        keywords: ['care', 'monthly', 'plan', 'hosting']
     },
     {
         id: 'services',
@@ -139,7 +167,7 @@ export const QUESTION_MATCHERS: QuestionMatcher[] = [
             /website/i,
             /app/i
         ],
-        keywords: ['offerings', 'work', 'create']
+        keywords: ['offerings', 'work', 'create', 'product']
     },
     {
         id: 'contact',
@@ -152,14 +180,85 @@ export const QUESTION_MATCHERS: QuestionMatcher[] = [
             /reach/i,
             /talk/i,
             /speak/i,
-            /meeting/i
+            /meeting/i,
+            /book/i
         ],
-        keywords: ['touch', 'message', 'number']
+        keywords: ['touch', 'message', 'number', 'address', 'location']
+    },
+
+    {
+        id: 'portfolio',
+        patterns: [
+            /example/i,
+            /work/i,
+            /portfolio/i,
+            /case/i,
+            /client/i,
+            /show/i,
+            /see/i
+        ],
+        keywords: ['sample', 'project', 'previous', 'done']
+    },
+    {
+        id: 'team',
+        patterns: [
+            /who/i,
+            /team/i,
+            /people/i,
+            /developer/i,
+            /designer/i,
+            /company/i
+        ],
+        keywords: ['us', 'we', 'about', 'story']
+    },
+    {
+        id: 'hiring',
+        patterns: [
+            /job/i,
+            /career/i,
+            /hiring/i,
+            /work for/i,
+            /join/i,
+            /vacancy/i
+        ],
+        keywords: ['apply', 'resume', 'cv']
     }
 ];
 
+
+// Levenshtein distance algorithm for fuzzy matching
+function levenshteinDistance(a: string, b: string): number {
+    const matrix = [];
+
+    for (let i = 0; i <= b.length; i++) {
+        matrix[i] = [i];
+    }
+
+    for (let j = 0; j <= a.length; j++) {
+        matrix[0][j] = j;
+    }
+
+    for (let i = 1; i <= b.length; i++) {
+        for (let j = 1; j <= a.length; j++) {
+            if (b.charAt(i - 1) == a.charAt(j - 1)) {
+                matrix[i][j] = matrix[i - 1][j - 1];
+            } else {
+                matrix[i][j] = Math.min(
+                    matrix[i - 1][j - 1] + 1, // substitution
+                    Math.min(
+                        matrix[i][j - 1] + 1, // insertion
+                        matrix[i - 1][j] + 1 // deletion
+                    )
+                );
+            }
+        }
+    }
+
+    return matrix[b.length][a.length];
+}
+
 export function findBestMatch(input: string): string {
-    const lowerInput = input.toLowerCase();
+    const lowerInput = input.toLowerCase().trim();
 
     // 1. Check for exact regex matches (highest priority)
     for (const matcher of QUESTION_MATCHERS) {
@@ -173,6 +272,35 @@ export function findBestMatch(input: string): string {
         if (matcher.keywords.some(keyword => lowerInput.includes(keyword))) {
             return matcher.id;
         }
+    }
+
+    // 3. Fuzzy Matching (Levenshtein Distance) - "Fake AI"
+    // We check if any word in the input is close to any keyword
+    const inputWords = lowerInput.split(/\s+/);
+    let bestMatchId: string | null = null;
+    let minDistance = Infinity;
+
+    for (const matcher of QUESTION_MATCHERS) {
+        for (const keyword of matcher.keywords) {
+            for (const word of inputWords) {
+                // Skip very short words to avoid false positives
+                if (word.length < 3 || keyword.length < 3) continue;
+
+                const distance = levenshteinDistance(word, keyword);
+
+                // Allow a distance of 1 for shorter words (3-5 chars), and 2 for longer words
+                const maxAllowedDistance = keyword.length > 5 ? 2 : 1;
+
+                if (distance <= maxAllowedDistance && distance < minDistance) {
+                    minDistance = distance;
+                    bestMatchId = matcher.id;
+                }
+            }
+        }
+    }
+
+    if (bestMatchId) {
+        return bestMatchId;
     }
 
     return 'default';

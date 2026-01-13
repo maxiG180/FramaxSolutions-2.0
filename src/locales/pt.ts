@@ -37,6 +37,13 @@ export const pt: Translation = {
         badge: "Converta Visitantes em Clientes.",
         titlePre: "Sites que",
         titleHighlight: "vendem mais",
+        dynamicKeywords: [
+            "poupam tempo",
+            "automatizam trabalho",
+            "escalam negócios",
+            "criam confiança",
+            "geram resultados"
+        ],
         description: "Pare de perder clientes para design ultrapassado. Criamos sites de alto desempenho, otimizados para SEO, que transformam visitantes em clientes fiéis.",
         startProject: "Iniciar Projeto",
         viewWork: "Ver o Nosso Trabalho",
@@ -113,6 +120,12 @@ export const pt: Translation = {
         thu: "Qui",
         fri: "Sex",
         sat: "Sáb",
+        // Days and Months
+        months: ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"],
+        // Validation & Errors
+        validationEmail: "Por favor, insira um endereço de email válido.",
+        validationRealEmail: "Por favor, utilize um endereço de email real.",
+        alertError: "Ocorreu um erro. Por favor, tente novamente.",
     },
     techStack: {
         poweredBy: "Desenvolvido com tecnologias modernas",
@@ -137,11 +150,72 @@ export const pt: Translation = {
         mobileDesc: "Perfeitamente responsivo em todos os dispositivos.",
         globalTitle: "Alcance Global",
         globalDesc: "Infraestrutura que escala com o seu negócio.",
+        // Notifications
+        notificationLead: "Novo Lead",
+        notificationInvoice: "Fatura Enviada",
+        notificationMeeting: "Reunião Agendada",
+        notificationEmail: "Email Aberto",
+        timeNow: "Agora mesmo",
+        time2m: "Há 2m",
+        time15m: "Há 15m",
+        time2h: "Há 2h",
+        // Dashboard
+        monthlyRevenue: "Receita Mensal",
+        newClients: "Novos Clientes",
+        // Other
+        thisCouldBeYou: "Este poderia ser você!",
+        searchYourBusiness: "O Seu Negócio",
     },
     legal: {
         lastUpdated: "Última atualização",
         privacyTitle: "Política de Privacidade",
         termsTitle: "Termos de Serviço",
+    },
+    faqSection: {
+        title: "Perguntas Frequentes",
+        subtitle: "Tem outra pergunta? Contacte-nos e teremos todo o gosto em ajudar.",
+        questions: [
+            {
+                question: "Quanto tempo demora um projeto típico?",
+                answer: "Para uma landing page padrão, entregamos normalmente em 1 semana. Sites corporativos maiores levam 2-3 semanas, enquanto aplicações web personalizadas podem levar 4-8 semanas, dependendo da complexidade."
+            },
+            {
+                question: "Oferecem alojamento e manutenção?",
+                answer: "Sim! Oferecemos planos de alojamento gerido que incluem backups diários, atualizações de segurança e monitorização 24/7. Tratamos da parte técnica para que se possa focar no seu negócio."
+            },
+            {
+                question: "Qual é a estrutura de pagamento?",
+                answer: "Normalmente exigimos um depósito de 50% para iniciar o projeto, com os restantes 50% a pagar após a conclusão e lançamento. Para projetos maiores, podemos discutir pagamentos baseados em etapas."
+            },
+            {
+                question: "Podem atualizar o meu site existente?",
+                answer: "Absolutamente. Podemos auditar o seu site atual e propor um plano de redesign ou migração para tecnologias modernas como Next.js para melhor desempenho e SEO."
+            },
+            {
+                question: "O meu site será compatível com dispositivos móveis?",
+                answer: "100%. Adotamos uma abordagem mobile-first, garantindo que o seu site tenha um aspeto e desempenho perfeitos em smartphones, tablets e desktops."
+            }
+        ]
+    },
+    mobileSEO: {
+        badge: "Visibilidade Dominante",
+        title: "Imagine o",
+        titleHighlight: "Seu Negócio",
+        description: "A maioria dos clientes não faz scroll. Otimizamos a sua presença digital para garantir o primeiro lugar nas pesquisas locais, transformando pesquisas 'perto de mim' em clientes fiéis.",
+        withoutSEO: "Sem SEO",
+        withFramax: "Com Framax",
+        provenResults: "Resultados Comprovados",
+        ranking: "#1",
+        rankingLabel: "Ranking Detalhado",
+        traffic: "3.5x",
+        trafficLabel: "Mais Tráfego",
+        yours: "O Seu Negócio",
+        yourBrand: "SUA MARCA",
+        open24: "Aberto 24 horas",
+        call: "Ligar",
+        route: "Rota",
+        web: "Web",
+        page2: "Ranking na página 2..."
     },
     dashboard: {
         menu: {
