@@ -70,11 +70,11 @@ export const en: Translation = {
         review3Name: "Ricardo Costa",
         review3Text: "The new website is faster and converts much better. Highly recommend!",
         heroVisuals: {
-            activeGrowth: "Lead Generation",
+            activeGrowth: "Client Acquisition",
             recentActivity: "Recent Activity",
-            revenueScale: "Revenue Growth",
-            trendingUp: "Increasing Daily",
-            scaleStatus: "Optimized"
+            revenueScale: "Client Success",
+            trendingUp: "High Conversion",
+            scaleStatus: "Exceptional Results"
         }
     },
     portfolio: {
