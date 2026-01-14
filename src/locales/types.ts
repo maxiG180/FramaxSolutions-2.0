@@ -247,6 +247,36 @@ export interface Translation {
         createFirst: string;
         createFirstInvoice: string;
         createFirstQuote: string;
+        tableId: string;
+        tableType: string;
+        tableClient: string;
+        tableAmount: string;
+        tableDate: string;
+        tableStatus: string;
+        tableActions: string;
+        downloadPdf: string;
+        send: string;
+        convertToInvoice: string;
+        deleteQuote: string;
+        moreOptions: string;
+        acceptQuote: string;
+        declineQuote: string;
+        acceptQuoteConfirm: string;
+        quoteAccepted: string;
+        quoteDeclined: string;
+        editQuote: string;
+        // Status translations
+        statusAccepted: string;
+        statusSent: string;
+        statusPending: string;
+        statusPaid: string;
+        statusOverdue: string;
+        statusDraft: string;
+        statusDeclined: string;
+        statusConverted: string;
+        // Type translations
+        typeInvoice: string;
+        typeQuote: string;
     };
     quoteModal: {
         title: string;

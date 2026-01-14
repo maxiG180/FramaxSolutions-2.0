@@ -23,10 +23,13 @@ interface QuoteModalProps {
     isOpen: boolean;
     onClose: () => void;
     onQuoteSaved?: () => void;
+    editingQuoteId?: string | null;
 }
 
-export function QuoteModal({ isOpen, onClose, onQuoteSaved }: QuoteModalProps) {
+export function QuoteModal({ isOpen, onClose, onQuoteSaved, editingQuoteId }: QuoteModalProps) {
     const { t } = useLanguage();
+    const [isEditMode, setIsEditMode] = useState(false);
+    const [loading, setLoading] = useState(false);
     const [clientName, setClientName] = useState("");
     const [clientContact, setClientContact] = useState("");
     const [clientEmail, setClientEmail] = useState("");
@@ -44,9 +47,7 @@ export function QuoteModal({ isOpen, onClose, onQuoteSaved }: QuoteModalProps) {
 
     const [expiryDate, setExpiryDate] = useState(getExpiryDate(new Date().toISOString().split('T')[0]));
     const [notes, setNotes] = useState("");
-    const [items, setItems] = useState<QuoteItem[]>([
-        { id: "1", description: t.quoteModal.descriptionPlaceholder, quantity: 1, price: 0 }
-    ]);
+    const [items, setItems] = useState<QuoteItem[]>([]);
     const [saving, setSaving] = useState(false);
     const [exporting, setExporting] = useState(false);
     const [saveError, setSaveError] = useState("");
@@ -101,6 +102,60 @@ export function QuoteModal({ isOpen, onClose, onQuoteSaved }: QuoteModalProps) {
     // Services state
     const [services, setServices] = useState<Service[]>([]);
     const [loadingServices, setLoadingServices] = useState(false);
+
+    // Load quote data when editing
+    useEffect(() => {
+        const loadQuoteData = async () => {
+            if (!editingQuoteId || !isOpen) return;
+
+            setLoading(true);
+            setIsEditMode(true);
+
+            try {
+                const response = await fetch(`/api/quotes/${editingQuoteId}`);
+                if (!response.ok) {
+                    throw new Error('Failed to load quote');
+                }
+
+                const quote = await response.json();
+
+                // Populate form fields
+                setClientName(quote.client_name || "");
+                setClientContact(quote.client_contact || "");
+                setClientEmail(quote.client_email || "");
+                setClientPhone(formatPhoneNumber(quote.client_phone || ""));
+                setClientAddress(quote.client_address || "");
+                setClientNif(quote.client_nif || "");
+                setQuoteDate(quote.quote_date || new Date().toISOString().split('T')[0]);
+                setExpiryDate(quote.expiry_date || getExpiryDate(quote.quote_date));
+                setNotes(quote.notes || "");
+
+                // Load items
+                const loadedItems = (quote.items || []).map((item: any, index: number) => ({
+                    id: item.id || `item-${index}`,
+                    description: item.description || "",
+                    quantity: item.quantity || 1,
+                    price: item.price || 0,
+                    serviceId: item.serviceId || null,
+                }));
+                setItems(loadedItems.length > 0 ? loadedItems : [{ id: "1", description: "", quantity: 1, price: 0, serviceId: null }]);
+
+            } catch (error) {
+                console.error('Error loading quote:', error);
+                alert('Erro ao carregar orçamento');
+                onClose();
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        if (editingQuoteId && isOpen) {
+            loadQuoteData();
+        } else if (!editingQuoteId && isOpen) {
+            // Reset to create mode
+            setIsEditMode(false);
+        }
+    }, [editingQuoteId, isOpen]);
 
     const filteredClients = clients.filter(client =>
         client.name.toLowerCase().includes(clientName.toLowerCase())
@@ -215,6 +270,22 @@ export function QuoteModal({ isOpen, onClose, onQuoteSaved }: QuoteModalProps) {
         return new Intl.NumberFormat('pt-PT', { style: 'currency', currency: 'EUR' }).format(amount);
     };
 
+    const resetForm = () => {
+        setClientName("");
+        setClientEmail("");
+        setClientPhone("");
+        setClientContact("");
+        setClientAddress("");
+        setClientNif("");
+        const newQuoteDate = new Date().toISOString().split('T')[0];
+        setQuoteDate(newQuoteDate);
+        setExpiryDate(getExpiryDate(newQuoteDate));
+        setNotes("");
+        setItems([]);
+        setSaveError("");
+        setIsEditMode(false);
+    };
+
     const handleExportPDF = async () => {
         try {
             // Validate required fields before exporting
@@ -263,7 +334,7 @@ export function QuoteModal({ isOpen, onClose, onQuoteSaved }: QuoteModalProps) {
 
                 // Add logo with correct proportions - logo is wider than tall
                 // Actual logo dimensions: 422x61px = 6.92:1 aspect ratio
-                const logoHeight = 12; // mm
+                const logoHeight = 8; // mm - Reduced from 12
                 const logoWidth = logoHeight * 6.92; // mm (maintaining actual 6.92:1 aspect ratio)
                 doc.addImage(logoImg, 'PNG', 20, 20, logoWidth, logoHeight);
                 logoLoaded = true;
@@ -276,13 +347,13 @@ export function QuoteModal({ isOpen, onClose, onQuoteSaved }: QuoteModalProps) {
 
             // "Framax Solutions" text - only if logo failed to load
             if (!logoLoaded) {
-                doc.setFontSize(fs(12));
+                doc.setFontSize(fs(10)); // Reduced from 12
                 doc.setFont(fontFamily, 'bold');
                 doc.setTextColor(darkGray[0], darkGray[1], darkGray[2]);
                 doc.text('Framax Solutions', 20, startY);
             } else {
                 // If logo loaded, just show company name in smaller text
-                doc.setFontSize(fs(11));
+                doc.setFontSize(fs(10)); // Reduced from 11
                 doc.setFont(fontFamily, 'bold');
                 doc.setTextColor(darkGray[0], darkGray[1], darkGray[2]);
                 doc.text('Framax Solutions', 20, startY);
@@ -296,7 +367,7 @@ export function QuoteModal({ isOpen, onClose, onQuoteSaved }: QuoteModalProps) {
             doc.text('framaxsolutions.com', 20, startY + 10);
 
             // Quote Title (Right side) - MUCH larger to match preview
-            doc.setFontSize(fs(36));
+            doc.setFontSize(fs(24)); // Reduced from 36
             doc.setFont(fontFamily, 'normal');
             doc.setTextColor(primaryBlue[0], primaryBlue[1], primaryBlue[2]);
             doc.text(t.quoteModal.quote, pageWidth - 20, 30, { align: 'right' });
@@ -311,7 +382,7 @@ export function QuoteModal({ isOpen, onClose, onQuoteSaved }: QuoteModalProps) {
             doc.setFontSize(fs(16));
             doc.setFont(fontFamily, 'bold');
             doc.setTextColor(darkGray[0], darkGray[1], darkGray[2]);
-            const quoteNumber = `QTE-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 1000)).padStart(3, '0')}`;
+            const quoteNumber = `ORC-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 1000)).padStart(3, '0')}`;
             doc.text(quoteNumber, pageWidth - 20, 48, { align: 'right' });
 
             // Bill To Section (Left)
@@ -431,7 +502,7 @@ export function QuoteModal({ isOpen, onClose, onQuoteSaved }: QuoteModalProps) {
                     fontSize: fs(10),
                     // Only blue border on BOTTOM of header (top of table content)
                     lineColor: primaryBlue,
-                    lineWidth: { bottom: 2, top: 0, left: 0, right: 0 }, // Only bottom border in blue
+                    lineWidth: { bottom: 0.5, top: 0, left: 0, right: 0 }, // Only bottom border in blue
                 },
                 bodyStyles: {
                     textColor: darkGray,
@@ -439,10 +510,20 @@ export function QuoteModal({ isOpen, onClose, onQuoteSaved }: QuoteModalProps) {
                     lineWidth: 0,
                 },
                 columnStyles: {
-                    0: { cellWidth: 'auto', fontStyle: 'normal' },
-                    1: { cellWidth: 25, halign: 'center', textColor: lightGray },
-                    2: { cellWidth: 35, halign: 'right', textColor: lightGray },
-                    3: { cellWidth: 35, halign: 'right', fontStyle: 'bold' },
+                    0: { cellWidth: 'auto', fontStyle: 'normal', halign: 'left' },
+                    1: { cellWidth: 20, halign: 'center', textColor: lightGray },
+                    2: { cellWidth: 30, halign: 'right', textColor: lightGray },
+                    3: { cellWidth: 30, halign: 'right', fontStyle: 'bold' },
+                },
+                didParseCell: function (data: any) {
+                    // Apply alignment to header cells to match body cells
+                    if (data.section === 'head') {
+                        if (data.column.index === 1) {
+                            data.cell.styles.halign = 'center';
+                        } else if (data.column.index === 2 || data.column.index === 3) {
+                            data.cell.styles.halign = 'right';
+                        }
+                    }
                 },
                 margin: { left: 20, right: 20 },
             });
@@ -546,8 +627,14 @@ export function QuoteModal({ isOpen, onClose, onQuoteSaved }: QuoteModalProps) {
                 return;
             }
 
-            const response = await fetch('/api/quotes', {
-                method: 'POST',
+            const url = isEditMode && editingQuoteId
+                ? `/api/quotes/${editingQuoteId}`
+                : '/api/quotes';
+
+            const method = isEditMode ? 'PUT' : 'POST';
+
+            const response = await fetch(url, {
+                method,
                 headers: {
                     'Content-Type': 'application/json',
                 },
@@ -582,17 +669,7 @@ export function QuoteModal({ isOpen, onClose, onQuoteSaved }: QuoteModalProps) {
             onClose();
 
             // Reset form
-            setClientName("");
-            setClientEmail("");
-            setClientPhone("");
-            setClientContact("");
-            setClientAddress("");
-            setClientNif("");
-            const newQuoteDate = new Date().toISOString().split('T')[0];
-            setQuoteDate(newQuoteDate);
-            setExpiryDate(getExpiryDate(newQuoteDate));
-            setNotes("");
-            setItems([{ id: "1", description: t.quoteModal.descriptionPlaceholder, quantity: 1, price: 0 }]);
+            resetForm();
         } catch (err: any) {
             console.error('Error saving quote:', err);
             setSaveError(err.message || t.quoteModal.failedToSave);
@@ -621,12 +698,21 @@ export function QuoteModal({ isOpen, onClose, onQuoteSaved }: QuoteModalProps) {
                     >
                         {/* Left Side - Form Input */}
                         <div className="w-full md:w-1/2 p-6 overflow-y-auto border-b md:border-b-0 md:border-r border-white/10 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
+                            {loading ? (
+                                <div className="flex items-center justify-center h-full">
+                                    <div className="text-center">
+                                        <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mb-4"></div>
+                                        <p className="text-white/60">A carregar orçamento...</p>
+                                    </div>
+                                </div>
+                            ) : (
+                                <>
                             <div className="flex items-center justify-between mb-6">
                                 <h2 className="text-2xl font-bold text-white flex items-center gap-2">
                                     <span className="p-2 bg-blue-500/20 rounded-lg text-blue-400">
                                         <FileText className="w-5 h-5" />
                                     </span>
-                                    {t.quoteModal.title}
+                                    {isEditMode ? 'Editar Orçamento' : t.quoteModal.title}
                                 </h2>
                                 <button onClick={onClose} className="p-2 hover:bg-white/10 rounded-lg text-white/40 hover:text-white transition-colors">
                                     <X className="w-5 h-5" />
@@ -883,6 +969,8 @@ export function QuoteModal({ isOpen, onClose, onQuoteSaved }: QuoteModalProps) {
                                     />
                                 </div>
                             </div>
+                                </>
+                            )}
                         </div>
 
                         {/* Right Side - Live Preview */}
@@ -912,7 +1000,7 @@ export function QuoteModal({ isOpen, onClose, onQuoteSaved }: QuoteModalProps) {
                                         <p className="text-gray-500 font-medium text-sm uppercase tracking-wide">
                                             {t.quoteModal.quoteNumber}
                                         </p>
-                                        <p className="text-gray-700 font-bold text-lg">QTE-{new Date().getFullYear()}-{String(Math.floor(Math.random() * 1000)).padStart(3, '0')}</p>
+                                        <p className="text-gray-700 font-bold text-lg">ORC-{new Date().getFullYear()}-{String(Math.floor(Math.random() * 1000)).padStart(3, '0')}</p>
                                     </div>
                                 </div>
 

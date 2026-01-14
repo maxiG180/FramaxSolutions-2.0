@@ -62,7 +62,16 @@ export async function POST(request: NextRequest) {
             }),
         });
 
+        console.log('n8n webhook response status:', webhookResponse.status);
+
         if (!webhookResponse.ok) {
+            const errorText = await webhookResponse.text();
+            console.error('n8n webhook error:', {
+                status: webhookResponse.status,
+                statusText: webhookResponse.statusText,
+                body: errorText
+            });
+
             logger.logWarning('n8n webhook returned error', {
                 endpoint: '/api/check-availability',
                 status: webhookResponse.status,

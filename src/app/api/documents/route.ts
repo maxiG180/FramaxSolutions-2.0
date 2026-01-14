@@ -39,13 +39,14 @@ export async function GET(request: Request) {
 
     // Transform quotes to document format
     const quoteDocs = (quotes || []).map(quote => ({
-      id: quote.quote_number,
+      id: quote.id,
+      displayId: quote.quote_number,
       client: quote.client_name,
-      amount: new Intl.NumberFormat('en-US', {
+      amount: new Intl.NumberFormat('pt-PT', {
         style: 'currency',
-        currency: quote.currency || 'USD'
+        currency: 'EUR'
       }).format(quote.total || 0),
-      date: new Date(quote.quote_date).toLocaleDateString('en-US', {
+      date: new Date(quote.quote_date).toLocaleDateString('pt-PT', {
         month: 'short',
         day: 'numeric',
         year: 'numeric'
@@ -57,13 +58,14 @@ export async function GET(request: Request) {
 
     // Transform invoices to document format
     const invoiceDocs = (invoices || []).map(invoice => ({
-      id: invoice.invoice_number,
+      id: invoice.id,
+      displayId: invoice.invoice_number,
       client: invoice.client_name,
-      amount: new Intl.NumberFormat('en-US', {
+      amount: new Intl.NumberFormat('pt-PT', {
         style: 'currency',
-        currency: invoice.currency || 'USD'
+        currency: 'EUR'
       }).format(invoice.total || 0),
-      date: new Date(invoice.invoice_date).toLocaleDateString('en-US', {
+      date: new Date(invoice.invoice_date).toLocaleDateString('pt-PT', {
         month: 'short',
         day: 'numeric',
         year: 'numeric'

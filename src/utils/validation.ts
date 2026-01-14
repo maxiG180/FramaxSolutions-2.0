@@ -187,7 +187,8 @@ export const bookMeetingSchema = z.object({
     name: z.string()
         .min(1, 'Name is required')
         .max(200, 'Name is too long')
-        .regex(/^[a-zA-Z\s\-']+$/, 'Name contains invalid characters'),
+        // Allow letters (including unicode), spaces, hyphens, and apostrophes
+        .regex(/^[a-zA-Z\u00C0-\u00FF\s\-']+$/, 'Name contains invalid characters'),
     email: emailSchema,
     notes: z.string()
         .max(2000, 'Notes are too long')
@@ -198,8 +199,12 @@ export const bookMeetingSchema = z.object({
         .datetime('Invalid date format'),
     time: z.string()
         .min(1, 'Time is required')
-        .regex(/^\d{2}:\d{2}\s(AM|PM)$/, 'Invalid time format'),
+        // Allow 12-hour (09:00 AM) or 24-hour (14:00) format
+        .regex(/^(\d{2}:\d{2}\s(AM|PM)|\d{2}:\d{2})$/, 'Invalid time format'),
     action: z.literal('bookMeeting'), // Prevent action injection
+    language: z.enum(['pt', 'en'])
+        .optional()
+        .default('pt'), // Default to Portuguese if not provided
 }).strict();
 
 /**

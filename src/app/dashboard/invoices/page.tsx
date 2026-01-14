@@ -4,6 +4,7 @@
 import { useState, useEffect } from "react";
 import { InvoiceList } from "@/components/dashboard/invoices/InvoiceList";
 import { QuoteModal } from "@/components/dashboard/invoices/QuoteModal";
+import { QuoteViewModal } from "@/components/dashboard/invoices/QuoteViewModal";
 import { Plus, FileText, AlertCircle, CheckCircle, ChevronDown, Receipt, FileSignature } from "lucide-react";
 import { Loader } from "@/components/ui/loader";
 import { useLanguage } from "@/context/LanguageContext";
@@ -12,11 +13,13 @@ type DocumentType = "all" | "invoice" | "quote";
 
 interface Document {
     id: string;
+    displayId?: string;
     client: string;
     amount: string;
     date: string;
     status: "paid" | "pending" | "overdue" | "draft" | "sent" | "accepted" | "declined" | "converted";
     type: "invoice" | "quote";
+    rawData?: any;
 }
 
 
@@ -27,6 +30,8 @@ export default function InvoicesPage() {
     const [activeTab, setActiveTab] = useState<DocumentType>("all");
     const [showCreateDropdown, setShowCreateDropdown] = useState(false);
     const [isQuoteModalOpen, setIsQuoteModalOpen] = useState(false);
+    const [editingQuoteId, setEditingQuoteId] = useState<string | null>(null);
+    const [viewingQuoteId, setViewingQuoteId] = useState<string | null>(null);
     const [documents, setDocuments] = useState<Document[]>([]);
     const [error, setError] = useState<string>("");
 
@@ -70,14 +75,73 @@ export default function InvoicesPage() {
         return doc.type === activeTab;
     });
 
-    const handleConvertToInvoice = (id: string) => {
-        setDocuments(prev => prev.map(doc => {
-            if (doc.id === id && doc.type === "quote") {
-                return { ...doc, status: "converted" as const };
+    const handleAcceptQuote = async (id: string) => {
+        if (!confirm(t.invoices.acceptQuoteConfirm)) return;
+
+        try {
+            const response = await fetch('/api/accept-quote', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ id }),
+            });
+
+            if (!response.ok) {
+                const data = await response.json();
+                throw new Error(data.error || 'Failed to accept quote');
             }
-            return doc;
-        }));
-        alert(`Quote ${id} has been converted to an invoice!`);
+
+            const result = await response.json();
+
+            // Update the quote status to 'accepted' in the local state
+            setDocuments(prev => prev.map(doc => {
+                if (doc.id === id && doc.type === "quote") {
+                    return { ...doc, status: "accepted" as const };
+                }
+                return doc;
+            }));
+
+            // Refresh documents to show the new invoice
+            await fetchDocuments();
+
+            alert(t.invoices.quoteAccepted);
+        } catch (err: any) {
+            console.error('Error accepting quote:', err);
+            alert(`Error: ${err.message}`);
+        }
+    };
+
+    const handleDeclineQuote = async (id: string) => {
+        if (!confirm('Tem certeza que deseja recusar este orçamento?')) return;
+
+        try {
+            const response = await fetch('/api/decline-quote', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ id }),
+            });
+
+            if (!response.ok) {
+                const data = await response.json();
+                throw new Error(data.error || 'Failed to decline quote');
+            }
+
+            // Update the quote status to 'declined' in the local state
+            setDocuments(prev => prev.map(doc => {
+                if (doc.id === id && doc.type === "quote") {
+                    return { ...doc, status: "declined" as const };
+                }
+                return doc;
+            }));
+
+            alert(t.invoices.quoteDeclined);
+        } catch (err: any) {
+            console.error('Error declining quote:', err);
+            alert(`Error: ${err.message}`);
+        }
     };
 
     // Calculate stats based on active tab
@@ -85,26 +149,142 @@ export default function InvoicesPage() {
         const relevantDocs = activeTab === "all" ? documents : documents.filter(d => d.type === activeTab);
 
         const total = relevantDocs.reduce((sum, doc) => {
-            const amount = parseFloat(doc.amount.replace(/[$,]/g, ''));
+            // Use the raw numeric value from rawData if available
+            const amount = doc.rawData?.total || 0;
             return sum + amount;
         }, 0);
 
         const overdue = relevantDocs
             .filter(d => d.status === "overdue")
-            .reduce((sum, doc) => sum + parseFloat(doc.amount.replace(/[$,]/g, '')), 0);
+            .reduce((sum, doc) => {
+                const amount = doc.rawData?.total || 0;
+                return sum + amount;
+            }, 0);
 
         const paidOrAccepted = relevantDocs
             .filter(d => d.status === "paid" || d.status === "accepted")
-            .reduce((sum, doc) => sum + parseFloat(doc.amount.replace(/[$,]/g, '')), 0);
+            .reduce((sum, doc) => {
+                const amount = doc.rawData?.total || 0;
+                return sum + amount;
+            }, 0);
 
         return {
-            total: `$${total.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
-            overdue: `$${overdue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
-            completed: `$${paidOrAccepted.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+            total: new Intl.NumberFormat('pt-PT', { style: 'currency', currency: 'EUR' }).format(total),
+            overdue: new Intl.NumberFormat('pt-PT', { style: 'currency', currency: 'EUR' }).format(overdue),
+            completed: new Intl.NumberFormat('pt-PT', { style: 'currency', currency: 'EUR' }).format(paidOrAccepted)
         };
     };
 
     const stats = calculateStats();
+
+    const handleDeleteQuote = async (id: string) => {
+        if (!confirm('Are you sure you want to delete this quote?')) return;
+
+        try {
+            const response = await fetch('/api/delete-quote', {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ id }),
+            });
+
+            if (!response.ok) {
+                const data = await response.json();
+                throw new Error(data.error || 'Failed to delete quote');
+            }
+
+            // Remove from state
+            setDocuments(prev => prev.filter(doc => doc.id !== id));
+            // alert('Quote deleted successfully');
+        } catch (err: any) {
+            console.error('Error deleting quote:', err);
+            alert(`Error: ${err.message}`);
+        }
+    };
+
+    const handleDownloadPdf = async (id: string) => {
+        try {
+            const doc = documents.find(d => d.id === id);
+            if (!doc) {
+                alert('Document not found');
+                return;
+            }
+
+            // TODO: Implement actual PDF generation from stored data
+            // For now, show a message
+            alert(`Download PDF: ${doc.displayId || id}\n\nThis feature will regenerate the PDF from the stored quote/invoice data.`);
+
+            // Future implementation:
+            // - Fetch full quote/invoice data from API
+            // - Generate PDF using jsPDF (similar to QuoteModal)
+            // - Download the generated PDF
+        } catch (err: any) {
+            console.error('Error downloading PDF:', err);
+            alert(`Error: ${err.message}`);
+        }
+    };
+
+    const handleSendDocument = async (id: string) => {
+        try {
+            const doc = documents.find(d => d.id === id);
+            if (!doc) {
+                alert('Documento não encontrado');
+                return;
+            }
+
+            // Check if client has email
+            if (!doc.rawData?.client_email) {
+                alert('Este documento não tem email do cliente associado. Por favor edite o orçamento e adicione o email.');
+                return;
+            }
+
+            // Confirm before sending
+            const confirmMessage = `Enviar ${doc.type === 'quote' ? 'orçamento' : 'fatura'} ${doc.displayId} para ${doc.rawData.client_email}?`;
+            if (!confirm(confirmMessage)) return;
+
+            // Show loading state
+            const sendingMessage = `A enviar ${doc.type === 'quote' ? 'orçamento' : 'fatura'}...`;
+            console.log(sendingMessage);
+
+            const response = await fetch('/api/send-quote-email', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    id: id,
+                    type: doc.type,
+                }),
+            });
+
+            if (!response.ok) {
+                const data = await response.json();
+                throw new Error(data.error || 'Failed to send email');
+            }
+
+            // Update status to 'sent' if it was draft
+            if (doc.status === 'draft') {
+                setDocuments(prev => prev.map(d => {
+                    if (d.id === id) {
+                        return { ...d, status: "sent" as const };
+                    }
+                    return d;
+                }));
+            }
+
+            alert(`✅ ${doc.type === 'quote' ? 'Orçamento' : 'Fatura'} enviado com sucesso para ${doc.rawData.client_email}!`);
+        } catch (err: any) {
+            console.error('Error sending document:', err);
+            alert(`❌ Erro ao enviar: ${err.message}`);
+        }
+    };
+
+    const handleEditQuote = (id: string) => {
+        // Set the quote ID to edit and open modal
+        setEditingQuoteId(id);
+        setIsQuoteModalOpen(true);
+    };
 
     if (loading) return <Loader />;
 
@@ -157,8 +337,21 @@ export default function InvoicesPage() {
 
             <QuoteModal
                 isOpen={isQuoteModalOpen}
-                onClose={() => setIsQuoteModalOpen(false)}
+                onClose={() => {
+                    setIsQuoteModalOpen(false);
+                    setEditingQuoteId(null);
+                }}
                 onQuoteSaved={fetchDocuments}
+                editingQuoteId={editingQuoteId}
+            />
+
+            <QuoteViewModal
+                isOpen={viewingQuoteId !== null}
+                onClose={() => setViewingQuoteId(null)}
+                quoteId={viewingQuoteId}
+                onEdit={handleEditQuote}
+                onDownload={handleDownloadPdf}
+                onSend={handleSendDocument}
             />
 
 
@@ -266,7 +459,16 @@ export default function InvoicesPage() {
                         </div>
                     </div>
                 ) : (
-                    <InvoiceList invoices={filteredDocuments} onConvertToInvoice={handleConvertToInvoice} />
+                    <InvoiceList
+                        invoices={filteredDocuments}
+                        onAcceptQuote={handleAcceptQuote}
+                        onDeclineQuote={handleDeclineQuote}
+                        onDelete={handleDeleteQuote}
+                        onDownload={handleDownloadPdf}
+                        onSend={handleSendDocument}
+                        onEdit={handleEditQuote}
+                        onView={(id) => setViewingQuoteId(id)}
+                    />
                 )}
             </div>
         </div>

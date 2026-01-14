@@ -58,6 +58,7 @@ export function Footer() {
                         © {new Date().getFullYear()} Framax Solutions. {t.footer.rights}
                     </p>
 
+
                     <div className="flex items-center gap-4">
                         <Link href="https://www.facebook.com/profile.php?id=61575606540556" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary transition-colors hover:scale-110 transform duration-200">
                             <Facebook size={20} />

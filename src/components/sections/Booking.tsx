@@ -7,16 +7,25 @@ import confetti from "canvas-confetti";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/context/LanguageContext";
 
-const TIME_SLOTS = [
-    "09:00 AM", "09:30 AM", "10:00 AM", "10:30 AM",
-    "11:00 AM", "11:30 AM", "01:00 PM", "01:30 PM",
-    "02:00 PM", "02:30 PM", "03:00 PM", "03:30 PM"
+const TIME_SLOTS_12H = [
+    "09:00 AM", "10:00 AM", "11:00 AM", "12:00 PM",
+    "01:00 PM", "02:00 PM", "03:00 PM", "04:00 PM",
+    "05:00 PM", "06:00 PM", "07:00 PM"
+];
+
+const TIME_SLOTS_24H = [
+    "09:00", "10:00", "11:00", "12:00",
+    "13:00", "14:00", "15:00", "16:00",
+    "17:00", "18:00", "19:00"
 ];
 
 
 
 export function Booking() {
-    const { t } = useLanguage();
+    const { t, language } = useLanguage();
+
+    // Use 24-hour format for Portuguese, 12-hour format for English
+    const TIME_SLOTS = language === 'pt' ? TIME_SLOTS_24H : TIME_SLOTS_12H;
 
     const DAYS = [t.booking.sun, t.booking.mon, t.booking.tue, t.booking.wed, t.booking.thu, t.booking.fri, t.booking.sat];
     const [step, setStep] = useState<"date" | "time" | "form" | "success">("date");
@@ -27,22 +36,61 @@ export function Booking() {
     const [errors, setErrors] = useState({ email: "" });
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [busySlots, setBusySlots] = useState<string[]>([]);
+    const [rawBusySlots, setRawBusySlots] = useState<string[]>([]);
     const [isLoadingAvailability, setIsLoadingAvailability] = useState(false);
     const [titleClicks, setTitleClicks] = useState(0);
+
+    // Convert selectedTime format when language changes
+    useEffect(() => {
+        if (selectedTime) {
+            // Convert time format when language changes
+            if (language === 'pt' && (selectedTime.includes('AM') || selectedTime.includes('PM'))) {
+                // Convert from 12h to 24h
+                const [timeStr, period] = selectedTime.split(' ');
+                const [hoursStr, minutesStr] = timeStr.split(':');
+                let hours = parseInt(hoursStr);
+
+                if (period === 'PM' && hours !== 12) hours += 12;
+                if (period === 'AM' && hours === 12) hours = 0;
+
+                const newTime = `${hours.toString().padStart(2, '0')}:${minutesStr}`;
+                if (TIME_SLOTS.includes(newTime)) {
+                    setSelectedTime(newTime);
+                }
+            } else if (language === 'en' && !selectedTime.includes('AM') && !selectedTime.includes('PM')) {
+                // Convert from 24h to 12h
+                const [hoursStr, minutesStr] = selectedTime.split(':');
+                let hours = parseInt(hoursStr);
+                const period = hours >= 12 ? 'PM' : 'AM';
+
+                if (hours > 12) hours -= 12;
+                if (hours === 0) hours = 12;
+
+                const newTime = `${hours.toString().padStart(2, '0')}:${minutesStr} ${period}`;
+                if (TIME_SLOTS.includes(newTime)) {
+                    setSelectedTime(newTime);
+                }
+            }
+        }
+    }, [language]);
 
     // Fetch availability when date changes
     useEffect(() => {
         if (selectedDate) {
             const fetchAvailability = async () => {
                 setIsLoadingAvailability(true);
-                setBusySlots([]); // Reset
+                setRawBusySlots([]); // Reset
+                setBusySlots([]); // Reset displayed slots too
 
                 try {
                     // Call our own API endpoint (which proxies to Make.com server-side)
                     const response = await fetch('/api/check-availability', {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ date: selectedDate.toISOString() })
+                        body: JSON.stringify({
+                            date: selectedDate.toISOString(),
+                            action: 'checkAvailability'
+                        })
                     });
 
                     if (!response.ok) {
@@ -50,13 +98,12 @@ export function Booking() {
                     }
 
                     const data = await response.json();
-                    // Only set busy slots that are actually in our TIME_SLOTS array
-                    const validBusySlots = (data.busySlots || []).filter((slot: string) => TIME_SLOTS.includes(slot));
-                    setBusySlots(validBusySlots);
+                    console.log('Raw busy slots from API:', data.busySlots);
+                    setRawBusySlots(data.busySlots || []);
 
                 } catch (error) {
                     console.error("Failed to check availability:", error);
-                    setBusySlots([]); // Ensure we reset to empty on error
+                    setRawBusySlots([]); // Ensure we reset to empty on error
                 } finally {
                     setIsLoadingAvailability(false);
                 }
@@ -64,7 +111,17 @@ export function Booking() {
 
             fetchAvailability();
         }
-    }, [selectedDate]);
+    }, [selectedDate]); // Only refetch when date changes, NOT when language changes
+
+    // Update busy slots when language (TIME_SLOTS) or raw data changes
+    useEffect(() => {
+        // Filter busy slots based on current time format (12h/24h)
+        // Note: Ideally we should normalize comparison, but for now we preserve existing behavior
+        // which assumes API returns slots matching the current format or we might miss them.
+        // TODO: Enhance this to handle 12h/24h conversion if API returns fixed format.
+        const validBusySlots = rawBusySlots.filter((slot: string) => TIME_SLOTS.includes(slot));
+        setBusySlots(validBusySlots);
+    }, [rawBusySlots, TIME_SLOTS]);
 
     // Check if a time slot is busy
     const isSlotBusy = (time: string) => {
@@ -82,16 +139,28 @@ export function Booking() {
         if (!isToday) return false;
 
         // Parse the time slot
-        const [timeStr, period] = time.split(' ');
-        const [hours, minutes] = timeStr.split(':');
-        let hour = parseInt(hours);
+        let hour: number;
+        let minutes: number;
 
-        if (period === 'PM' && hour !== 12) hour += 12;
-        if (period === 'AM' && hour === 12) hour = 0;
+        if (time.includes('AM') || time.includes('PM')) {
+            // 12-hour format
+            const [timeStr, period] = time.split(' ');
+            const [hoursStr, minutesStr] = timeStr.split(':');
+            hour = parseInt(hoursStr);
+            minutes = parseInt(minutesStr);
+
+            if (period === 'PM' && hour !== 12) hour += 12;
+            if (period === 'AM' && hour === 12) hour = 0;
+        } else {
+            // 24-hour format
+            const [hoursStr, minutesStr] = time.split(':');
+            hour = parseInt(hoursStr);
+            minutes = parseInt(minutesStr);
+        }
 
         // Create a date object for the time slot
         const slotTime = new Date(selectedDate);
-        slotTime.setHours(hour, parseInt(minutes), 0, 0);
+        slotTime.setHours(hour, minutes, 0, 0);
 
         // Compare with current time
         return slotTime < today;
@@ -143,21 +212,34 @@ export function Booking() {
 
         try {
             // Combine date and time
-            const [timeStr, period] = selectedTime!.split(' ');
-            const [hours, minutes] = timeStr.split(':');
-            let hour = parseInt(hours);
+            let hour: number;
+            let minutes: number;
 
-            if (period === 'PM' && hour !== 12) hour += 12;
-            if (period === 'AM' && hour === 12) hour = 0;
+            if (selectedTime!.includes('AM') || selectedTime!.includes('PM')) {
+                // 12-hour format
+                const [timeStr, period] = selectedTime!.split(' ');
+                const [hoursStr, minutesStr] = timeStr.split(':');
+                hour = parseInt(hoursStr);
+                minutes = parseInt(minutesStr);
+
+                if (period === 'PM' && hour !== 12) hour += 12;
+                if (period === 'AM' && hour === 12) hour = 0;
+            } else {
+                // 24-hour format
+                const [hoursStr, minutesStr] = selectedTime!.split(':');
+                hour = parseInt(hoursStr);
+                minutes = parseInt(minutesStr);
+            }
 
             const dateTime = new Date(selectedDate!);
-            dateTime.setHours(hour, parseInt(minutes));
+            dateTime.setHours(hour, minutes);
 
             const payload = {
                 ...formData,
                 date: dateTime.toISOString(),
                 time: selectedTime,
                 action: 'bookMeeting',
+                language: language, // Send the selected language (pt or en)
             };
 
             await fetch('/api/book-meeting', {
@@ -352,7 +434,7 @@ export function Booking() {
                                                 <div>
                                                     <h3 className="text-xl font-semibold">{t.booking.selectTime}</h3>
                                                     <p className="text-sm text-muted-foreground">
-                                                        {selectedDate?.toLocaleDateString("en-US", { weekday: 'long', month: 'long', day: 'numeric' })}
+                                                        {selectedDate?.toLocaleDateString(language === 'pt' ? 'pt-PT' : 'en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
                                                     </p>
                                                 </div>
                                             </div>
@@ -427,7 +509,7 @@ export function Booking() {
                                                     </div>
                                                     <div className="text-sm">
                                                         <p className="font-semibold text-foreground">
-                                                            {selectedDate?.toLocaleDateString("en-US", { weekday: 'short', month: 'short', day: 'numeric' })}
+                                                            {selectedDate?.toLocaleDateString(language === 'pt' ? 'pt-PT' : 'en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
                                                         </p>
                                                         <p className="text-muted-foreground">{selectedTime}</p>
                                                     </div>

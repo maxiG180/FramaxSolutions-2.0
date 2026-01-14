@@ -1,14 +1,10 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
 
-// Generate quote number
-function generateQuoteNumber(): string {
-  const year = new Date().getFullYear();
-  const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
-  return `ORC-${year}-${random}`;
-}
-
-export async function POST(request: Request) {
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
   try {
     const supabase = await createClient();
 
@@ -22,7 +18,53 @@ export async function POST(request: Request) {
       );
     }
 
+    const { id } = await params;
+
+    // Fetch quote
+    const { data: quote, error: quoteError } = await supabase
+      .from('quotes')
+      .select('*')
+      .eq('id', id)
+      .eq('user_id', user.id)
+      .single();
+
+    if (quoteError || !quote) {
+      return NextResponse.json(
+        { error: 'Quote not found' },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json(quote);
+  } catch (error: any) {
+    console.error('Error fetching quote:', error);
+    return NextResponse.json(
+      { error: 'Internal server error', details: error.message },
+      { status: 500 }
+    );
+  }
+}
+
+export async function PUT(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const supabase = await createClient();
+
+    // Get authenticated user
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
+
+    if (userError || !user) {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
+      );
+    }
+
+    const { id } = await params;
     const body = await request.json();
+
     const {
       clientName,
       clientEmail,
@@ -53,37 +95,10 @@ export async function POST(request: Request) {
     const taxAmount = subtotal * taxRate;
     const total = subtotal + taxAmount;
 
-    // Generate unique quote number
-    let quoteNumber = generateQuoteNumber();
-    let attempts = 0;
-    const maxAttempts = 10;
-
-    while (attempts < maxAttempts) {
-      const { data: existing } = await supabase
-        .from('quotes')
-        .select('quote_number')
-        .eq('quote_number', quoteNumber)
-        .single();
-
-      if (!existing) break;
-
-      quoteNumber = generateQuoteNumber();
-      attempts++;
-    }
-
-    if (attempts === maxAttempts) {
-      return NextResponse.json(
-        { error: 'Failed to generate unique quote number' },
-        { status: 500 }
-      );
-    }
-
-    // Insert quote
-    const { data: quote, error: insertError } = await supabase
+    // Update quote
+    const { data: quote, error: updateError } = await supabase
       .from('quotes')
-      .insert({
-        user_id: user.id,
-        quote_number: quoteNumber,
+      .update({
         client_name: clientName,
         client_email: clientEmail || null,
         client_phone: clientPhone || null,
@@ -99,22 +114,23 @@ export async function POST(request: Request) {
         total: total,
         currency: 'EUR',
         notes: notes || null,
-        status: 'draft'
       })
+      .eq('id', id)
+      .eq('user_id', user.id)
       .select()
       .single();
 
-    if (insertError) {
-      console.error('Error creating quote:', insertError);
+    if (updateError) {
+      console.error('Error updating quote:', updateError);
       return NextResponse.json(
-        { error: 'Failed to create quote', details: insertError.message },
+        { error: 'Failed to update quote', details: updateError.message },
         { status: 500 }
       );
     }
 
-    return NextResponse.json(quote, { status: 201 });
+    return NextResponse.json(quote);
   } catch (error: any) {
-    console.error('Error in quotes API:', error);
+    console.error('Error in quote update API:', error);
     return NextResponse.json(
       { error: 'Internal server error', details: error.message },
       { status: 500 }
