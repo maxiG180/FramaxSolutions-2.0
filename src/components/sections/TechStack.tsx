@@ -21,7 +21,10 @@ export function TechStack() {
     return (
         <section className="border-y border-border bg-background/50 py-10 backdrop-blur-sm">
             <div className="container mx-auto px-4">
-                <p className="mb-8 text-center text-sm font-medium text-muted-foreground">
+                <p
+                    className="mb-8 text-center text-sm font-medium text-muted-foreground"
+                    suppressHydrationWarning
+                >
                     {t.techStack.poweredBy}
                 </p>
                 {/* Desktop Version */}

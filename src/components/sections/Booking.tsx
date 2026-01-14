@@ -98,11 +98,9 @@ export function Booking() {
                     }
 
                     const data = await response.json();
-                    console.log('Raw busy slots from API:', data.busySlots);
                     setRawBusySlots(data.busySlots || []);
 
                 } catch (error) {
-                    console.error("Failed to check availability:", error);
                     setRawBusySlots([]); // Ensure we reset to empty on error
                 } finally {
                     setIsLoadingAvailability(false);
@@ -269,7 +267,6 @@ export function Booking() {
 
             setStep("success");
         } catch (error) {
-            console.error("Booking failed:", error);
             alert(t.booking.alertError);
         } finally {
             setIsSubmitting(false);

@@ -51,8 +51,6 @@ export default function SettingsPage() {
                 // Set Google Calendar token from profile
                 if (profile?.google_calendar_token) {
                     setGoogleAccessToken(profile.google_calendar_token);
-                } else {
-                    console.log('No Google Calendar token found in profile:', profile);
                 }
                 // Set Discord webhook URL
                 setDiscordWebhookUrl(profile.discord_webhook_url || "");
@@ -81,10 +79,8 @@ export default function SettingsPage() {
         const error = searchParams.get('error');
         if (success === 'calendar_connected') {
             // Show success toast or notification if desired
-            console.log('Google Calendar connected successfully');
         }
         if (error) {
-            console.error('OAuth error:', error);
         }
     }, [tabParam, searchParams]);
 
@@ -125,7 +121,6 @@ export default function SettingsPage() {
     // Use environment variable for consistent redirect URI between client and server
     const baseUrl = (process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000').replace(/\/$/, '');
     const loginUrl = `${baseUrl}/api/auth/google/callback`;
-    console.log('Google Auth Redirect URI (Client):', loginUrl);
 
     const googleLogin = useGoogleLogin({
         onSuccess: (codeResponse) => {
@@ -247,7 +242,6 @@ export default function SettingsPage() {
                                                         .upload(filePath, file);
 
                                                     if (uploadError) {
-                                                        console.error("Upload error:", uploadError);
                                                         setSaving(false);
                                                         return;
                                                     }

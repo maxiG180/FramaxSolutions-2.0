@@ -70,7 +70,6 @@ export function DiscountOffer() {
                 }, 250);
             }
         } catch (error) {
-            console.error('Error sending discount:', error);
             alert("Failed to send discount code. Please try again.");
         } finally {
             setIsSubmitting(false);

@@ -56,7 +56,6 @@ export default function InvoicesPage() {
             const data = await response.json();
             setDocuments(data);
         } catch (err: any) {
-            console.error('Error fetching documents:', err);
             // Set empty array instead of showing error if API doesn't exist yet
             setDocuments([]);
             // setError(err.message);
@@ -107,7 +106,6 @@ export default function InvoicesPage() {
 
             alert(t.invoices.quoteAccepted);
         } catch (err: any) {
-            console.error('Error accepting quote:', err);
             alert(`Error: ${err.message}`);
         }
     };
@@ -139,7 +137,6 @@ export default function InvoicesPage() {
 
             alert(t.invoices.quoteDeclined);
         } catch (err: any) {
-            console.error('Error declining quote:', err);
             alert(`Error: ${err.message}`);
         }
     };
@@ -198,7 +195,6 @@ export default function InvoicesPage() {
             setDocuments(prev => prev.filter(doc => doc.id !== id));
             // alert('Quote deleted successfully');
         } catch (err: any) {
-            console.error('Error deleting quote:', err);
             alert(`Error: ${err.message}`);
         }
     };
@@ -220,7 +216,6 @@ export default function InvoicesPage() {
             // - Generate PDF using jsPDF (similar to QuoteModal)
             // - Download the generated PDF
         } catch (err: any) {
-            console.error('Error downloading PDF:', err);
             alert(`Error: ${err.message}`);
         }
     };
@@ -245,7 +240,6 @@ export default function InvoicesPage() {
 
             // Show loading state
             const sendingMessage = `A enviar ${doc.type === 'quote' ? 'orçamento' : 'fatura'}...`;
-            console.log(sendingMessage);
 
             const response = await fetch('/api/send-quote-email', {
                 method: 'POST',
@@ -275,7 +269,6 @@ export default function InvoicesPage() {
 
             alert(`✅ ${doc.type === 'quote' ? 'Orçamento' : 'Fatura'} enviado com sucesso para ${doc.rawData.client_email}!`);
         } catch (err: any) {
-            console.error('Error sending document:', err);
             alert(`❌ Erro ao enviar: ${err.message}`);
         }
     };

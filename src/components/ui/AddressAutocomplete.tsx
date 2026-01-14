@@ -23,7 +23,6 @@ export function AddressAutocomplete({ onSelect, defaultValue = "", defaultCountr
     });
 
     if (loadError) {
-        console.error("Google Maps Load Error:", loadError);
         return (
             <div className="p-4 bg-red-500/10 border border-red-500/20 text-red-500 rounded-lg text-sm">
                 Error loading Google Maps. Check your configuration or billing.
@@ -76,7 +75,6 @@ function SearchBox({ onSelect, defaultValue }: { onSelect: any, defaultValue: st
 
             onSelect(address, country, lat, lng);
         } catch (error) {
-            console.error("Error: ", error);
         }
     };
 

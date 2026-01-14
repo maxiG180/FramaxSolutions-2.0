@@ -157,11 +157,14 @@ export function Features() {
                     viewport={{ once: true }}
                     className="mb-16 text-center"
                 >
-                    <h2 className="mb-4 text-3xl font-bold text-foreground sm:text-4xl md:text-5xl">
+                    <h2
+                        className="mb-4 text-3xl font-bold text-foreground sm:text-4xl md:text-5xl"
+                        suppressHydrationWarning
+                    >
                         {t.features.title} <br />
-                        <span className="text-primary">{t.features.titleHighlight}</span>
+                        <span className="text-primary" suppressHydrationWarning>{t.features.titleHighlight}</span>
                     </h2>
-                    <p className="mx-auto max-w-2xl text-lg text-muted-foreground">
+                    <p className="mx-auto max-w-2xl text-lg text-muted-foreground" suppressHydrationWarning>
                         {t.features.subtitle}
                     </p>
                 </motion.div>
@@ -181,8 +184,8 @@ export function Features() {
                             <div className="mb-4 inline-flex rounded-lg bg-primary/10 p-3 text-primary">
                                 <MousePointerClick className="h-6 w-6" />
                             </div>
-                            <h3 className="mb-2 text-xl font-bold text-foreground relative z-10">{t.features.websitesTitle}</h3>
-                            <p className="text-sm text-muted-foreground mb-4 relative z-10">
+                            <h3 className="mb-2 text-xl font-bold text-foreground relative z-10" suppressHydrationWarning>{t.features.websitesTitle}</h3>
+                            <p className="text-sm text-muted-foreground mb-4 relative z-10" suppressHydrationWarning>
                                 {t.features.websitesDesc}
                             </p>
                         </div>
@@ -263,8 +266,8 @@ export function Features() {
                             <div className="mb-4 inline-flex rounded-lg bg-emerald-500/10 p-3 text-emerald-500">
                                 <LayoutDashboard className="h-6 w-6" />
                             </div>
-                            <h3 className="mb-2 text-2xl font-bold text-foreground">{t.features.systemsTitle}</h3>
-                            <p className="text-base text-muted-foreground mb-4 max-w-sm">
+                            <h3 className="mb-2 text-2xl font-bold text-foreground" suppressHydrationWarning>{t.features.systemsTitle}</h3>
+                            <p className="text-base text-muted-foreground mb-4 max-w-sm" suppressHydrationWarning>
                                 {t.features.systemsDesc}
                             </p>
                         </div>
@@ -305,14 +308,14 @@ export function Features() {
                                             {/* KPIs */}
                                             <div className="grid grid-cols-2 gap-3">
                                                 <div className="bg-[#1e293b]/50 rounded-xl p-3 border border-white/5">
-                                                    <div className="text-[10px] text-slate-400 mb-1">{t.features.monthlyRevenue}</div>
+                                                    <div className="text-[10px] text-slate-400 mb-1" suppressHydrationWarning>{t.features.monthlyRevenue}</div>
                                                     <div className="text-lg font-bold text-white mb-1">€12.450</div>
                                                     <div className="h-1 w-full bg-white/5 rounded-full overflow-hidden">
                                                         <div className="h-full w-[70%] bg-emerald-500 rounded-full" />
                                                     </div>
                                                 </div>
                                                 <div className="bg-[#1e293b]/50 rounded-xl p-3 border border-white/5">
-                                                    <div className="text-[10px] text-slate-400 mb-1">{t.features.newClients}</div>
+                                                    <div className="text-[10px] text-slate-400 mb-1" suppressHydrationWarning>{t.features.newClients}</div>
                                                     <div className="text-lg font-bold text-white mb-1">+124</div>
                                                     <div className="h-1 w-full bg-white/5 rounded-full overflow-hidden">
                                                         <div className="h-full w-[45%] bg-blue-500 rounded-full" />
@@ -353,8 +356,8 @@ export function Features() {
                             <div className="mb-4 inline-flex rounded-lg bg-white/10 p-3 text-white">
                                 <Search className="h-6 w-6" />
                             </div>
-                            <h3 className="mb-2 text-2xl font-bold text-foreground relative z-10">{t.features.seoTitle}</h3>
-                            <p className="text-base text-muted-foreground mb-4 max-w-sm relative z-10">
+                            <h3 className="mb-2 text-2xl font-bold text-foreground relative z-10" suppressHydrationWarning>{t.features.seoTitle}</h3>
+                            <p className="text-base text-muted-foreground mb-4 max-w-sm relative z-10" suppressHydrationWarning>
                                 {t.features.seoDesc}
                             </p>
                         </div>
@@ -369,7 +372,7 @@ export function Features() {
                                 {/* Search Bar */}
                                 <div className="mx-3 mb-3 h-7 bg-white rounded-full shadow-sm flex items-center px-2 gap-1.5 border border-gray-100">
                                     <Search className="w-3 h-3 text-gray-400" />
-                                    <span className="text-[10px] text-gray-400 font-medium ml-1">{t.features.searchYourBusiness}</span>
+                                    <span className="text-[10px] text-gray-400 font-medium ml-1" suppressHydrationWarning>{t.features.searchYourBusiness}</span>
                                 </div>
 
                                 {/* Results */}
@@ -387,6 +390,7 @@ export function Features() {
                                             whileInView={{ opacity: 1, y: 0 }}
                                             transition={{ delay: 0.8, type: "spring" }}
                                             className="absolute -top-8 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground text-[8px] font-bold px-2 py-1 rounded-full whitespace-nowrap shadow-xl z-30 flex items-center gap-1"
+                                            suppressHydrationWarning
                                         >
                                             {t.features.thisCouldBeYou}
                                             <div className="absolute bottom-[-4px] left-1/2 -translate-x-1/2 border-x-4 border-x-transparent border-t-4 border-t-primary" />
@@ -439,8 +443,8 @@ export function Features() {
                             <div className="mb-4 inline-flex rounded-lg bg-purple-500/10 p-3 text-purple-500" style={{ transform: "translateZ(20px)" }}>
                                 <Bot className="h-6 w-6" />
                             </div>
-                            <h3 className="mb-2 text-xl font-bold text-foreground" style={{ transform: "translateZ(20px)" }}>{t.features.automationTitle}</h3>
-                            <p className="text-sm text-muted-foreground" style={{ transform: "translateZ(20px)" }}>
+                            <h3 className="mb-2 text-xl font-bold text-foreground" style={{ transform: "translateZ(20px)" }} suppressHydrationWarning>{t.features.automationTitle}</h3>
+                            <p className="text-sm text-muted-foreground" style={{ transform: "translateZ(20px)" }} suppressHydrationWarning>
                                 {t.features.automationDesc}
                             </p>
                         </div>
@@ -468,8 +472,8 @@ export function Features() {
                                                 <item.icon className={`w-4 h-4 ${item.color.replace('bg-', 'text-')}`} />
                                             </div>
                                             <div className="flex-1 min-w-0">
-                                                <p className="text-xs font-medium text-white/90 truncate">{item.text}</p>
-                                                <p className="text-[10px] text-white/50">{item.subtext}</p>
+                                                <p className="text-xs font-medium text-white/90 truncate" suppressHydrationWarning>{item.text}</p>
+                                                <p className="text-[10px] text-white/50" suppressHydrationWarning>{item.subtext}</p>
                                             </div>
                                             <div className="w-5 h-5 rounded-full bg-green-500/20 flex items-center justify-center">
                                                 <CheckCircle className="w-3 h-3 text-green-500" />
@@ -492,8 +496,8 @@ export function Features() {
                             <div className="mb-4 inline-flex rounded-lg bg-slate-500/10 p-3 text-slate-500">
                                 <Globe className="h-6 w-6" />
                             </div>
-                            <h3 className="mb-2 text-2xl font-bold text-foreground">{t.features.globalTitle}</h3>
-                            <p className="text-muted-foreground">
+                            <h3 className="mb-2 text-2xl font-bold text-foreground" suppressHydrationWarning>{t.features.globalTitle}</h3>
+                            <p className="text-muted-foreground" suppressHydrationWarning>
                                 {t.features.globalDesc}
                             </p>
                         </div>

@@ -49,6 +49,20 @@ const nextConfig: NextConfig = {
 
     return config;
   },
+
+  async headers() {
+    return [
+      {
+        source: '/(.*)',
+        headers: [
+          {
+            key: 'Content-Security-Policy',
+            value: "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://va.vercel-scripts.com https://a.plerdy.com https://accounts.google.com https://www.google.com https://maps.googleapis.com; connect-src 'self' https://va.vercel-scripts.com https://a.plerdy.com https://maps.googleapis.com https://vitals.vercel-insights.com;",
+          },
+        ],
+      },
+    ];
+  },
 };
 
 export default nextConfig;

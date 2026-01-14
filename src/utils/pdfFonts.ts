@@ -33,7 +33,6 @@ async function fetchOutfitFont(): Promise<string> {
 
         return base64Font;
     } catch (error) {
-        console.error('Error fetching Outfit font:', error);
         throw error;
     }
 }
@@ -68,11 +67,8 @@ export async function loadOutfitFont(doc: jsPDF): Promise<boolean> {
         // Also add bold version (we'll use the same font with bold style)
         doc.addFont('Outfit-Regular.ttf', 'Outfit', 'bold');
 
-        console.log('Outfit font loaded successfully');
         return true;
     } catch (error) {
-        console.error('Error loading custom font:', error);
-        console.warn('Falling back to Helvetica with adjusted sizes.');
         return false;
     }
 }

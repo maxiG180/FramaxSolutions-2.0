@@ -239,6 +239,7 @@ export function NewPortfolio() {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     className="inline-block px-3 py-1 mb-4 text-xs font-medium tracking-wider text-primary uppercase bg-primary/10 rounded-full border border-primary/20"
+                    suppressHydrationWarning
                 >
                     {t.portfolio.badge}
                 </motion.div>
@@ -249,8 +250,9 @@ export function NewPortfolio() {
                     viewport={{ once: true }}
                     transition={{ delay: 0.1 }}
                     className="text-4xl md:text-6xl font-bold mb-4"
+                    suppressHydrationWarning
                 >
-                    {t.portfolio.title} <span className="text-primary">{t.portfolio.titleHighlight}</span>
+                    {t.portfolio.title} <span className="text-primary" suppressHydrationWarning>{t.portfolio.titleHighlight}</span>
                 </motion.h2>
 
                 <motion.p
@@ -259,6 +261,7 @@ export function NewPortfolio() {
                     viewport={{ once: true }}
                     transition={{ delay: 0.2 }}
                     className="text-muted-foreground max-w-2xl mx-auto"
+                    suppressHydrationWarning
                 >
                     {t.portfolio.subtitle}
                 </motion.p>
@@ -288,7 +291,7 @@ export function NewPortfolio() {
                         transition={{ duration: 0.6 }}
                         className="text-center"
                     >
-                        <h3 className="text-5xl md:text-7xl font-black tracking-tighter text-white/10 uppercase select-none">
+                        <h3 className="text-5xl md:text-7xl font-black tracking-tighter text-white/10 uppercase select-none" suppressHydrationWarning>
                             {t.portfolio.comingSoon}
                         </h3>
                     </motion.div>
@@ -296,7 +299,7 @@ export function NewPortfolio() {
             </div>
 
             <div className="container mx-auto px-4 mt-12 flex justify-center">
-                <a href="#booking" className="inline-flex items-center justify-center px-6 py-3 text-sm font-medium transition-colors rounded-full bg-primary text-primary-foreground hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background">
+                <a href="#booking" className="inline-flex items-center justify-center px-6 py-3 text-sm font-medium transition-colors rounded-full bg-primary text-primary-foreground hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background" suppressHydrationWarning>
                     {t.portfolio.startProject}
                 </a>
             </div>

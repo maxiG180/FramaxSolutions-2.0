@@ -88,20 +88,14 @@ export async function saveGoogleCalendarToken(token: string, refreshToken?: stri
         updateData.google_calendar_refresh_token = refreshToken;
     }
 
-    console.log('Saving Google Calendar token for user:', user.id);
-    console.log('Update data keys:', Object.keys(updateData));
-
     const { error, data } = await supabase
         .from('profiles')
         .upsert(updateData)
         .select()
 
     if (error) {
-        console.error('Error saving Google Calendar token:', error);
         return { error: error.message }
     }
-
-    console.log('Google Calendar token saved successfully. Returned data:', data);
 
     revalidatePath('/dashboard/settings')
     revalidatePath('/dashboard/calendar')

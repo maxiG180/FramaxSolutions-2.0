@@ -12,6 +12,7 @@ interface LanguageContextType {
     language: Language;
     setLanguage: (lang: Language) => void;
     t: Translation;
+    isLoaded: boolean; // Helper to know when language is determined
 }
 
 export const translations = {
@@ -22,17 +23,44 @@ export const translations = {
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
+    // Always initialize with 'en' to match server-side rendering
     const [language, setLanguage] = useState<Language>("en");
+    const [isLoaded, setIsLoaded] = useState(false);
 
     useEffect(() => {
-        const browserLang = navigator.language.toLowerCase();
-        if (browserLang.startsWith('pt')) {
-            setLanguage('pt');
-        }
+        // This runs only on the client, after hydration
+        const initLanguage = () => {
+            const savedLang = localStorage.getItem('framax_lang') as Language;
+            if (savedLang && (savedLang === 'en' || savedLang === 'pt')) {
+                setLanguage(savedLang);
+            } else {
+                const browserLang = navigator.language.toLowerCase();
+                if (browserLang.startsWith('pt')) {
+                    setLanguage('pt');
+                }
+            }
+            setIsLoaded(true);
+        };
+
+        initLanguage();
     }, []);
 
+    // Persist language changes
+    useEffect(() => {
+        if (isLoaded) {
+            localStorage.setItem('framax_lang', language);
+        }
+    }, [language, isLoaded]);
+
+    const value = {
+        language,
+        setLanguage,
+        t: translations[language],
+        isLoaded
+    };
+
     return (
-        <LanguageContext.Provider value={{ language, setLanguage, t: translations[language] }}>
+        <LanguageContext.Provider value={value}>
             {children}
         </LanguageContext.Provider>
     );

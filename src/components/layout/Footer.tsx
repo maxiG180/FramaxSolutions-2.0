@@ -19,7 +19,8 @@ export function Footer() {
                                 alt="Framax Solutions"
                                 width={160}
                                 height={160}
-                                className="h-auto w-40"
+                                style={{ width: 'auto', height: 'auto' }}
+                                className="w-40"
                             />
                         </Link>
                         <p className="text-muted-foreground max-w-sm">

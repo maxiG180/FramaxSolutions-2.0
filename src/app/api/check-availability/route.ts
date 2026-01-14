@@ -48,10 +48,7 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ busySlots: [] });
         }
 
-        console.log('Sending to n8n:', {
-            url: BOOKING_WEBHOOK,
-            payload: { date, action: 'checkAvailability' }
-        });
+
 
         const webhookResponse = await fetch(BOOKING_WEBHOOK, {
             method: 'POST',
@@ -62,15 +59,8 @@ export async function POST(request: NextRequest) {
             }),
         });
 
-        console.log('n8n webhook response status:', webhookResponse.status);
-
         if (!webhookResponse.ok) {
-            const errorText = await webhookResponse.text();
-            console.error('n8n webhook error:', {
-                status: webhookResponse.status,
-                statusText: webhookResponse.statusText,
-                body: errorText
-            });
+            await webhookResponse.text();
 
             logger.logWarning('n8n webhook returned error', {
                 endpoint: '/api/check-availability',

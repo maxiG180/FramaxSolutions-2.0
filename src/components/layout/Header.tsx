@@ -36,7 +36,9 @@ export function Header() {
                         alt="Framax Solutions"
                         width={200}
                         height={200}
-                        className="h-auto w-48"
+                        priority
+                        style={{ width: 'auto', height: 'auto' }}
+                        className="w-48"
                     />
                 </Link>
 

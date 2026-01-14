@@ -32,6 +32,8 @@ interface LogContext {
     [key: string]: any;
 }
 
+const isDev = process.env.NODE_ENV === 'development';
+
 class SecurityLogger {
     /**
      * Log security event
@@ -45,8 +47,10 @@ class SecurityLogger {
             ...context,
         };
 
-        // Console logging (always enabled)
-        console.log(`[SECURITY] ${eventType}`, logEntry);
+        // Console logging (only in development)
+        if (isDev) {
+            console.log(`[SECURITY] ${eventType}`, logEntry);
+        }
 
         // TODO: Integration point for Sentry/LogRocket
         // if (process.env.SENTRY_DSN) {
@@ -74,7 +78,9 @@ class SecurityLogger {
             ...context,
         };
 
-        console.error(`[ERROR] ${message}`, logEntry);
+        if (isDev) {
+            console.error(`[ERROR] ${message}`, logEntry);
+        }
 
         // TODO: Integration point for Sentry
         // if (process.env.SENTRY_DSN) {
@@ -94,7 +100,9 @@ class SecurityLogger {
             ...context,
         };
 
-        console.warn(`[WARNING] ${message}`, logEntry);
+        if (isDev) {
+            console.warn(`[WARNING] ${message}`, logEntry);
+        }
     }
 
     /**
@@ -109,7 +117,9 @@ class SecurityLogger {
             ...context,
         };
 
-        console.log(`[INFO] ${message}`, logEntry);
+        if (isDev) {
+            console.log(`[INFO] ${message}`, logEntry);
+        }
     }
 
     /**
@@ -162,3 +172,4 @@ class SecurityLogger {
 
 // Export singleton instance
 export const logger = new SecurityLogger();
+
