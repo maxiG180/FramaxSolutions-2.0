@@ -5,6 +5,7 @@ import { Trash2, User, Users } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { updateTaskStatus, deleteTask } from "@/app/dashboard/todo/actions";
 import { cn } from "@/lib/utils";
+import { useLanguage } from "@/context/LanguageContext";
 
 type Task = {
     id: number;
@@ -33,13 +34,14 @@ type KanbanBoardProps = {
 type Column = 'Todo' | 'Doing' | 'Done';
 
 export default function KanbanBoard({ tasks, currentUser, profiles, onTasksChange }: KanbanBoardProps) {
+    const { t } = useLanguage();
     const [draggedTask, setDraggedTask] = useState<Task | null>(null);
     const [draggedOverColumn, setDraggedOverColumn] = useState<Column | null>(null);
 
     const columns: { id: Column; title: string; color: string }[] = [
-        { id: 'Todo', title: 'To Do', color: 'bg-gray-500/20 border-gray-500/30' },
-        { id: 'Doing', title: 'In Progress', color: 'bg-blue-500/20 border-blue-500/30' },
-        { id: 'Done', title: 'Done', color: 'bg-green-500/20 border-green-500/30' },
+        { id: 'Todo', title: t.tasks.todo, color: 'bg-gray-500/20 border-gray-500/30' },
+        { id: 'Doing', title: t.tasks.doing, color: 'bg-blue-500/20 border-blue-500/30' },
+        { id: 'Done', title: t.tasks.done, color: 'bg-green-500/20 border-green-500/30' },
     ];
 
     const getTasksByStatus = (status: Column) => {
@@ -96,8 +98,8 @@ export default function KanbanBoard({ tasks, currentUser, profiles, onTasksChang
     };
 
     const getAssigneeName = (assigneeId: string | null) => {
-        if (!assigneeId) return "Everyone";
-        if (assigneeId === currentUser) return "Me";
+        if (!assigneeId) return t.tasks.everyone;
+        if (assigneeId === currentUser) return t.tasks.me;
         const profile = profiles.find(p => p.id === assigneeId);
         return profile ? profile.full_name : "Unknown";
     };
@@ -198,7 +200,7 @@ export default function KanbanBoard({ tasks, currentUser, profiles, onTasksChang
 
                         {getTasksByStatus(column.id).length === 0 && (
                             <div className="flex items-center justify-center h-full text-white/30 text-sm italic">
-                                No tasks
+                                {t.tasks.noTasks}
                             </div>
                         )}
                     </div>

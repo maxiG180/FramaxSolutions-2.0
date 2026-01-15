@@ -7,6 +7,7 @@ import { getTasks, createTask, toggleTask, deleteTask, getProfiles, updateTaskSt
 import { createClient } from "@/utils/supabase/client";
 import { cn } from "@/lib/utils";
 import KanbanBoard from "@/components/dashboard/KanbanBoard";
+import { useLanguage } from "@/context/LanguageContext";
 
 type Task = {
     id: number;
@@ -29,6 +30,7 @@ type FilterType = 'all' | 'me' | 'unassigned';
 type ViewMode = 'list' | 'kanban';
 
 export default function TodoPage() {
+    const { t } = useLanguage();
     const [tasks, setTasks] = useState<Task[]>([]);
     const [profiles, setProfiles] = useState<Profile[]>([]);
     const [currentUser, setCurrentUser] = useState<string | null>(null);
@@ -132,8 +134,8 @@ export default function TodoPage() {
     };
 
     const getAssigneeName = (assigneeId: string | null) => {
-        if (!assigneeId) return "Everyone";
-        if (assigneeId === currentUser) return "Me";
+        if (!assigneeId) return t.tasks.everyone;
+        if (assigneeId === currentUser) return t.tasks.me;
         const profile = profiles.find(p => p.id === assigneeId);
         return profile ? profile.full_name : "Unknown";
     };
@@ -152,12 +154,12 @@ export default function TodoPage() {
             <div className="flex items-center justify-between mb-4 md:mb-6">
                 <div>
                     <h1 className="text-2xl md:text-3xl font-bold">
-                        {activeFilter === 'all' && 'All Tasks'}
-                        {activeFilter === 'me' && 'My Tasks'}
-                        {activeFilter === 'unassigned' && 'Unassigned'}
+                        {activeFilter === 'all' && t.tasks.allTasks}
+                        {activeFilter === 'me' && t.tasks.myTasks}
+                        {activeFilter === 'unassigned' && t.tasks.unassigned}
                     </h1>
                     <p className="text-white/60 text-sm">
-                        {activeTasks.length} active • {doingTasks.length} in progress
+                        {activeTasks.length} {t.tasks.active} • {doingTasks.length} {t.tasks.inProgress}
                     </p>
                 </div>
 
@@ -190,7 +192,7 @@ export default function TodoPage() {
                             onClick={() => setShowFilters(!showFilters)}
                             className="flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-lg hover:bg-white/10 transition-colors"
                         >
-                            <span className="text-sm font-medium">Filter</span>
+                            <span className="text-sm font-medium">{t.tasks.filter}</span>
                             <ChevronDown className={cn("w-4 h-4 transition-transform", showFilters && "rotate-180")} />
                         </button>
 
@@ -212,7 +214,7 @@ export default function TodoPage() {
                                             )}
                                         >
                                             <User className="w-4 h-4" />
-                                            My Tasks
+                                            {t.tasks.myTasks}
                                         </button>
                                         <button
                                             onClick={() => { setActiveFilter('all'); setShowFilters(false); }}
@@ -222,7 +224,7 @@ export default function TodoPage() {
                                             )}
                                         >
                                             <Users className="w-4 h-4" />
-                                            All Tasks
+                                            {t.tasks.allTasks}
                                         </button>
                                         <button
                                             onClick={() => { setActiveFilter('unassigned'); setShowFilters(false); }}
@@ -232,7 +234,7 @@ export default function TodoPage() {
                                             )}
                                         >
                                             <Users className="w-4 h-4" />
-                                            Unassigned
+                                            {t.tasks.unassigned}
                                         </button>
                                     </motion.div>
                                 </>
@@ -250,7 +252,7 @@ export default function TodoPage() {
                         type="text"
                         value={newTask}
                         onChange={(e) => setNewTask(e.target.value)}
-                        placeholder="Add a task..."
+                        placeholder={t.tasks.addTask}
                         className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all placeholder:text-white/40"
                         autoFocus
                     />
@@ -259,8 +261,8 @@ export default function TodoPage() {
                         onChange={(e) => setSelectedAssignee(e.target.value)}
                         className="bg-white/5 border border-white/10 rounded-xl px-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 hidden md:block"
                     >
-                        <option value="me" className="bg-gray-900">Me</option>
-                        <option value="everyone" className="bg-gray-900">Everyone</option>
+                        <option value="me" className="bg-gray-900">{t.tasks.me}</option>
+                        <option value="everyone" className="bg-gray-900">{t.tasks.everyone}</option>
                         {profiles.filter(p => p.id !== currentUser).map(profile => (
                             <option key={profile.id} value={profile.id} className="bg-gray-900">
                                 {profile.full_name}
@@ -294,7 +296,7 @@ export default function TodoPage() {
                     <div className="space-y-2">
                         <h3 className="text-xs font-bold text-blue-400 uppercase tracking-widest mb-3 flex items-center gap-2">
                             <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse" />
-                            In Progress ({doingTasks.length})
+                            {t.tasks.doing} ({doingTasks.length})
                         </h3>
                         <AnimatePresence mode="popLayout">
                             {doingTasks.map((task) => (
@@ -326,9 +328,9 @@ export default function TodoPage() {
                                                 className="text-xs bg-blue-500/20 border border-blue-500/30 rounded px-2 py-0.5 text-blue-300 hover:text-blue-200 focus:outline-none focus:ring-1 focus:ring-blue-500/50"
                                                 onClick={(e) => e.stopPropagation()}
                                             >
-                                                <option value="Todo" className="bg-gray-900">To Do</option>
-                                                <option value="Doing" className="bg-gray-900">Doing</option>
-                                                <option value="Done" className="bg-gray-900">Done</option>
+                                                <option value="Todo" className="bg-gray-900">{t.tasks.todo}</option>
+                                                <option value="Doing" className="bg-gray-900">{t.tasks.doing}</option>
+                                                <option value="Done" className="bg-gray-900">{t.tasks.done}</option>
                                             </select>
                                         </div>
                                     </div>
@@ -348,7 +350,7 @@ export default function TodoPage() {
                 {/* Todo Tasks */}
                 <div className="space-y-2">
                     {activeTasks.length > 0 && (
-                        <h3 className="text-xs font-bold text-white/40 uppercase tracking-widest mb-3">To Do ({activeTasks.length})</h3>
+                        <h3 className="text-xs font-bold text-white/40 uppercase tracking-widest mb-3">{t.tasks.todo} ({activeTasks.length})</h3>
                     )}
                     <AnimatePresence mode="popLayout">
                         {activeTasks.map((task) => (
@@ -380,9 +382,9 @@ export default function TodoPage() {
                                             className="text-xs bg-white/5 border border-white/10 rounded px-2 py-0.5 text-white/60 hover:text-white focus:outline-none focus:ring-1 focus:ring-blue-500/50"
                                             onClick={(e) => e.stopPropagation()}
                                         >
-                                            <option value="Todo" className="bg-gray-900">To Do</option>
-                                            <option value="Doing" className="bg-gray-900">Doing</option>
-                                            <option value="Done" className="bg-gray-900">Done</option>
+                                            <option value="Todo" className="bg-gray-900">{t.tasks.todo}</option>
+                                            <option value="Doing" className="bg-gray-900">{t.tasks.doing}</option>
+                                            <option value="Done" className="bg-gray-900">{t.tasks.done}</option>
                                         </select>
                                     </div>
                                 </div>
@@ -398,7 +400,7 @@ export default function TodoPage() {
                     </AnimatePresence>
                     {activeTasks.length === 0 && doingTasks.length === 0 && (
                         <div className="text-center py-12 text-white/40 italic">
-                            No active tasks
+                            {t.tasks.noActiveTasks}
                         </div>
                     )}
                 </div>
@@ -406,7 +408,7 @@ export default function TodoPage() {
                 {/* Completed Tasks */}
                 {completedTasks.length > 0 && (
                     <div className="space-y-2 pt-6 border-t border-white/10">
-                        <h3 className="text-xs font-bold text-white/40 uppercase tracking-widest mb-3">Completed</h3>
+                        <h3 className="text-xs font-bold text-white/40 uppercase tracking-widest mb-3">{t.tasks.completed}</h3>
                         <AnimatePresence mode="popLayout">
                             {completedTasks.map((task) => (
                                 <motion.div

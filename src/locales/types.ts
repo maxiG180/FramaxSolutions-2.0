@@ -323,4 +323,22 @@ export interface Translation {
         issueDate: string;
         validity: string;
     };
+    tasks: {
+        allTasks: string;
+        myTasks: string;
+        unassigned: string;
+        active: string;
+        inProgress: string;
+        filter: string;
+        addTask: string;
+        me: string;
+        everyone: string;
+        noActiveTasks: string;
+        completed: string;
+        todo: string;
+        doing: string;
+        done: string;
+        noTasks: string;
+        assignedTo: string;
+    };
 }
