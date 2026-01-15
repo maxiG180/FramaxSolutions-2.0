@@ -30,13 +30,23 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     useEffect(() => {
         // This runs only on the client, after hydration
         const initLanguage = () => {
-            const savedLang = localStorage.getItem('framax_lang') as Language;
-            if (savedLang && (savedLang === 'en' || savedLang === 'pt')) {
-                setLanguage(savedLang);
+            // Check if we're in the dashboard
+            const isDashboard = window.location.pathname.startsWith('/dashboard');
+
+            if (isDashboard) {
+                // Dashboard ALWAYS defaults to Portuguese (ignore saved preference for now)
+                setLanguage('pt');
+                localStorage.setItem('framax_lang', 'pt');
             } else {
-                const browserLang = navigator.language.toLowerCase();
-                if (browserLang.startsWith('pt')) {
-                    setLanguage('pt');
+                // Landing page: check saved preference first, then browser language
+                const savedLang = localStorage.getItem('framax_lang') as Language;
+                if (savedLang && (savedLang === 'en' || savedLang === 'pt')) {
+                    setLanguage(savedLang);
+                } else {
+                    const browserLang = navigator.language.toLowerCase();
+                    if (browserLang.startsWith('pt')) {
+                        setLanguage('pt');
+                    }
                 }
             }
             setIsLoaded(true);

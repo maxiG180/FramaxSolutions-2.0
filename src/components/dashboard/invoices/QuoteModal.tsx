@@ -142,7 +142,7 @@ export function QuoteModal({ isOpen, onClose, onQuoteSaved, editingQuoteId }: Qu
 
             } catch (error) {
                 console.error('Error loading quote:', error);
-                alert('Erro ao carregar orçamento');
+                alert(t.quoteModal.errorLoading);
                 onClose();
             } finally {
                 setLoading(false);
@@ -702,7 +702,7 @@ export function QuoteModal({ isOpen, onClose, onQuoteSaved, editingQuoteId }: Qu
                                 <div className="flex items-center justify-center h-full">
                                     <div className="text-center">
                                         <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mb-4"></div>
-                                        <p className="text-white/60">A carregar orçamento...</p>
+                                        <p className="text-white/60">{t.quoteModal.loading}</p>
                                     </div>
                                 </div>
                             ) : (
@@ -712,7 +712,7 @@ export function QuoteModal({ isOpen, onClose, onQuoteSaved, editingQuoteId }: Qu
                                     <span className="p-2 bg-blue-500/20 rounded-lg text-blue-400">
                                         <FileText className="w-5 h-5" />
                                     </span>
-                                    {isEditMode ? 'Editar Orçamento' : t.quoteModal.title}
+                                    {isEditMode ? t.quoteModal.editTitle : t.quoteModal.title}
                                 </h2>
                                 <button onClick={onClose} className="p-2 hover:bg-white/10 rounded-lg text-white/40 hover:text-white transition-colors">
                                     <X className="w-5 h-5" />
@@ -947,7 +947,7 @@ export function QuoteModal({ isOpen, onClose, onQuoteSaved, editingQuoteId }: Qu
                                                         <button
                                                             onClick={() => removeItem(item.id)}
                                                             className="p-2 hover:bg-red-500/20 rounded-lg text-white/20 hover:text-red-400 transition-colors mt-[1px]"
-                                                            title="Remove Item"
+                                                            title={t.quoteModal.removeItem}
                                                         >
                                                             <Trash2 className="w-4 h-4" />
                                                         </button>
@@ -1045,7 +1045,7 @@ export function QuoteModal({ isOpen, onClose, onQuoteSaved, editingQuoteId }: Qu
                                         {items.map((item) => (
                                             <div key={item.id} className="flex text-sm text-gray-800 border-b border-gray-100 pb-4 last:border-0">
                                                 <div className="flex-1">
-                                                    <p className="font-medium">{item.description || <span className="text-gray-300 italic">Item description...</span>}</p>
+                                                    <p className="font-medium">{item.description || <span className="text-gray-300 italic">{t.quoteModal.itemDescriptionPlaceholder}</span>}</p>
                                                 </div>
                                                 <div className="w-20 text-center text-gray-500">{item.quantity}</div>
                                                 <div className="w-32 text-right text-gray-500">{formatCurrency(item.price)}</div>
@@ -1099,7 +1099,7 @@ export function QuoteModal({ isOpen, onClose, onQuoteSaved, editingQuoteId }: Qu
                             {exporting ? (
                                 <>
                                     <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                                    <span>Exporting...</span>
+                                    <span>{t.quoteModal.exporting}</span>
                                 </>
                             ) : (
                                 <>

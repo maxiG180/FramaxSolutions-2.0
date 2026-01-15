@@ -111,7 +111,7 @@ export default function InvoicesPage() {
     };
 
     const handleDeclineQuote = async (id: string) => {
-        if (!confirm('Tem certeza que deseja recusar este orçamento?')) return;
+        if (!confirm(t.invoices.declineQuoteConfirm)) return;
 
         try {
             const response = await fetch('/api/decline-quote', {
@@ -175,7 +175,7 @@ export default function InvoicesPage() {
     const stats = calculateStats();
 
     const handleDeleteQuote = async (id: string) => {
-        if (!confirm('Are you sure you want to delete this quote?')) return;
+        if (!confirm(t.invoices.deleteConfirm)) return;
 
         try {
             const response = await fetch('/api/delete-quote', {
@@ -203,13 +203,13 @@ export default function InvoicesPage() {
         try {
             const doc = documents.find(d => d.id === id);
             if (!doc) {
-                alert('Document not found');
+                alert(t.invoices.documentNotFound);
                 return;
             }
 
             // TODO: Implement actual PDF generation from stored data
             // For now, show a message
-            alert(`Download PDF: ${doc.displayId || id}\n\nThis feature will regenerate the PDF from the stored quote/invoice data.`);
+            alert(t.invoices.downloadPdfMessage.replace('{id}', doc.displayId || id));
 
             // Future implementation:
             // - Fetch full quote/invoice data from API
@@ -224,22 +224,23 @@ export default function InvoicesPage() {
         try {
             const doc = documents.find(d => d.id === id);
             if (!doc) {
-                alert('Documento não encontrado');
+                alert(t.invoices.documentNotFound);
                 return;
             }
 
             // Check if client has email
             if (!doc.rawData?.client_email) {
-                alert('Este documento não tem email do cliente associado. Por favor edite o orçamento e adicione o email.');
+                alert(t.invoices.noClientEmail);
                 return;
             }
 
             // Confirm before sending
-            const confirmMessage = `Enviar ${doc.type === 'quote' ? 'orçamento' : 'fatura'} ${doc.displayId} para ${doc.rawData.client_email}?`;
+            const docType = doc.type === 'quote' ? t.invoices.typeQuote : t.invoices.typeInvoice;
+            const confirmMessage = t.invoices.sendConfirm
+                .replace('{type}', docType.toLowerCase())
+                .replace('{id}', doc.displayId)
+                .replace('{email}', doc.rawData.client_email);
             if (!confirm(confirmMessage)) return;
-
-            // Show loading state
-            const sendingMessage = `A enviar ${doc.type === 'quote' ? 'orçamento' : 'fatura'}...`;
 
             const response = await fetch('/api/send-quote-email', {
                 method: 'POST',
@@ -267,9 +268,9 @@ export default function InvoicesPage() {
                 }));
             }
 
-            alert(`✅ ${doc.type === 'quote' ? 'Orçamento' : 'Fatura'} enviado com sucesso para ${doc.rawData.client_email}!`);
+            alert(t.invoices.sentSuccess.replace('{type}', docType).replace('{email}', doc.rawData.client_email));
         } catch (err: any) {
-            alert(`❌ Erro ao enviar: ${err.message}`);
+            alert(t.invoices.sendError.replace('{error}', err.message));
         }
     };
 
@@ -300,7 +301,7 @@ export default function InvoicesPage() {
                     {showCreateDropdown && (
                         <div className="absolute right-0 mt-2 w-56 bg-gray-900 border border-white/10 rounded-lg shadow-xl overflow-hidden z-10">
                             <button
-                                onClick={() => { alert("Create Invoice clicked!"); setShowCreateDropdown(false); }}
+                                onClick={() => { alert(t.invoices.createInvoiceComingSoon); setShowCreateDropdown(false); }}
                                 className="w-full flex items-center gap-3 px-4 py-3 hover:bg-white/5 transition-colors text-left"
                             >
                                 <div className="p-2 bg-blue-500/20 rounded-lg">

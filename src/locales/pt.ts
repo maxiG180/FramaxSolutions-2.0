@@ -299,6 +299,16 @@ export const pt: Translation = {
         // Type translations
         typeInvoice: "Fatura",
         typeQuote: "Orçamento",
+        // Additional translations
+        declineQuoteConfirm: "Tem certeza que deseja recusar este orçamento?",
+        deleteConfirm: "Tem certeza que deseja apagar este orçamento?",
+        documentNotFound: "Documento não encontrado",
+        downloadPdfMessage: "Download PDF: {id}\n\nEsta funcionalidade irá regenerar o PDF dos dados do orçamento/fatura armazenados.",
+        noClientEmail: "Este documento não tem email do cliente associado. Por favor edite o orçamento e adicione o email.",
+        sendConfirm: "Enviar {type} {id} para {email}?",
+        sentSuccess: "✅ {type} enviado com sucesso para {email}!",
+        sendError: "❌ Erro ao enviar: {error}",
+        createInvoiceComingSoon: "Criar Fatura - Em breve!",
     },
     quoteModal: {
         title: "Criar Orçamento",
@@ -344,5 +354,14 @@ export const pt: Translation = {
         quoteNumber: "Número de Orçamento",
         issueDate: "Data de Emissão",
         validity: "Validade",
+        // Additional translations
+        errorLoading: "Erro ao carregar orçamento",
+        loading: "A carregar orçamento...",
+        editTitle: "Editar Orçamento",
+        removeItem: "Remover Item",
+        itemDescriptionPlaceholder: "Descrição do item...",
+        exporting: "A exportar...",
+        zoomIn: "Ampliar",
+        zoomOut: "Reduzir",
     },
 };

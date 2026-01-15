@@ -36,7 +36,7 @@ export function QuoteViewModal({ isOpen, onClose, quoteId, onEdit, onDownload, o
                 setQuote(data);
             } catch (error) {
                 console.error('Error loading quote:', error);
-                alert('Erro ao carregar orçamento');
+                alert(t.quoteModal.errorLoading);
                 onClose();
             } finally {
                 setLoading(false);
@@ -77,7 +77,7 @@ export function QuoteViewModal({ isOpen, onClose, quoteId, onEdit, onDownload, o
                     {/* Top Toolbar */}
                     <div className="absolute top-0 left-0 right-0 flex items-center justify-between px-6 py-4 bg-black/50 backdrop-blur-sm border-b border-white/10">
                         <h2 className="text-lg font-medium text-white">
-                            {quote?.quote_number || 'Orçamento'}
+                            {quote?.quote_number || t.quoteModal.quote}
                         </h2>
 
                         <div className="flex items-center gap-3">
@@ -89,7 +89,7 @@ export function QuoteViewModal({ isOpen, onClose, quoteId, onEdit, onDownload, o
                                         handleZoomOut();
                                     }}
                                     className="p-1 hover:bg-white/10 rounded transition-colors"
-                                    title="Zoom Out"
+                                    title={t.quoteModal.zoomOut}
                                 >
                                     <ZoomOut className="w-4 h-4 text-white" />
                                 </button>
@@ -102,7 +102,7 @@ export function QuoteViewModal({ isOpen, onClose, quoteId, onEdit, onDownload, o
                                         handleZoomIn();
                                     }}
                                     className="p-1 hover:bg-white/10 rounded transition-colors"
-                                    title="Zoom In"
+                                    title={t.quoteModal.zoomIn}
                                 >
                                     <ZoomIn className="w-4 h-4 text-white" />
                                 </button>
@@ -127,7 +127,7 @@ export function QuoteViewModal({ isOpen, onClose, quoteId, onEdit, onDownload, o
                             <div className="flex items-center justify-center h-full">
                                 <div className="text-center">
                                     <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mb-4"></div>
-                                    <p className="text-white/60">A carregar orçamento...</p>
+                                    <p className="text-white/60">{t.quoteModal.loading}</p>
                                 </div>
                             </div>
                         ) : quote ? (
@@ -162,8 +162,8 @@ export function QuoteViewModal({ isOpen, onClose, quoteId, onEdit, onDownload, o
                                                 </div>
                                             </div>
                                             <div className="text-right">
-                                                <h1 className="text-4xl font-light text-blue-600 mb-2">ORÇAMENTO</h1>
-                                                <p className="text-gray-500 font-medium text-sm uppercase tracking-wide">Número de Orçamento</p>
+                                                <h1 className="text-4xl font-light text-blue-600 mb-2">{t.quoteModal.quote.toUpperCase()}</h1>
+                                                <p className="text-gray-500 font-medium text-sm uppercase tracking-wide">{t.quoteModal.quoteNumber}</p>
                                                 <p className="text-gray-700 font-bold text-lg">{quote.quote_number}</p>
                                             </div>
                                         </div>
@@ -171,24 +171,24 @@ export function QuoteViewModal({ isOpen, onClose, quoteId, onEdit, onDownload, o
                                         {/* Info Grid */}
                                         <div className="flex justify-between mb-12">
                                             <div>
-                                                <p className="text-xs font-bold text-gray-400 uppercase mb-2">Faturar a</p>
+                                                <p className="text-xs font-bold text-gray-400 uppercase mb-2">{t.quoteModal.billTo}</p>
                                                 <div className="text-sm text-gray-800 space-y-1">
                                                     <p className="font-bold text-base">{quote.client_name}</p>
                                                     {quote.client_contact && <p className="font-medium">{quote.client_contact}</p>}
                                                     {quote.client_address && quote.client_address.split('\n').map((line: string, i: number) => <p key={i}>{line}</p>)}
                                                     {quote.client_email && <p className="text-blue-600">{quote.client_email}</p>}
                                                     {quote.client_phone && <p className="text-gray-600">{quote.client_phone}</p>}
-                                                    {quote.client_nif && <p className="text-gray-600"><span className="font-medium">NIF:</span> {quote.client_nif}</p>}
+                                                    {quote.client_nif && <p className="text-gray-600"><span className="font-medium">{t.quoteModal.nif}:</span> {quote.client_nif}</p>}
                                                 </div>
                                             </div>
                                             <div className="text-right space-y-4">
                                                 <div>
-                                                    <p className="text-xs font-bold text-gray-400 uppercase mb-1">Data de Emissão</p>
+                                                    <p className="text-xs font-bold text-gray-400 uppercase mb-1">{t.quoteModal.issueDate}</p>
                                                     <p className="text-sm font-medium">{new Date(quote.quote_date).toLocaleDateString('pt-PT')}</p>
                                                 </div>
                                                 {quote.expiry_date && (
                                                     <div>
-                                                        <p className="text-xs font-bold text-gray-400 uppercase mb-1">Validade</p>
+                                                        <p className="text-xs font-bold text-gray-400 uppercase mb-1">{t.quoteModal.validity}</p>
                                                         <p className="text-sm font-medium">{new Date(quote.expiry_date).toLocaleDateString('pt-PT')}</p>
                                                     </div>
                                                 )}
@@ -198,10 +198,10 @@ export function QuoteViewModal({ isOpen, onClose, quoteId, onEdit, onDownload, o
                                         {/* Items Table */}
                                         <div className="mb-8">
                                             <div className="border-b-2 border-blue-600 pb-2 mb-4 flex text-xs font-bold text-gray-400 uppercase">
-                                                <div className="flex-1">Descrição</div>
-                                                <div className="w-20 text-center">Qtd</div>
-                                                <div className="w-32 text-right">Preço</div>
-                                                <div className="w-32 text-right">Total</div>
+                                                <div className="flex-1">{t.quoteModal.description}</div>
+                                                <div className="w-20 text-center">{t.quoteModal.qty}</div>
+                                                <div className="w-32 text-right">{t.quoteModal.price}</div>
+                                                <div className="w-32 text-right">{t.quoteModal.total}</div>
                                             </div>
                                             <div className="space-y-4">
                                                 {(quote.items || []).map((item: any, index: number) => (
@@ -221,15 +221,15 @@ export function QuoteViewModal({ isOpen, onClose, quoteId, onEdit, onDownload, o
                                         <div className="flex justify-end mb-12">
                                             <div className="w-64 space-y-2">
                                                 <div className="flex justify-between text-sm text-gray-500">
-                                                    <span>Subtotal</span>
+                                                    <span>{t.quoteModal.subtotal}</span>
                                                     <span>{formatCurrency(subtotal)}</span>
                                                 </div>
                                                 <div className="flex justify-between text-sm text-gray-500">
-                                                    <span>IVA (23%)</span>
+                                                    <span>{t.quoteModal.tax} (23%)</span>
                                                     <span>{formatCurrency(tax)}</span>
                                                 </div>
                                                 <div className="border-t border-gray-200 pt-2 flex justify-between text-lg font-bold text-blue-600">
-                                                    <span>Total</span>
+                                                    <span>{t.quoteModal.total}</span>
                                                     <span>{formatCurrency(total)}</span>
                                                 </div>
                                             </div>
@@ -238,7 +238,7 @@ export function QuoteViewModal({ isOpen, onClose, quoteId, onEdit, onDownload, o
                                         {/* Notes */}
                                         {quote.notes && (
                                             <div className="pt-8 border-t border-gray-100">
-                                                <p className="text-xs font-bold text-gray-400 uppercase mb-2">Notas / Termos</p>
+                                                <p className="text-xs font-bold text-gray-400 uppercase mb-2">{t.quoteModal.notesTerms}</p>
                                                 <p className="text-sm text-gray-600 whitespace-pre-wrap">{quote.notes}</p>
                                             </div>
                                         )}
@@ -246,7 +246,7 @@ export function QuoteViewModal({ isOpen, onClose, quoteId, onEdit, onDownload, o
                                         {/* Footer */}
                                         <div className="mt-auto pt-8 border-t border-gray-200 text-center">
                                             <p className="text-xs text-gray-500 italic">
-                                                Este orçamento não constitui fatura. Após aceitação, será emitida fatura oficial através do Portal das Finanças.
+                                                {t.quoteModal.legalNote}
                                             </p>
                                         </div>
                                     </div>

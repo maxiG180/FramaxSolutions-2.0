@@ -299,6 +299,16 @@ export const en: Translation = {
         // Type translations
         typeInvoice: "Invoice",
         typeQuote: "Quote",
+        // Additional translations
+        declineQuoteConfirm: "Are you sure you want to decline this quote?",
+        deleteConfirm: "Are you sure you want to delete this quote?",
+        documentNotFound: "Document not found",
+        downloadPdfMessage: "Download PDF: {id}\n\nThis feature will regenerate the PDF from the stored quote/invoice data.",
+        noClientEmail: "This document does not have a client email associated. Please edit the quote and add the email.",
+        sendConfirm: "Send {type} {id} to {email}?",
+        sentSuccess: "✅ {type} sent successfully to {email}!",
+        sendError: "❌ Error sending: {error}",
+        createInvoiceComingSoon: "Create Invoice - Coming soon!",
     },
     quoteModal: {
         title: "Create Quote",
@@ -344,5 +354,14 @@ export const en: Translation = {
         quoteNumber: "Quote Number",
         issueDate: "Issue Date",
         validity: "Validity",
+        // Additional translations
+        errorLoading: "Error loading quote",
+        loading: "Loading quote...",
+        editTitle: "Edit Quote",
+        removeItem: "Remove Item",
+        itemDescriptionPlaceholder: "Item description...",
+        exporting: "Exporting...",
+        zoomIn: "Zoom In",
+        zoomOut: "Zoom Out",
     },
 };
