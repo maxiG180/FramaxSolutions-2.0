@@ -284,6 +284,7 @@ export const pt: Translation = {
         acceptQuote: "Aceitar Orçamento",
         declineQuote: "Recusar Orçamento",
         acceptQuoteConfirm: "Tem certeza que deseja aceitar este orçamento? Isto irá criar automaticamente uma fatura.",
+        declineQuoteConfirm: "Tem certeza que deseja recusar este orçamento?",
         quoteAccepted: "Orçamento aceite! Fatura criada com sucesso.",
         quoteDeclined: "Orçamento recusado.",
         editQuote: "Editar Orçamento",
@@ -299,16 +300,6 @@ export const pt: Translation = {
         // Type translations
         typeInvoice: "Fatura",
         typeQuote: "Orçamento",
-        // Additional translations
-        declineQuoteConfirm: "Tem certeza que deseja recusar este orçamento?",
-        deleteConfirm: "Tem certeza que deseja apagar este orçamento?",
-        documentNotFound: "Documento não encontrado",
-        downloadPdfMessage: "Download PDF: {id}\n\nEsta funcionalidade irá regenerar o PDF dos dados do orçamento/fatura armazenados.",
-        noClientEmail: "Este documento não tem email do cliente associado. Por favor edite o orçamento e adicione o email.",
-        sendConfirm: "Enviar {type} {id} para {email}?",
-        sentSuccess: "✅ {type} enviado com sucesso para {email}!",
-        sendError: "❌ Erro ao enviar: {error}",
-        createInvoiceComingSoon: "Criar Fatura - Em breve!",
     },
     quoteModal: {
         title: "Criar Orçamento",

@@ -262,6 +262,7 @@ export interface Translation {
         acceptQuote: string;
         declineQuote: string;
         acceptQuoteConfirm: string;
+        declineQuoteConfirm: string;
         quoteAccepted: string;
         quoteDeclined: string;
         editQuote: string;
