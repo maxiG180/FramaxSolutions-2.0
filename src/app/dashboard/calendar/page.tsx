@@ -1,9 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { ChevronLeft, ChevronRight, Plus, Clock, LogIn, Loader2 } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
-import { useGoogleLogin } from '@react-oauth/google';
+import { useState, useEffect, useMemo, useCallback } from "react";
+import { ChevronLeft, ChevronRight, Clock, Loader2 } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
 
 interface CalendarEvent {
@@ -23,6 +21,15 @@ interface CalendarEvent {
 
 const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
+const getEventColor = (type: string) => {
+    switch (type) {
+        case "meeting": return "bg-red-500/20 text-red-400 border-red-500/30";
+        case "deadline": return "bg-orange-500/20 text-orange-400 border-orange-500/30";
+        case "allday": return "bg-green-500/20 text-green-400 border-green-500/30";
+        default: return "bg-blue-500/20 text-blue-400 border-blue-500/30";
+    }
+};
+
 export default function CalendarPage() {
     const [selectedDate, setSelectedDate] = useState(new Date().getDate());
     const [currentMonth, setCurrentMonth] = useState(new Date());
@@ -32,19 +39,7 @@ export default function CalendarPage() {
     const [isCheckingAuth, setIsCheckingAuth] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
-    const login = useGoogleLogin({
-        onSuccess: () => {
-            // Token is saved in settings, just redirect user there
-            window.location.href = '/dashboard/settings?tab=integrations';
-        },
-        onError: () => {
-            setError('Failed to authenticate with Google. Please try from Settings.');
-        },
-        scope: 'https://www.googleapis.com/auth/calendar.readonly',
-    });
-
     useEffect(() => {
-        // Fetch token from database
         const fetchToken = async () => {
             const supabase = createClient();
             const { data: { user } } = await supabase.auth.getUser();
@@ -68,13 +63,7 @@ export default function CalendarPage() {
         fetchToken();
     }, []);
 
-    useEffect(() => {
-        if (!isCheckingAuth && accessToken) {
-            fetchEvents();
-        }
-    }, [accessToken, currentMonth, isCheckingAuth]);
-
-    const fetchEvents = async () => {
+    const fetchEvents = useCallback(async () => {
         if (!accessToken) return;
 
         setIsLoading(true);
@@ -99,7 +88,6 @@ export default function CalendarPage() {
 
             const data = await response.json();
 
-            // Transform events to include day number and formatted time
             const transformedEvents = data.events.map((event: CalendarEvent) => {
                 const startDate = new Date(event.start);
                 const endDate = new Date(event.end);
@@ -120,43 +108,62 @@ export default function CalendarPage() {
             setEvents(transformedEvents);
         } catch (err: any) {
             setError(err.message);
-            // If token is invalid, clear it
             if (err.message.includes('401')) {
-                localStorage.removeItem('google_access_token');
                 setAccessToken(null);
             }
         } finally {
             setIsLoading(false);
         }
-    };
+    }, [accessToken, currentMonth]);
 
-    const getEventColor = (type: string) => {
-        switch (type) {
-            case "meeting": return "bg-red-500/20 text-red-400 border-red-500/30";
-            case "deadline": return "bg-orange-500/20 text-orange-400 border-orange-500/30";
-            case "allday": return "bg-green-500/20 text-green-400 border-green-500/30";
-            default: return "bg-blue-500/20 text-blue-400 border-blue-500/30";
+    useEffect(() => {
+        if (!isCheckingAuth && accessToken) {
+            fetchEvents();
         }
-    };
+    }, [accessToken, isCheckingAuth, fetchEvents]);
 
-    const selectedEvents = events.filter(e => e.day === selectedDate);
-    const monthName = currentMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
-    const daysInMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 0).getDate();
-    const firstDayOfMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 1).getDay();
+    const selectedEvents = useMemo(() =>
+        events.filter(e => e.day === selectedDate),
+        [events, selectedDate]
+    );
 
-    const goToPreviousMonth = () => {
-        setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1));
-    };
+    const monthName = useMemo(() =>
+        currentMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' }),
+        [currentMonth]
+    );
 
-    const goToNextMonth = () => {
-        setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1));
-    };
+    const daysInMonth = useMemo(() =>
+        new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 0).getDate(),
+        [currentMonth]
+    );
 
-    const goToToday = () => {
+    const firstDayOfMonth = useMemo(() =>
+        new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 1).getDay(),
+        [currentMonth]
+    );
+
+    const todayInfo = useMemo(() => {
+        const today = new Date();
+        return {
+            date: today.getDate(),
+            month: today.getMonth(),
+            year: today.getFullYear()
+        };
+    }, []);
+
+    const goToPreviousMonth = useCallback(() => {
+        setCurrentMonth(prev => new Date(prev.getFullYear(), prev.getMonth() - 1));
+    }, []);
+
+    const goToNextMonth = useCallback(() => {
+        setCurrentMonth(prev => new Date(prev.getFullYear(), prev.getMonth() + 1));
+    }, []);
+
+    const goToToday = useCallback(() => {
         const today = new Date();
         setCurrentMonth(today);
         setSelectedDate(today.getDate());
-    };
+    }, []);
 
     if (isCheckingAuth) {
         return (
@@ -202,19 +209,19 @@ export default function CalendarPage() {
                         <div className="flex items-center gap-1 bg-white/5 rounded-lg p-1 border border-white/10">
                             <button
                                 onClick={goToPreviousMonth}
-                                className="p-1 hover:bg-white/10 rounded text-white/60 hover:text-white"
+                                className="p-1 hover:bg-white/10 rounded text-white/60 hover:text-white transition-colors"
                             >
                                 <ChevronLeft className="w-5 h-5" />
                             </button>
                             <button
                                 onClick={goToToday}
-                                className="px-3 py-1 hover:bg-white/10 rounded text-sm font-medium"
+                                className="px-3 py-1 hover:bg-white/10 rounded text-sm font-medium transition-colors"
                             >
                                 Today
                             </button>
                             <button
                                 onClick={goToNextMonth}
-                                className="p-1 hover:bg-white/10 rounded text-white/60 hover:text-white"
+                                className="p-1 hover:bg-white/10 rounded text-white/60 hover:text-white transition-colors"
                             >
                                 <ChevronRight className="w-5 h-5" />
                             </button>
@@ -242,16 +249,16 @@ export default function CalendarPage() {
                             const dayNum = i - firstDayOfMonth + 1;
                             const isCurrentMonth = dayNum > 0 && dayNum <= daysInMonth;
                             const isSelected = dayNum === selectedDate && isCurrentMonth;
-                            const isToday = dayNum === new Date().getDate() &&
-                                currentMonth.getMonth() === new Date().getMonth() &&
-                                currentMonth.getFullYear() === new Date().getFullYear();
+                            const isToday = dayNum === todayInfo.date &&
+                                currentMonth.getMonth() === todayInfo.month &&
+                                currentMonth.getFullYear() === todayInfo.year;
                             const dayEvents = events.filter(e => e.day === dayNum);
 
                             return (
                                 <div
                                     key={i}
                                     onClick={() => isCurrentMonth && setSelectedDate(dayNum)}
-                                    className={`border-b border-r border-white/5 p-1 md:p-2 relative group transition-colors ${!isCurrentMonth ? "bg-white/[0.02]" : "hover:bg-white/5 cursor-pointer"
+                                    className={`border-b border-r border-white/5 p-1 md:p-2 relative transition-colors ${!isCurrentMonth ? "bg-white/[0.02]" : "hover:bg-white/5 cursor-pointer"
                                         } ${isSelected ? "bg-white/10" : ""}`}
                                 >
                                     <div className={`w-6 h-6 md:w-8 md:h-8 flex items-center justify-center rounded-full text-xs md:text-sm font-medium mb-1 ${isSelected
@@ -304,10 +311,8 @@ export default function CalendarPage() {
                         </div>
                     ) : selectedEvents.length > 0 ? (
                         selectedEvents.map(event => (
-                            <motion.div
+                            <div
                                 key={event.id}
-                                initial={{ opacity: 0, y: 10 }}
-                                animate={{ opacity: 1, y: 0 }}
                                 className={`p-4 rounded-xl border ${getEventColor(event.type || 'meeting')}`}
                             >
                                 <div className="flex items-start justify-between mb-2">
@@ -341,7 +346,7 @@ export default function CalendarPage() {
                                         Join Google Meet
                                     </a>
                                 )}
-                            </motion.div>
+                            </div>
                         ))
                     ) : (
                         <div className="text-center py-12 text-white/20">
