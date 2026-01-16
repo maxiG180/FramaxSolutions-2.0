@@ -285,6 +285,7 @@ export const pt: Translation = {
         declineQuote: "Recusar Orçamento",
         acceptQuoteConfirm: "Tem certeza que deseja aceitar este orçamento? Isto irá criar automaticamente uma fatura.",
         declineQuoteConfirm: "Tem certeza que deseja recusar este orçamento?",
+        deleteConfirm: "Tem certeza que deseja apagar este orçamento?",
         quoteAccepted: "Orçamento aceite! Fatura criada com sucesso.",
         quoteDeclined: "Orçamento recusado.",
         editQuote: "Editar Orçamento",
@@ -345,15 +346,6 @@ export const pt: Translation = {
         quoteNumber: "Número de Orçamento",
         issueDate: "Data de Emissão",
         validity: "Validade",
-        // Additional translations
-        errorLoading: "Erro ao carregar orçamento",
-        loading: "A carregar orçamento...",
-        editTitle: "Editar Orçamento",
-        removeItem: "Remover Item",
-        itemDescriptionPlaceholder: "Descrição do item...",
-        exporting: "A exportar...",
-        zoomIn: "Ampliar",
-        zoomOut: "Reduzir",
     },
     tasks: {
         allTasks: "Todas as Tarefas",

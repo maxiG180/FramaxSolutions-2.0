@@ -285,6 +285,7 @@ export const en: Translation = {
         declineQuote: "Decline Quote",
         acceptQuoteConfirm: "Are you sure you want to accept this quote? This will automatically create an invoice.",
         declineQuoteConfirm: "Are you sure you want to decline this quote?",
+        deleteConfirm: "Are you sure you want to delete this quote?",
         quoteAccepted: "Quote accepted! Invoice created successfully.",
         quoteDeclined: "Quote declined.",
         editQuote: "Edit Quote",
@@ -345,15 +346,6 @@ export const en: Translation = {
         quoteNumber: "Quote Number",
         issueDate: "Issue Date",
         validity: "Validity",
-        // Additional translations
-        errorLoading: "Error loading quote",
-        loading: "Loading quote...",
-        editTitle: "Edit Quote",
-        removeItem: "Remove Item",
-        itemDescriptionPlaceholder: "Item description...",
-        exporting: "Exporting...",
-        zoomIn: "Zoom In",
-        zoomOut: "Zoom Out",
     },
     tasks: {
         allTasks: "All Tasks",
