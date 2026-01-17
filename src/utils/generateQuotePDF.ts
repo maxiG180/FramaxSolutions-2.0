@@ -127,16 +127,52 @@ export async function generateQuotePDF(
     let logoLoaded = false;
     if (logoUrl) {
         try {
-            // For server-side, we need to fetch and convert to base64
-            const response = await fetch(logoUrl);
-            const arrayBuffer = await response.arrayBuffer();
-            const base64 = Buffer.from(arrayBuffer).toString('base64');
-            const logoDataUrl = `data:image/png;base64,${base64}`;
+            let logoDataUrl: string;
 
-            const logoHeight = 8; // mm
-            const logoWidth = logoHeight * 6.92; // mm (maintaining 6.92:1 aspect ratio)
-            doc.addImage(logoDataUrl, 'PNG', 20, 20, logoWidth, logoHeight);
-            logoLoaded = true;
+            // Check if we're in a browser environment
+            if (typeof window !== 'undefined' && !logoUrl.startsWith('file://')) {
+                // Browser environment - use Image element for better compatibility
+                await new Promise<void>((resolve, reject) => {
+                    const img = new Image();
+                    img.crossOrigin = 'anonymous'; // Handle CORS
+                    img.onload = () => {
+                        try {
+                            // Create canvas to convert image to base64
+                            const canvas = document.createElement('canvas');
+                            canvas.width = img.width;
+                            canvas.height = img.height;
+                            const ctx = canvas.getContext('2d');
+                            if (!ctx) {
+                                reject(new Error('Failed to get canvas context'));
+                                return;
+                            }
+                            ctx.drawImage(img, 0, 0);
+                            logoDataUrl = canvas.toDataURL('image/png');
+
+                            const logoHeight = 8; // mm
+                            const logoWidth = logoHeight * 6.92; // mm (maintaining 6.92:1 aspect ratio)
+                            doc.addImage(logoDataUrl, 'PNG', 20, 20, logoWidth, logoHeight);
+                            logoLoaded = true;
+                            resolve();
+                        } catch (err) {
+                            reject(err);
+                        }
+                    };
+                    img.onerror = () => reject(new Error('Failed to load image'));
+                    img.src = logoUrl;
+                });
+            } else {
+                // Node.js environment (server-side) - use fetch
+                const response = await fetch(logoUrl);
+                const arrayBuffer = await response.arrayBuffer();
+                const base64 = Buffer.from(arrayBuffer).toString('base64');
+                logoDataUrl = `data:image/png;base64,${base64}`;
+
+                const logoHeight = 8; // mm
+                const logoWidth = logoHeight * 6.92; // mm (maintaining 6.92:1 aspect ratio)
+                doc.addImage(logoDataUrl, 'PNG', 20, 20, logoWidth, logoHeight);
+                logoLoaded = true;
+            }
         } catch (err) {
             console.error('Error loading logo:', err);
         }

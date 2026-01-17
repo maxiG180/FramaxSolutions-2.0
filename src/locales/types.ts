@@ -247,6 +247,49 @@ export interface Translation {
         createFirst: string;
         createFirstInvoice: string;
         createFirstQuote: string;
+        tableId: string;
+        tableType: string;
+        tableClient: string;
+        tableAmount: string;
+        tableDate: string;
+        tableStatus: string;
+        tableActions: string;
+        downloadPdf: string;
+        send: string;
+        convertToInvoice: string;
+        deleteQuote: string;
+        deleteInvoice: string;
+        moreOptions: string;
+        acceptQuote: string;
+        declineQuote: string;
+        acceptQuoteConfirm: string;
+        quoteAccepted: string;
+        quoteDeclined: string;
+        editQuote: string;
+        // Status translations
+        statusAccepted: string;
+        statusSent: string;
+        statusPending: string;
+        statusPaid: string;
+        statusOverdue: string;
+        statusDraft: string;
+        statusDeclined: string;
+        statusConverted: string;
+        // Type translations
+        typeInvoice: string;
+        typeQuote: string;
+        // Additional translations
+        declineQuoteConfirm: string;
+        deleteConfirm: string;
+        deleteQuoteConfirm: string;
+        deleteInvoiceConfirm: string;
+        documentNotFound: string;
+        downloadPdfMessage: string;
+        noClientEmail: string;
+        sendConfirm: string;
+        sentSuccess: string;
+        sendError: string;
+        createInvoiceComingSoon: string;
     };
     quoteModal: {
         title: string;
@@ -290,7 +333,34 @@ export interface Translation {
         quote: string;
         legalNote: string;
         quoteNumber: string;
+        invoiceNumber: string;
         issueDate: string;
         validity: string;
+        errorLoading: string;
+        loading: string;
+        editTitle: string;
+        removeItem: string;
+        itemDescriptionPlaceholder: string;
+        exporting: string;
+        zoomIn: string;
+        zoomOut: string;
+    };
+    tasks: {
+        allTasks: string;
+        myTasks: string;
+        unassigned: string;
+        active: string;
+        inProgress: string;
+        filter: string;
+        addTask: string;
+        me: string;
+        everyone: string;
+        noActiveTasks: string;
+        completed: string;
+        todo: string;
+        doing: string;
+        done: string;
+        noTasks: string;
+        assignedTo: string;
     };
 }

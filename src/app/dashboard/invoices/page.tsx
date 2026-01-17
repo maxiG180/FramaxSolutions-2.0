@@ -174,11 +174,16 @@ export default function InvoicesPage() {
 
     const stats = calculateStats();
 
-    const handleDeleteQuote = async (id: string) => {
-        if (!confirm(t.invoices.deleteConfirm)) return;
+    const handleDeleteDocument = async (id: string, type: "invoice" | "quote") => {
+        const doc = documents.find(d => d.id === id);
+        if (!doc) return;
+
+        const confirmMessage = type === "quote" ? t.invoices.deleteQuoteConfirm : t.invoices.deleteInvoiceConfirm;
+        if (!confirm(confirmMessage)) return;
 
         try {
-            const response = await fetch('/api/delete-quote', {
+            const endpoint = type === "quote" ? '/api/delete-quote' : '/api/delete-invoice';
+            const response = await fetch(endpoint, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
@@ -188,12 +193,11 @@ export default function InvoicesPage() {
 
             if (!response.ok) {
                 const data = await response.json();
-                throw new Error(data.error || 'Failed to delete quote');
+                throw new Error(data.error || `Failed to delete ${type}`);
             }
 
             // Remove from state
             setDocuments(prev => prev.filter(doc => doc.id !== id));
-            // alert('Quote deleted successfully');
         } catch (err: any) {
             alert(`Error: ${err.message}`);
         }
@@ -207,15 +211,83 @@ export default function InvoicesPage() {
                 return;
             }
 
-            // TODO: Implement actual PDF generation from stored data
-            // For now, show a message
-            alert(t.invoices.downloadPdfMessage.replace('{id}', doc.displayId || id));
+            if (!doc.rawData) {
+                alert(t.invoices.documentNotFound);
+                return;
+            }
 
-            // Future implementation:
-            // - Fetch full quote/invoice data from API
-            // - Generate PDF using jsPDF (similar to QuoteModal)
-            // - Download the generated PDF
+            // Dynamic import to avoid SSR issues
+            const { generateQuotePDF } = await import('@/utils/generateQuotePDF');
+
+            // Prepare data for PDF generation
+            const pdfData = {
+                quote_number: doc.type === 'quote' ? doc.rawData.quote_number : undefined,
+                invoice_number: doc.type === 'invoice' ? doc.rawData.invoice_number : undefined,
+                client_name: doc.rawData.client_name,
+                client_contact: doc.rawData.client_contact,
+                client_email: doc.rawData.client_email,
+                client_phone: doc.rawData.client_phone,
+                client_address: doc.rawData.client_address,
+                client_nif: doc.rawData.client_nif,
+                quote_date: doc.type === 'quote' ? doc.rawData.quote_date : undefined,
+                invoice_date: doc.type === 'invoice' ? doc.rawData.invoice_date : undefined,
+                expiry_date: doc.rawData.expiry_date,
+                items: doc.rawData.items || [],
+                subtotal: doc.rawData.subtotal || 0,
+                tax_rate: doc.rawData.tax_rate || 0.23,
+                tax_amount: doc.rawData.tax_amount || 0,
+                total: doc.rawData.total || 0,
+                notes: doc.rawData.notes,
+                currency: doc.rawData.currency || 'EUR'
+            };
+
+            // Try to load custom font
+            let fontBase64: string | undefined;
+            try {
+                const response = await fetch('/fonts/Outfit-Regular.ttf');
+                if (response.ok) {
+                    const fontBuffer = await response.arrayBuffer();
+                    const bytes = new Uint8Array(fontBuffer);
+                    let binary = '';
+                    for (let i = 0; i < bytes.byteLength; i++) {
+                        binary += String.fromCharCode(bytes[i]);
+                    }
+                    fontBase64 = btoa(binary);
+                }
+            } catch (err) {
+                console.error('Error loading font:', err);
+            }
+
+            // Generate PDF
+            const pdfDoc = await generateQuotePDF(pdfData, {
+                type: doc.type,
+                logoUrl: '/logos/framax-logo-black.png',
+                fontBase64,
+                translations: {
+                    quote: t.invoices.typeQuote.toUpperCase(),
+                    invoice: t.invoices.typeInvoice.toUpperCase(),
+                    quoteNumber: t.quoteModal.quoteNumber,
+                    invoiceNumber: t.quoteModal.invoiceNumber,
+                    billTo: t.quoteModal.billTo,
+                    issueDate: t.quoteModal.issueDate,
+                    validity: t.quoteModal.validity,
+                    description: t.quoteModal.description,
+                    qty: t.quoteModal.qty,
+                    price: t.quoteModal.price,
+                    total: t.quoteModal.total,
+                    subtotal: t.quoteModal.subtotal,
+                    tax: t.quoteModal.tax,
+                    notesTerms: t.quoteModal.notesTerms,
+                    legalNote: t.quoteModal.legalNote,
+                    nif: t.quoteModal.nif
+                }
+            });
+
+            // Download the PDF
+            const fileName = `${doc.displayId || id}.pdf`;
+            pdfDoc.save(fileName);
         } catch (err: any) {
+            console.error('PDF generation error:', err);
             alert(`Error: ${err.message}`);
         }
     };
@@ -238,7 +310,7 @@ export default function InvoicesPage() {
             const docType = doc.type === 'quote' ? t.invoices.typeQuote : t.invoices.typeInvoice;
             const confirmMessage = t.invoices.sendConfirm
                 .replace('{type}', docType.toLowerCase())
-                .replace('{id}', doc.displayId)
+                .replace('{id}', doc.displayId || id)
                 .replace('{email}', doc.rawData.client_email);
             if (!confirm(confirmMessage)) return;
 
@@ -457,7 +529,7 @@ export default function InvoicesPage() {
                         invoices={filteredDocuments}
                         onAcceptQuote={handleAcceptQuote}
                         onDeclineQuote={handleDeclineQuote}
-                        onDelete={handleDeleteQuote}
+                        onDelete={handleDeleteDocument}
                         onDownload={handleDownloadPdf}
                         onSend={handleSendDocument}
                         onEdit={handleEditQuote}

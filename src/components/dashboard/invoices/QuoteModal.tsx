@@ -7,9 +7,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useClients, Client } from "@/hooks/useClients";
 import { Service } from "@/types/service";
 import { useLanguage } from "@/context/LanguageContext";
-import jsPDF from 'jspdf';
-import autoTable from 'jspdf-autotable';
-import { loadOutfitFont, getAdjustedFontSize } from '@/utils/pdfFonts';
+import { generateQuotePDF, QuotePDFData } from '@/utils/generateQuotePDF';
 
 interface QuoteItem {
     id: string;
@@ -302,304 +300,77 @@ export function QuoteModal({ isOpen, onClose, onQuoteSaved, editingQuoteId }: Qu
             setExporting(true);
             setSaveError("");
 
-            // Create PDF
-            const doc = new jsPDF();
-            const pageWidth = doc.internal.pageSize.getWidth();
-            const pageHeight = doc.internal.pageSize.getHeight();
+            // Generate temporary quote number for preview
+            const tempQuoteNumber = `ORC-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 1000)).padStart(3, '0')}`;
 
-            // Try to load custom font (Outfit)
-            const customFontLoaded = await loadOutfitFont(doc);
+            // Prepare PDF data using the shared interface
+            const pdfData: QuotePDFData = {
+                quote_number: tempQuoteNumber,
+                client_name: clientName,
+                client_contact: clientContact || undefined,
+                client_email: clientEmail || undefined,
+                client_phone: clientPhone || undefined,
+                client_address: clientAddress || undefined,
+                client_nif: clientNif || undefined,
+                quote_date: quoteDate,
+                expiry_date: expiryDate || undefined,
+                items: items.map(item => ({
+                    description: item.description,
+                    quantity: item.quantity,
+                    price: item.price,
+                })),
+                subtotal: subtotal,
+                tax_rate: taxRate,
+                tax_amount: tax,
+                total: total,
+                notes: notes || undefined,
+                currency: 'EUR'
+            };
 
-            // Helper function to get adjusted font size
-            const fs = (size: number) => getAdjustedFontSize(size, customFontLoaded);
-
-            // Determine which font to use
-            const fontFamily = customFontLoaded ? 'Outfit' : 'helvetica';
-
-            // Colors (as tuples for jsPDF type compatibility)
-            const primaryBlue: [number, number, number] = [37, 99, 235]; // #2563eb
-            const lightGray: [number, number, number] = [107, 114, 128]; // #6b7280
-            const darkGray: [number, number, number] = [31, 41, 55]; // #1f2937
-
-            // Load and add logo
-            let logoLoaded = false;
+            // Try to load custom font
+            let fontBase64: string | undefined;
             try {
-                const logoImg = document.createElement('img') as HTMLImageElement;
-                logoImg.src = '/logos/framax-logo-black.png';
-
-                await new Promise<void>((resolve, reject) => {
-                    logoImg.onload = () => resolve();
-                    logoImg.onerror = () => reject(new Error('Failed to load logo'));
-                });
-
-                // Add logo with correct proportions - logo is wider than tall
-                // Actual logo dimensions: 422x61px = 6.92:1 aspect ratio
-                const logoHeight = 8; // mm - Reduced from 12
-                const logoWidth = logoHeight * 6.92; // mm (maintaining actual 6.92:1 aspect ratio)
-                doc.addImage(logoImg, 'PNG', 20, 20, logoWidth, logoHeight);
-                logoLoaded = true;
-            } catch (err) {
-                console.error('Error loading logo:', err);
-            }
-
-            // Company info below logo
-            const startY = logoLoaded ? 40 : 20;
-
-            // "Framax Solutions" text - only if logo failed to load
-            if (!logoLoaded) {
-                doc.setFontSize(fs(10)); // Reduced from 12
-                doc.setFont(fontFamily, 'bold');
-                doc.setTextColor(darkGray[0], darkGray[1], darkGray[2]);
-                doc.text('Framax Solutions', 20, startY);
-            } else {
-                // If logo loaded, just show company name in smaller text
-                doc.setFontSize(fs(10)); // Reduced from 11
-                doc.setFont(fontFamily, 'bold');
-                doc.setTextColor(darkGray[0], darkGray[1], darkGray[2]);
-                doc.text('Framax Solutions', 20, startY);
-            }
-
-            // Contacts
-            doc.setFontSize(fs(10));
-            doc.setFont(fontFamily, 'normal');
-            doc.setTextColor(lightGray[0], lightGray[1], lightGray[2]);
-            doc.text('contact@framaxsolutions.com', 20, startY + 5);
-            doc.text('framaxsolutions.com', 20, startY + 10);
-
-            // Quote Title (Right side) - MUCH larger to match preview
-            doc.setFontSize(fs(24)); // Reduced from 36
-            doc.setFont(fontFamily, 'normal');
-            doc.setTextColor(primaryBlue[0], primaryBlue[1], primaryBlue[2]);
-            doc.text(t.quoteModal.quote, pageWidth - 20, 30, { align: 'right' });
-
-            // "Quote Number" label - uppercase, smaller
-            doc.setFontSize(fs(9));
-            doc.setFont(fontFamily, 'normal');
-            doc.setTextColor(lightGray[0], lightGray[1], lightGray[2]);
-            doc.text(t.quoteModal.quoteNumber.toUpperCase(), pageWidth - 20, 40, { align: 'right' });
-
-            // Quote number value - larger and bold
-            doc.setFontSize(fs(16));
-            doc.setFont(fontFamily, 'bold');
-            doc.setTextColor(darkGray[0], darkGray[1], darkGray[2]);
-            const quoteNumber = `ORC-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 1000)).padStart(3, '0')}`;
-            doc.text(quoteNumber, pageWidth - 20, 48, { align: 'right' });
-
-            // Bill To Section (Left)
-            let yPos = 70;
-            // "BILL TO" label
-            doc.setFontSize(fs(9));
-            doc.setFont(fontFamily, 'bold');
-            doc.setTextColor(lightGray[0], lightGray[1], lightGray[2]);
-            doc.text(t.quoteModal.billTo.toUpperCase(), 20, yPos);
-
-            yPos += 8;
-            // Client name - bigger and bolder
-            doc.setFontSize(fs(14));
-            doc.setFont(fontFamily, 'bold');
-            doc.setTextColor(darkGray[0], darkGray[1], darkGray[2]);
-            doc.text(clientName || t.quoteModal.clientNamePlaceholder, 20, yPos);
-
-            yPos += 7;
-            // Client details
-            doc.setFontSize(fs(11));
-            doc.setFont(fontFamily, 'normal');
-
-            if (clientContact) {
-                // Contact person - matches font-medium
-                doc.setFont(fontFamily, 'normal');
-                doc.setTextColor(darkGray[0], darkGray[1], darkGray[2]);
-                doc.text(clientContact, 20, yPos);
-                yPos += 5;
-            }
-
-            if (clientAddress) {
-                const addressLines = clientAddress.split('\n');
-                addressLines.forEach((line) => {
-                    doc.text(line, 20, yPos);
-                    yPos += 5;
-                });
-            }
-
-            if (clientEmail) {
-                doc.setTextColor(primaryBlue[0], primaryBlue[1], primaryBlue[2]);
-                doc.text(clientEmail, 20, yPos);
-                yPos += 5;
-                doc.setTextColor(darkGray[0], darkGray[1], darkGray[2]);
-            }
-
-            if (clientPhone) {
-                doc.setTextColor(lightGray[0], lightGray[1], lightGray[2]);
-                doc.text(clientPhone, 20, yPos);
-                doc.setTextColor(darkGray[0], darkGray[1], darkGray[2]);
-                yPos += 5;
-            }
-
-            if (clientNif) {
-                doc.setTextColor(lightGray[0], lightGray[1], lightGray[2]);
-                doc.setFont(fontFamily, 'normal');
-                const nifText = `${t.quoteModal.nif}: ${clientNif}`;
-                doc.text(nifText, 20, yPos);
-                doc.setTextColor(darkGray[0], darkGray[1], darkGray[2]);
-                yPos += 5;
-            }
-
-            // Date Information (Right)
-            let dateYPos = 70;
-            // Date labels
-            doc.setFontSize(fs(9));
-            doc.setFont(fontFamily, 'bold');
-            doc.setTextColor(lightGray[0], lightGray[1], lightGray[2]);
-            doc.text(t.quoteModal.issueDate.toUpperCase(), pageWidth - 20, dateYPos, { align: 'right' });
-
-            dateYPos += 7;
-            // Date values
-            doc.setFontSize(fs(11));
-            doc.setFont(fontFamily, 'normal');
-            doc.setTextColor(darkGray[0], darkGray[1], darkGray[2]);
-            const quoteDateStr = quoteDate ? new Date(quoteDate).toLocaleDateString('pt-PT') : '-';
-            doc.text(quoteDateStr, pageWidth - 20, dateYPos, { align: 'right' });
-
-            dateYPos += 15;
-            doc.setFontSize(fs(9));
-            doc.setFont(fontFamily, 'bold');
-            doc.setTextColor(lightGray[0], lightGray[1], lightGray[2]);
-            doc.text(t.quoteModal.validity.toUpperCase(), pageWidth - 20, dateYPos, { align: 'right' });
-
-            dateYPos += 7;
-            doc.setFontSize(fs(11));
-            doc.setFont(fontFamily, 'normal');
-            doc.setTextColor(darkGray[0], darkGray[1], darkGray[2]);
-            const expiryDateStr = expiryDate ? new Date(expiryDate).toLocaleDateString('pt-PT') : '-';
-            doc.text(expiryDateStr, pageWidth - 20, dateYPos, { align: 'right' });
-
-            // Items Table
-            const tableStartY = Math.max(yPos, dateYPos) + 10;
-
-            const tableData = items.map((item) => [
-                item.description || '',
-                item.quantity.toString(),
-                `${item.price.toLocaleString('pt-PT', { minimumFractionDigits: 2 })} €`,
-                `${(item.quantity * item.price).toLocaleString('pt-PT', { minimumFractionDigits: 2 })} €`
-            ]);
-
-            autoTable(doc, {
-                startY: tableStartY,
-                head: [[t.quoteModal.description, t.quoteModal.qty, t.quoteModal.price, t.quoteModal.total]],
-                body: tableData,
-                theme: 'plain',
-                styles: {
-                    font: fontFamily,
-                    fontSize: fs(11),
-                    cellPadding: 5,
-                    lineColor: [243, 244, 246], // Very light gray for body lines
-                    lineWidth: 0.1,
-                },
-                headStyles: {
-                    fillColor: [255, 255, 255],
-                    textColor: lightGray,
-                    fontStyle: 'bold',
-                    fontSize: fs(10),
-                    // Only blue border on BOTTOM of header (top of table content)
-                    lineColor: primaryBlue,
-                    lineWidth: { bottom: 0.5, top: 0, left: 0, right: 0 }, // Only bottom border in blue
-                },
-                bodyStyles: {
-                    textColor: darkGray,
-                    lineColor: [255, 255, 255], // White lines = no visible borders
-                    lineWidth: 0,
-                },
-                columnStyles: {
-                    0: { cellWidth: 'auto', fontStyle: 'normal', halign: 'left' },
-                    1: { cellWidth: 20, halign: 'center', textColor: lightGray },
-                    2: { cellWidth: 30, halign: 'right', textColor: lightGray },
-                    3: { cellWidth: 30, halign: 'right', fontStyle: 'bold' },
-                },
-                didParseCell: function (data: any) {
-                    // Apply alignment to header cells to match body cells
-                    if (data.section === 'head') {
-                        if (data.column.index === 1) {
-                            data.cell.styles.halign = 'center';
-                        } else if (data.column.index === 2 || data.column.index === 3) {
-                            data.cell.styles.halign = 'right';
-                        }
+                const response = await fetch('/fonts/Outfit-Regular.ttf');
+                if (response.ok) {
+                    const fontBuffer = await response.arrayBuffer();
+                    const bytes = new Uint8Array(fontBuffer);
+                    let binary = '';
+                    for (let i = 0; i < bytes.byteLength; i++) {
+                        binary += String.fromCharCode(bytes[i]);
                     }
-                },
-                margin: { left: 20, right: 20 },
+                    fontBase64 = btoa(binary);
+                }
+            } catch (err) {
+                console.error('Error loading font:', err);
+            }
+
+            // Generate PDF using shared function
+            const doc = await generateQuotePDF(pdfData, {
+                type: 'quote',
+                logoUrl: '/logos/framax-logo-black.png',
+                fontBase64,
+                translations: {
+                    quote: t.quoteModal.quote,
+                    invoice: t.invoices.typeInvoice.toUpperCase(),
+                    quoteNumber: t.quoteModal.quoteNumber,
+                    invoiceNumber: t.quoteModal.invoiceNumber,
+                    billTo: t.quoteModal.billTo,
+                    issueDate: t.quoteModal.issueDate,
+                    validity: t.quoteModal.validity,
+                    description: t.quoteModal.description,
+                    qty: t.quoteModal.qty,
+                    price: t.quoteModal.price,
+                    total: t.quoteModal.total,
+                    subtotal: t.quoteModal.subtotal,
+                    tax: t.quoteModal.tax,
+                    notesTerms: t.quoteModal.notesTerms,
+                    legalNote: t.quoteModal.legalNote,
+                    nif: t.quoteModal.nif
+                }
             });
 
-            // Totals
-            const finalY = (doc as any).lastAutoTable?.finalY ? (doc as any).lastAutoTable.finalY + 15 : tableStartY + 50;
-            const totalsX = pageWidth - 70;
-            let totalsY = finalY;
-
-            // Subtotal and Tax
-            doc.setFontSize(fs(11));
-            doc.setFont(fontFamily, 'normal');
-            doc.setTextColor(lightGray[0], lightGray[1], lightGray[2]);
-
-            // Subtotal
-            doc.text(t.quoteModal.subtotal, totalsX, totalsY);
-            doc.text(`${subtotal.toLocaleString('pt-PT', { minimumFractionDigits: 2 })} €`, pageWidth - 20, totalsY, { align: 'right' });
-
-            totalsY += 8;
-
-            // IVA
-            const taxPercentage = (taxRate * 100).toFixed(0);
-            doc.text(`${t.quoteModal.tax} (${taxPercentage}%)`, totalsX, totalsY);
-            doc.text(`${tax.toLocaleString('pt-PT', { minimumFractionDigits: 2 })} €`, pageWidth - 20, totalsY, { align: 'right' });
-
-            totalsY += 12;
-
-            // Border line above total - thinner and lighter
-            doc.setDrawColor(229, 231, 235);
-            doc.setLineWidth(0.3);
-            doc.line(totalsX, totalsY - 3, pageWidth - 20, totalsY - 3);
-
-            // Total - BIGGER and BLUE to match preview
-            doc.setFontSize(fs(16));
-            doc.setFont(fontFamily, 'bold');
-            doc.setTextColor(primaryBlue[0], primaryBlue[1], primaryBlue[2]);
-            doc.text(t.quoteModal.total, totalsX, totalsY + 2);
-            doc.text(`${total.toLocaleString('pt-PT', { minimumFractionDigits: 2 })} €`, pageWidth - 20, totalsY + 2, { align: 'right' });
-
-            // Notes
-            if (notes) {
-                totalsY += 20;
-
-                // Border above notes
-                doc.setDrawColor(243, 244, 246);
-                doc.setLineWidth(0.4);
-                doc.line(20, totalsY - 5, pageWidth - 20, totalsY - 5);
-
-                // Notes header - matches text-xs font-bold uppercase (≈ 10pt)
-                doc.setFontSize(fs(10));
-                doc.setFont(fontFamily, 'bold');
-                doc.setTextColor(lightGray[0], lightGray[1], lightGray[2]);
-                doc.text(t.quoteModal.notesTerms.toUpperCase(), 20, totalsY);
-
-                totalsY += 6;
-                // Notes content - matches text-sm text-gray-600 (≈ 11pt)
-                doc.setFontSize(fs(11));
-                doc.setFont(fontFamily, 'normal');
-                doc.setTextColor(lightGray[0] + 20, lightGray[1] + 20, lightGray[2] + 20);
-
-                const notesLines = doc.splitTextToSize(notes, pageWidth - 40);
-                doc.text(notesLines, 20, totalsY);
-            }
-
-            // Footer - Legal Note
-            const footerY = pageHeight - 25;
-
-            // Legal note - matches text-xs italic (≈ 10pt)
-            doc.setFontSize(fs(10));
-            doc.setFont(fontFamily, 'italic');
-            doc.setTextColor(lightGray[0], lightGray[1], lightGray[2]);
-            const legalNoteLines = doc.splitTextToSize(t.quoteModal.legalNote, pageWidth - 40);
-            doc.text(legalNoteLines, pageWidth / 2, footerY, { align: 'center' });
-
             // Save PDF
-            doc.save(`Quote-${quoteNumber}.pdf`);
+            doc.save(`Quote-${tempQuoteNumber}.pdf`);
 
             // Clear any errors
             setSaveError("");

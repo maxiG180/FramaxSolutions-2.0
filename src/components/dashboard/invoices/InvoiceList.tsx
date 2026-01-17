@@ -16,7 +16,7 @@ interface InvoiceListProps {
     invoices: Invoice[];
     onAcceptQuote?: (id: string) => void;
     onDeclineQuote?: (id: string) => void;
-    onDelete?: (id: string) => void;
+    onDelete?: (id: string, type: "invoice" | "quote") => void;
     onDownload?: (id: string) => void;
     onSend?: (id: string) => void;
     onEdit?: (id: string) => void;
@@ -182,12 +182,13 @@ export function InvoiceList({ invoices, onAcceptQuote, onDeclineQuote, onDelete,
                                         </>
                                     )}
 
-                                    {/* Apagar - só para quotes não aceites */}
-                                    {invoice.type === "quote" && invoice.status !== "accepted" && onDelete && (
+                                    {/* Apagar - quotes não aceites ou faturas não pagas */}
+                                    {((invoice.type === "quote" && invoice.status !== "accepted") ||
+                                      (invoice.type === "invoice" && invoice.status !== "paid")) && onDelete && (
                                         <button
-                                            onClick={() => onDelete(invoice.id)}
+                                            onClick={() => onDelete(invoice.id, invoice.type)}
                                             className="p-2 hover:bg-red-500/20 rounded-lg text-red-400 hover:text-red-300 transition-colors"
-                                            title={t.invoices.deleteQuote}
+                                            title={invoice.type === "quote" ? t.invoices.deleteQuote : t.invoices.deleteInvoice}
                                         >
                                             <Trash2 className="w-4 h-4" />
                                         </button>

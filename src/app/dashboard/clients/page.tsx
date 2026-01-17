@@ -196,6 +196,55 @@ export default function ClientsPage() {
                 console.error('Error details object:', error.details);
                 alert(`Error adding client: ${error.message || 'Unknown error. Check console for details.'}`);
             } else {
+                // Create folder in Docs page for the new client
+                console.log('🗂️ Starting folder creation in Docs for new client...');
+                console.log('Client data:', data);
+
+                try {
+                    const clientFolderName = formData.name || `Client ${data.id}`;
+                    console.log('📁 Creating Docs folder:', clientFolderName);
+
+                    // Get current user
+                    const { data: { user } } = await supabase.auth.getUser();
+
+                    if (user) {
+                        // Create folder in the folders table (for Docs page)
+                        const folderPayload: any = {
+                            user_id: user.id,
+                            name: clientFolderName,
+                            color: 'text-blue-400',
+                            bg: 'bg-blue-400/10'
+                        };
+
+                        // Try to add client_id (will be ignored if column doesn't exist)
+                        try {
+                            folderPayload.client_id = data.id;
+                        } catch (e) {
+                            console.log('Note: client_id column not available yet');
+                        }
+
+                        const { data: folderData, error: folderError } = await supabase
+                            .from('folders')
+                            .insert(folderPayload)
+                            .select()
+                            .single();
+
+                        if (folderError) {
+                            console.error('❌ Could not create client folder in Docs:', folderError);
+                            console.error('Error details:', folderError);
+                            // Don't fail the client creation if folder creation fails
+                        } else {
+                            console.log('✅ Successfully created Docs folder for client:', clientFolderName);
+                            console.log('Folder data:', folderData);
+                        }
+                    } else {
+                        console.warn('⚠️ No authenticated user found, skipping folder creation');
+                    }
+                } catch (folderError) {
+                    console.error('❌ Exception while creating client folder:', folderError);
+                    // Don't fail the client creation if folder creation fails
+                }
+
                 setClients([data, ...clients]);
                 resetForm();
             }
