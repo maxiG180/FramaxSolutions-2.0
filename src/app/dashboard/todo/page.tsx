@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Plus, Check, Trash2, Loader2, User, Users, X, ChevronDown, LayoutGrid, List } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { getTasks, createTask, toggleTask, deleteTask, getProfiles, updateTaskStatus } from "./actions";
+import { getTasks, createTask, toggleTask, deleteTask, getProfiles, updateTaskStatus, updateTaskTitle } from "./actions";
 import { createClient } from "@/utils/supabase/client";
 import { cn } from "@/lib/utils";
 import KanbanBoard from "@/components/dashboard/KanbanBoard";
@@ -35,11 +35,13 @@ export default function TodoPage() {
     const [profiles, setProfiles] = useState<Profile[]>([]);
     const [currentUser, setCurrentUser] = useState<string | null>(null);
     const [newTask, setNewTask] = useState("");
-    const [selectedAssignee, setSelectedAssignee] = useState<string | null>("me");
+    const [selectedAssignee, setSelectedAssignee] = useState<string | null>("everyone");
     const [loading, setLoading] = useState(true);
     const [activeFilter, setActiveFilter] = useState<FilterType>('all');
     const [showFilters, setShowFilters] = useState(false);
     const [viewMode, setViewMode] = useState<ViewMode>('kanban');
+    const [editingTaskId, setEditingTaskId] = useState<number | null>(null);
+    const [editingTitle, setEditingTitle] = useState("");
     const taskInputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
@@ -140,6 +142,37 @@ export default function TodoPage() {
         return profile ? profile.full_name : "Unknown";
     };
 
+    const handleStartEditing = (task: Task) => {
+        setEditingTaskId(task.id);
+        setEditingTitle(task.title);
+    };
+
+    const handleCancelEditing = () => {
+        setEditingTaskId(null);
+        setEditingTitle("");
+    };
+
+    const handleSaveTitle = async (taskId: number) => {
+        if (!editingTitle.trim()) {
+            handleCancelEditing();
+            return;
+        }
+
+        // Optimistic update
+        const updatedTasks = tasks.map(t =>
+            t.id === taskId ? { ...t, title: editingTitle } : t
+        );
+        setTasks(updatedTasks);
+        setEditingTaskId(null);
+
+        // Server update
+        const { success } = await updateTaskTitle(taskId, editingTitle);
+        if (!success) {
+            // Revert on failure
+            setTasks(tasks);
+        }
+    };
+
     if (loading) {
         return (
             <div className="h-full flex items-center justify-center">
@@ -149,21 +182,21 @@ export default function TodoPage() {
     }
 
     return (
-        <div className="h-full flex flex-col max-w-7xl mx-auto px-4">
+        <div className="h-full flex flex-col max-w-7xl mx-auto px-2 sm:px-4">
             {/* Header */}
-            <div className="flex items-center justify-between mb-4 md:mb-6">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 md:mb-6 gap-3">
                 <div>
-                    <h1 className="text-2xl md:text-3xl font-bold">
+                    <h1 className="text-xl sm:text-2xl md:text-3xl font-bold">
                         {activeFilter === 'all' && t.tasks.allTasks}
                         {activeFilter === 'me' && t.tasks.myTasks}
                         {activeFilter === 'unassigned' && t.tasks.unassigned}
                     </h1>
-                    <p className="text-white/60 text-sm">
+                    <p className="text-white/60 text-xs sm:text-sm">
                         {activeTasks.length} {t.tasks.active} • {doingTasks.length} {t.tasks.inProgress}
                     </p>
                 </div>
 
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 w-full sm:w-auto">
                     {/* View Mode Toggle */}
                     <div className="flex bg-white/5 border border-white/10 rounded-lg p-1">
                         <button
@@ -187,10 +220,10 @@ export default function TodoPage() {
                     </div>
 
                     {/* Filter Dropdown */}
-                    <div className="relative">
+                    <div className="relative flex-1 sm:flex-none">
                         <button
                             onClick={() => setShowFilters(!showFilters)}
-                            className="flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-lg hover:bg-white/10 transition-colors"
+                            className="flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-lg hover:bg-white/10 transition-colors w-full justify-center"
                         >
                             <span className="text-sm font-medium">{t.tasks.filter}</span>
                             <ChevronDown className={cn("w-4 h-4 transition-transform", showFilters && "rotate-180")} />
@@ -246,7 +279,7 @@ export default function TodoPage() {
 
             {/* Add Task Input */}
             <form onSubmit={addTask} className="mb-6">
-                <div className="flex gap-2">
+                <div className="flex flex-col sm:flex-row gap-2">
                     <input
                         ref={taskInputRef}
                         type="text"
@@ -256,25 +289,27 @@ export default function TodoPage() {
                         className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all placeholder:text-white/40"
                         autoFocus
                     />
-                    <select
-                        value={selectedAssignee || 'everyone'}
-                        onChange={(e) => setSelectedAssignee(e.target.value)}
-                        className="bg-white/5 border border-white/10 rounded-xl px-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 hidden md:block"
-                    >
-                        <option value="me" className="bg-gray-900">{t.tasks.me}</option>
-                        <option value="everyone" className="bg-gray-900">{t.tasks.everyone}</option>
-                        {profiles.filter(p => p.id !== currentUser).map(profile => (
-                            <option key={profile.id} value={profile.id} className="bg-gray-900">
-                                {profile.full_name}
-                            </option>
-                        ))}
-                    </select>
-                    <button
-                        type="submit"
-                        className="bg-blue-500 text-white px-4 md:px-6 rounded-xl hover:bg-blue-600 transition-colors flex items-center justify-center"
-                    >
-                        <Plus className="w-5 h-5" />
-                    </button>
+                    <div className="flex gap-2">
+                        <select
+                            value={selectedAssignee || 'everyone'}
+                            onChange={(e) => setSelectedAssignee(e.target.value)}
+                            className="flex-1 sm:flex-none bg-white/5 border border-white/10 rounded-xl px-3 py-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                        >
+                            <option value="me" className="bg-gray-900">{t.tasks.me}</option>
+                            <option value="everyone" className="bg-gray-900">{t.tasks.everyone}</option>
+                            {profiles.filter(p => p.id !== currentUser).map(profile => (
+                                <option key={profile.id} value={profile.id} className="bg-gray-900">
+                                    {profile.full_name}
+                                </option>
+                            ))}
+                        </select>
+                        <button
+                            type="submit"
+                            className="bg-blue-500 text-white px-4 md:px-6 rounded-xl hover:bg-blue-600 transition-colors flex items-center justify-center"
+                        >
+                            <Plus className="w-5 h-5" />
+                        </button>
+                    </div>
                 </div>
             </form>
 
@@ -291,41 +326,137 @@ export default function TodoPage() {
             {/* List View */}
             {viewMode === 'list' && (
                 <div className="flex-1 overflow-y-auto space-y-6 pb-8">
-                {/* Doing Tasks - Highlighted */}
-                {doingTasks.length > 0 && (
+                    {/* Doing Tasks - Highlighted */}
+                    {doingTasks.length > 0 && (
+                        <div className="space-y-2">
+                            <h3 className="text-xs font-bold text-blue-400 uppercase tracking-widest mb-3 flex items-center gap-2">
+                                <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse" />
+                                {t.tasks.doing} ({doingTasks.length})
+                            </h3>
+                            <AnimatePresence mode="popLayout">
+                                {doingTasks.map((task) => (
+                                    <motion.div
+                                        key={task.id}
+                                        initial={{ opacity: 0, y: 10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        exit={{ opacity: 0, x: -20 }}
+                                        layout
+                                        className="group flex items-start gap-3 md:gap-4 p-3 md:p-4 bg-blue-500/10 border-2 border-blue-500/30 rounded-xl hover:border-blue-500/50 transition-all"
+                                    >
+                                        <button
+                                            onClick={() => handleToggleTask(task.id, task.status)}
+                                            className="mt-0.5 w-6 h-6 md:w-7 md:h-7 rounded-lg border-2 border-blue-400/50 flex items-center justify-center hover:border-blue-500 hover:bg-blue-500/20 transition-all flex-shrink-0"
+                                        >
+                                            <div className="w-0 h-0 bg-blue-500 rounded-sm transition-all" />
+                                        </button>
+
+                                        <div className="flex-1 min-w-0">
+                                            {editingTaskId === task.id ? (
+                                                <input
+                                                    type="text"
+                                                    value={editingTitle}
+                                                    onChange={(e) => setEditingTitle(e.target.value)}
+                                                    onBlur={() => handleSaveTitle(task.id)}
+                                                    onKeyDown={(e) => {
+                                                        if (e.key === 'Enter') handleSaveTitle(task.id);
+                                                        if (e.key === 'Escape') handleCancelEditing();
+                                                    }}
+                                                    autoFocus
+                                                    className="w-full bg-white/10 border border-blue-500/50 rounded px-2 py-1 text-white font-medium focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                />
+                                            ) : (
+                                                <div
+                                                    onDoubleClick={() => handleStartEditing(task)}
+                                                    className="font-medium text-white leading-tight break-words cursor-text hover:bg-white/5 px-2 py-1 rounded transition-colors"
+                                                    title="Double-click to edit"
+                                                >
+                                                    {task.title}
+                                                </div>
+                                            )}
+                                            <div className="flex items-center gap-3 mt-1.5">
+                                                <span className="text-xs text-white/60 flex items-center gap-1">
+                                                    {task.assignee ? <User className="w-3 h-3" /> : <Users className="w-3 h-3" />}
+                                                    {getAssigneeName(task.assignee)}
+                                                </span>
+                                                <select
+                                                    value={task.status}
+                                                    onChange={(e) => handleUpdateTaskStatus(task.id, e.target.value as 'Todo' | 'Doing' | 'Done')}
+                                                    className="text-xs bg-blue-500/20 border border-blue-500/30 rounded px-2 py-0.5 text-blue-300 hover:text-blue-200 focus:outline-none focus:ring-1 focus:ring-blue-500/50"
+                                                    onClick={(e) => e.stopPropagation()}
+                                                >
+                                                    <option value="Todo" className="bg-gray-900">{t.tasks.todo}</option>
+                                                    <option value="Doing" className="bg-gray-900">{t.tasks.doing}</option>
+                                                    <option value="Done" className="bg-gray-900">{t.tasks.done}</option>
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <button
+                                            onClick={() => handleDeleteTask(task.id)}
+                                            className="p-2 hover:bg-red-500/20 rounded-lg text-white/40 hover:text-red-400 transition-colors md:opacity-0 md:group-hover:opacity-100"
+                                        >
+                                            <Trash2 className="w-4 h-4" />
+                                        </button>
+                                    </motion.div>
+                                ))}
+                            </AnimatePresence>
+                        </div>
+                    )}
+
+                    {/* Todo Tasks */}
                     <div className="space-y-2">
-                        <h3 className="text-xs font-bold text-blue-400 uppercase tracking-widest mb-3 flex items-center gap-2">
-                            <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse" />
-                            {t.tasks.doing} ({doingTasks.length})
-                        </h3>
+                        {activeTasks.length > 0 && (
+                            <h3 className="text-xs font-bold text-white/40 uppercase tracking-widest mb-3">{t.tasks.todo} ({activeTasks.length})</h3>
+                        )}
                         <AnimatePresence mode="popLayout">
-                            {doingTasks.map((task) => (
+                            {activeTasks.map((task) => (
                                 <motion.div
                                     key={task.id}
                                     initial={{ opacity: 0, y: 10 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     exit={{ opacity: 0, x: -20 }}
                                     layout
-                                    className="group flex items-start gap-3 md:gap-4 p-3 md:p-4 bg-blue-500/10 border-2 border-blue-500/30 rounded-xl hover:border-blue-500/50 transition-all"
+                                    className="group flex items-start gap-3 md:gap-4 p-3 md:p-4 bg-white/5 border border-white/10 rounded-xl hover:border-white/20 transition-all"
                                 >
                                     <button
                                         onClick={() => handleToggleTask(task.id, task.status)}
-                                        className="mt-0.5 w-6 h-6 md:w-7 md:h-7 rounded-lg border-2 border-blue-400/50 flex items-center justify-center hover:border-blue-500 hover:bg-blue-500/20 transition-all flex-shrink-0"
+                                        className="mt-0.5 w-6 h-6 md:w-7 md:h-7 rounded-lg border-2 border-white/30 flex items-center justify-center hover:border-blue-500 hover:bg-blue-500/20 transition-all flex-shrink-0"
                                     >
                                         <div className="w-0 h-0 bg-blue-500 rounded-sm transition-all" />
                                     </button>
 
                                     <div className="flex-1 min-w-0">
-                                        <div className="font-medium text-white leading-tight break-words">{task.title}</div>
+                                        {editingTaskId === task.id ? (
+                                            <input
+                                                type="text"
+                                                value={editingTitle}
+                                                onChange={(e) => setEditingTitle(e.target.value)}
+                                                onBlur={() => handleSaveTitle(task.id)}
+                                                onKeyDown={(e) => {
+                                                    if (e.key === 'Enter') handleSaveTitle(task.id);
+                                                    if (e.key === 'Escape') handleCancelEditing();
+                                                }}
+                                                autoFocus
+                                                className="w-full bg-white/10 border border-blue-500/50 rounded px-2 py-1 text-white font-medium focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            />
+                                        ) : (
+                                            <div
+                                                onDoubleClick={() => handleStartEditing(task)}
+                                                className="font-medium text-white leading-tight break-words cursor-text hover:bg-white/5 px-2 py-1 rounded transition-colors"
+                                                title="Double-click to edit"
+                                            >
+                                                {task.title}
+                                            </div>
+                                        )}
                                         <div className="flex items-center gap-3 mt-1.5">
-                                            <span className="text-xs text-white/60 flex items-center gap-1">
+                                            <span className="text-xs text-white/40 flex items-center gap-1">
                                                 {task.assignee ? <User className="w-3 h-3" /> : <Users className="w-3 h-3" />}
                                                 {getAssigneeName(task.assignee)}
                                             </span>
                                             <select
                                                 value={task.status}
                                                 onChange={(e) => handleUpdateTaskStatus(task.id, e.target.value as 'Todo' | 'Doing' | 'Done')}
-                                                className="text-xs bg-blue-500/20 border border-blue-500/30 rounded px-2 py-0.5 text-blue-300 hover:text-blue-200 focus:outline-none focus:ring-1 focus:ring-blue-500/50"
+                                                className="text-xs bg-white/5 border border-white/10 rounded px-2 py-0.5 text-white/60 hover:text-white focus:outline-none focus:ring-1 focus:ring-blue-500/50"
                                                 onClick={(e) => e.stopPropagation()}
                                             >
                                                 <option value="Todo" className="bg-gray-900">{t.tasks.todo}</option>
@@ -344,101 +475,68 @@ export default function TodoPage() {
                                 </motion.div>
                             ))}
                         </AnimatePresence>
+                        {activeTasks.length === 0 && doingTasks.length === 0 && (
+                            <div className="text-center py-12 text-white/40 italic">
+                                {t.tasks.noActiveTasks}
+                            </div>
+                        )}
                     </div>
-                )}
 
-                {/* Todo Tasks */}
-                <div className="space-y-2">
-                    {activeTasks.length > 0 && (
-                        <h3 className="text-xs font-bold text-white/40 uppercase tracking-widest mb-3">{t.tasks.todo} ({activeTasks.length})</h3>
-                    )}
-                    <AnimatePresence mode="popLayout">
-                        {activeTasks.map((task) => (
-                            <motion.div
-                                key={task.id}
-                                initial={{ opacity: 0, y: 10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                exit={{ opacity: 0, x: -20 }}
-                                layout
-                                className="group flex items-start gap-3 md:gap-4 p-3 md:p-4 bg-white/5 border border-white/10 rounded-xl hover:border-white/20 transition-all"
-                            >
-                                <button
-                                    onClick={() => handleToggleTask(task.id, task.status)}
-                                    className="mt-0.5 w-6 h-6 md:w-7 md:h-7 rounded-lg border-2 border-white/30 flex items-center justify-center hover:border-blue-500 hover:bg-blue-500/20 transition-all flex-shrink-0"
-                                >
-                                    <div className="w-0 h-0 bg-blue-500 rounded-sm transition-all" />
-                                </button>
-
-                                <div className="flex-1 min-w-0">
-                                    <div className="font-medium text-white leading-tight break-words">{task.title}</div>
-                                    <div className="flex items-center gap-3 mt-1.5">
-                                        <span className="text-xs text-white/40 flex items-center gap-1">
-                                            {task.assignee ? <User className="w-3 h-3" /> : <Users className="w-3 h-3" />}
-                                            {getAssigneeName(task.assignee)}
-                                        </span>
-                                        <select
-                                            value={task.status}
-                                            onChange={(e) => handleUpdateTaskStatus(task.id, e.target.value as 'Todo' | 'Doing' | 'Done')}
-                                            className="text-xs bg-white/5 border border-white/10 rounded px-2 py-0.5 text-white/60 hover:text-white focus:outline-none focus:ring-1 focus:ring-blue-500/50"
-                                            onClick={(e) => e.stopPropagation()}
+                    {/* Completed Tasks */}
+                    {completedTasks.length > 0 && (
+                        <div className="space-y-2 pt-6 border-t border-white/10">
+                            <h3 className="text-xs font-bold text-white/40 uppercase tracking-widest mb-3">{t.tasks.completed}</h3>
+                            <AnimatePresence mode="popLayout">
+                                {completedTasks.map((task) => (
+                                    <motion.div
+                                        key={task.id}
+                                        initial={{ opacity: 0 }}
+                                        animate={{ opacity: 0.5 }}
+                                        exit={{ opacity: 0 }}
+                                        layout
+                                        className="group flex items-center gap-3 md:gap-4 p-3 bg-black/20 rounded-xl"
+                                    >
+                                        <button
+                                            onClick={() => handleToggleTask(task.id, task.status)}
+                                            className="w-6 h-6 md:w-7 md:h-7 rounded-lg border-2 border-blue-500 bg-blue-500 flex items-center justify-center flex-shrink-0"
                                         >
-                                            <option value="Todo" className="bg-gray-900">{t.tasks.todo}</option>
-                                            <option value="Doing" className="bg-gray-900">{t.tasks.doing}</option>
-                                            <option value="Done" className="bg-gray-900">{t.tasks.done}</option>
-                                        </select>
-                                    </div>
-                                </div>
+                                            <Check className="w-4 h-4 text-white" />
+                                        </button>
+                                        {editingTaskId === task.id ? (
+                                            <input
+                                                type="text"
+                                                value={editingTitle}
+                                                onChange={(e) => setEditingTitle(e.target.value)}
+                                                onBlur={() => handleSaveTitle(task.id)}
+                                                onKeyDown={(e) => {
+                                                    if (e.key === 'Enter') handleSaveTitle(task.id);
+                                                    if (e.key === 'Escape') handleCancelEditing();
+                                                }}
+                                                autoFocus
+                                                className="flex-1 bg-white/10 border border-blue-500/50 rounded px-2 py-1 text-white font-medium focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            />
+                                        ) : (
+                                            <span
+                                                onDoubleClick={() => handleStartEditing(task)}
+                                                className="flex-1 font-medium text-white/60 line-through break-words cursor-text hover:bg-white/5 px-2 py-1 rounded transition-colors"
+                                                title="Double-click to edit"
+                                            >
+                                                {task.title}
+                                            </span>
+                                        )}
 
-                                <button
-                                    onClick={() => handleDeleteTask(task.id)}
-                                    className="p-2 hover:bg-red-500/20 rounded-lg text-white/40 hover:text-red-400 transition-colors md:opacity-0 md:group-hover:opacity-100"
-                                >
-                                    <Trash2 className="w-4 h-4" />
-                                </button>
-                            </motion.div>
-                        ))}
-                    </AnimatePresence>
-                    {activeTasks.length === 0 && doingTasks.length === 0 && (
-                        <div className="text-center py-12 text-white/40 italic">
-                            {t.tasks.noActiveTasks}
+                                        <button
+                                            onClick={() => handleDeleteTask(task.id)}
+                                            className="p-2 hover:bg-red-500/20 rounded-lg text-white/40 hover:text-red-400 transition-colors md:opacity-0 md:group-hover:opacity-100"
+                                        >
+                                            <Trash2 className="w-4 h-4" />
+                                        </button>
+                                    </motion.div>
+                                ))}
+                            </AnimatePresence>
                         </div>
                     )}
                 </div>
-
-                {/* Completed Tasks */}
-                {completedTasks.length > 0 && (
-                    <div className="space-y-2 pt-6 border-t border-white/10">
-                        <h3 className="text-xs font-bold text-white/40 uppercase tracking-widest mb-3">{t.tasks.completed}</h3>
-                        <AnimatePresence mode="popLayout">
-                            {completedTasks.map((task) => (
-                                <motion.div
-                                    key={task.id}
-                                    initial={{ opacity: 0 }}
-                                    animate={{ opacity: 0.5 }}
-                                    exit={{ opacity: 0 }}
-                                    layout
-                                    className="group flex items-center gap-3 md:gap-4 p-3 bg-black/20 rounded-xl"
-                                >
-                                    <button
-                                        onClick={() => handleToggleTask(task.id, task.status)}
-                                        className="w-6 h-6 md:w-7 md:h-7 rounded-lg border-2 border-blue-500 bg-blue-500 flex items-center justify-center flex-shrink-0"
-                                    >
-                                        <Check className="w-4 h-4 text-white" />
-                                    </button>
-                                    <span className="flex-1 font-medium text-white/60 line-through break-words">{task.title}</span>
-
-                                    <button
-                                        onClick={() => handleDeleteTask(task.id)}
-                                        className="p-2 hover:bg-red-500/20 rounded-lg text-white/40 hover:text-red-400 transition-colors md:opacity-0 md:group-hover:opacity-100"
-                                    >
-                                        <Trash2 className="w-4 h-4" />
-                                    </button>
-                                </motion.div>
-                            ))}
-                        </AnimatePresence>
-                    </div>
-                )}
-            </div>
             )}
         </div>
     );

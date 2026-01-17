@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Trash2, User, Users } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { updateTaskStatus, deleteTask } from "@/app/dashboard/todo/actions";
+import { updateTaskStatus, deleteTask, updateTaskTitle } from "@/app/dashboard/todo/actions";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/context/LanguageContext";
 
@@ -37,6 +37,8 @@ export default function KanbanBoard({ tasks, currentUser, profiles, onTasksChang
     const { t } = useLanguage();
     const [draggedTask, setDraggedTask] = useState<Task | null>(null);
     const [draggedOverColumn, setDraggedOverColumn] = useState<Column | null>(null);
+    const [editingTaskId, setEditingTaskId] = useState<number | null>(null);
+    const [editingTitle, setEditingTitle] = useState("");
 
     const columns: { id: Column; title: string; color: string }[] = [
         { id: 'Todo', title: t.tasks.todo, color: 'bg-gray-500/20 border-gray-500/30' },
@@ -110,102 +112,155 @@ export default function KanbanBoard({ tasks, currentUser, profiles, onTasksChang
         return profile?.avatar_url || null;
     };
 
-    return (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 h-full overflow-x-auto pb-8">
-            {columns.map((column) => (
-                <div
-                    key={column.id}
-                    className="flex flex-col min-h-[400px]"
-                    onDragOver={(e) => handleDragOver(e, column.id)}
-                    onDragLeave={handleDragLeave}
-                    onDrop={(e) => handleDrop(e, column.id)}
-                >
-                    {/* Column Header */}
-                    <div className={cn(
-                        "flex items-center justify-between p-4 rounded-t-xl border-2 border-b-0",
-                        column.color,
-                        draggedOverColumn === column.id && "ring-2 ring-white/50"
-                    )}>
-                        <div className="flex items-center gap-2">
-                            <h3 className="font-bold text-white">{column.title}</h3>
-                            <span className="text-xs bg-white/10 px-2 py-0.5 rounded-full">
-                                {getTasksByStatus(column.id).length}
-                            </span>
-                        </div>
-                    </div>
+    const handleStartEditing = (task: Task) => {
+        setEditingTaskId(task.id);
+        setEditingTitle(task.title);
+    };
 
-                    {/* Column Content */}
-                    <div className={cn(
-                        "flex-1 p-4 border-2 border-t-0 rounded-b-xl space-y-3 min-h-[300px] max-h-[calc(100vh-300px)] overflow-y-auto transition-all scrollbar-thin",
-                        column.color,
-                        draggedOverColumn === column.id && "bg-white/5 ring-2 ring-white/50"
-                    )}>
-                        <AnimatePresence mode="popLayout">
-                            {getTasksByStatus(column.id).map((task) => (
-                                <motion.div
-                                    key={task.id}
-                                    layout
-                                    initial={{ opacity: 0, scale: 0.8 }}
-                                    animate={{ opacity: 1, scale: 1 }}
-                                    exit={{ opacity: 0, scale: 0.8 }}
-                                    draggable
-                                    onDragStart={() => handleDragStart(task)}
-                                    className={cn(
-                                        "group bg-white/5 border border-white/10 rounded-lg p-4 cursor-move hover:bg-white/10 hover:border-white/20 transition-all",
-                                        draggedTask?.id === task.id && "opacity-50"
-                                    )}
-                                >
-                                    <div className="flex items-start justify-between gap-3">
-                                        <div className="flex-1 min-w-0">
-                                            <div className={cn(
-                                                "font-medium text-white leading-tight break-words mb-2",
-                                                task.status === 'Done' && "line-through text-white/60"
-                                            )}>
-                                                {task.title}
-                                            </div>
-                                            <div className="flex items-center gap-2">
-                                                <div className="flex items-center gap-1.5 text-xs text-white/60">
-                                                    {task.assignee ? (
-                                                        <>
-                                                            {getAssigneeAvatar(task.assignee) ? (
-                                                                <img
-                                                                    src={getAssigneeAvatar(task.assignee)!}
-                                                                    alt={getAssigneeName(task.assignee)}
-                                                                    className="w-5 h-5 rounded-full"
-                                                                />
-                                                            ) : (
-                                                                <User className="w-3.5 h-3.5" />
-                                                            )}
-                                                            <span>{getAssigneeName(task.assignee)}</span>
-                                                        </>
-                                                    ) : (
-                                                        <>
-                                                            <Users className="w-3.5 h-3.5" />
-                                                            <span>Everyone</span>
-                                                        </>
-                                                    )}
+    const handleCancelEditing = () => {
+        setEditingTaskId(null);
+        setEditingTitle("");
+    };
+
+    const handleSaveTitle = async (taskId: number) => {
+        if (!editingTitle.trim()) {
+            handleCancelEditing();
+            return;
+        }
+
+        // Optimistic update
+        const updatedTasks = tasks.map(t =>
+            t.id === taskId ? { ...t, title: editingTitle } : t
+        );
+        onTasksChange(updatedTasks);
+        setEditingTaskId(null);
+
+        // Server update
+        const { success } = await updateTaskTitle(taskId, editingTitle);
+        if (!success) {
+            // Revert on failure
+            onTasksChange(tasks);
+        }
+    };
+
+    return (
+        <div className="overflow-x-auto pb-8 -mx-4 px-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 min-w-full md:min-w-0">
+                {columns.map((column) => (
+                    <div
+                        key={column.id}
+                        className="flex flex-col min-w-[85vw] md:min-w-0 min-h-[400px]"
+                        onDragOver={(e) => handleDragOver(e, column.id)}
+                        onDragLeave={handleDragLeave}
+                        onDrop={(e) => handleDrop(e, column.id)}
+                    >
+                        {/* Column Header */}
+                        <div className={cn(
+                            "flex items-center justify-between p-4 rounded-t-xl border-2 border-b-0",
+                            column.color,
+                            draggedOverColumn === column.id && "ring-2 ring-white/50"
+                        )}>
+                            <div className="flex items-center gap-2">
+                                <h3 className="font-bold text-white">{column.title}</h3>
+                                <span className="text-xs bg-white/10 px-2 py-0.5 rounded-full">
+                                    {getTasksByStatus(column.id).length}
+                                </span>
+                            </div>
+                        </div>
+
+                        {/* Column Content */}
+                        <div className={cn(
+                            "flex-1 p-4 border-2 border-t-0 rounded-b-xl space-y-3 min-h-[300px] max-h-[calc(100vh-300px)] overflow-y-auto transition-all scrollbar-thin",
+                            column.color,
+                            draggedOverColumn === column.id && "bg-white/5 ring-2 ring-white/50"
+                        )}>
+                            <AnimatePresence mode="popLayout">
+                                {getTasksByStatus(column.id).map((task) => (
+                                    <motion.div
+                                        key={task.id}
+                                        layout
+                                        initial={{ opacity: 0, scale: 0.8 }}
+                                        animate={{ opacity: 1, scale: 1 }}
+                                        exit={{ opacity: 0, scale: 0.8 }}
+                                        draggable={!('ontouchstart' in window)}
+                                        onDragStart={() => handleDragStart(task)}
+                                        className={cn(
+                                            "group bg-white/5 border border-white/10 rounded-lg p-3 md:p-4 hover:bg-white/10 hover:border-white/20 transition-all",
+                                            !('ontouchstart' in window) && "cursor-move",
+                                            draggedTask?.id === task.id && "opacity-50"
+                                        )}
+                                    >
+                                        <div className="flex items-start justify-between gap-3">
+                                            <div className="flex-1 min-w-0">
+                                                {editingTaskId === task.id ? (
+                                                    <input
+                                                        type="text"
+                                                        value={editingTitle}
+                                                        onChange={(e) => setEditingTitle(e.target.value)}
+                                                        onBlur={() => handleSaveTitle(task.id)}
+                                                        onKeyDown={(e) => {
+                                                            if (e.key === 'Enter') handleSaveTitle(task.id);
+                                                            if (e.key === 'Escape') handleCancelEditing();
+                                                        }}
+                                                        autoFocus
+                                                        className="w-full bg-white/10 border border-blue-500/50 rounded px-2 py-1 text-white font-medium focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                    />
+                                                ) : (
+                                                    <div
+                                                        onDoubleClick={() => handleStartEditing(task)}
+                                                        className={cn(
+                                                            "font-medium text-white leading-tight break-words mb-2 cursor-text hover:bg-white/5 px-2 py-1 rounded transition-colors",
+                                                            task.status === 'Done' && "line-through text-white/60"
+                                                        )}
+                                                        title="Double-click to edit"
+                                                    >
+                                                        {task.title}
+                                                    </div>
+                                                )}
+                                                <div className="flex items-center gap-2">
+                                                    <div className="flex items-center gap-1.5 text-xs text-white/60">
+                                                        {task.assignee ? (
+                                                            <>
+                                                                {getAssigneeAvatar(task.assignee) ? (
+                                                                    <img
+                                                                        src={getAssigneeAvatar(task.assignee)!}
+                                                                        alt={getAssigneeName(task.assignee)}
+                                                                        className="w-5 h-5 rounded-full"
+                                                                    />
+                                                                ) : (
+                                                                    <User className="w-3.5 h-3.5" />
+                                                                )}
+                                                                <span>{getAssigneeName(task.assignee)}</span>
+                                                            </>
+                                                        ) : (
+                                                            <>
+                                                                <Users className="w-3.5 h-3.5" />
+                                                                <span>Everyone</span>
+                                                            </>
+                                                        )}
+                                                    </div>
                                                 </div>
                                             </div>
+                                            <button
+                                                onClick={() => handleDeleteTask(task.id)}
+                                                className="opacity-0 group-hover:opacity-100 p-1.5 hover:bg-red-500/20 rounded text-white/40 hover:text-red-400 transition-all"
+                                            >
+                                                <Trash2 className="w-4 h-4" />
+                                            </button>
                                         </div>
-                                        <button
-                                            onClick={() => handleDeleteTask(task.id)}
-                                            className="opacity-0 group-hover:opacity-100 p-1.5 hover:bg-red-500/20 rounded text-white/40 hover:text-red-400 transition-all"
-                                        >
-                                            <Trash2 className="w-4 h-4" />
-                                        </button>
-                                    </div>
-                                </motion.div>
-                            ))}
-                        </AnimatePresence>
+                                    </motion.div>
+                                ))}
+                            </AnimatePresence>
 
-                        {getTasksByStatus(column.id).length === 0 && (
-                            <div className="flex items-center justify-center h-full text-white/30 text-sm italic">
-                                {t.tasks.noTasks}
-                            </div>
-                        )}
+                            {getTasksByStatus(column.id).length === 0 && (
+                                <div className="flex items-center justify-center h-full text-white/30 text-sm italic">
+                                    {t.tasks.noTasks}
+                                </div>
+                            )}
+                        </div>
                     </div>
-                </div>
-            ))}
+                ))}
+            </div>
         </div>
     );
 }
