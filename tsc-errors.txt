@@ -1,0 +1,3 @@
+﻿src/app/dashboard/todo/page_old.tsx(6,69): error TS2305: Module '"./actions"' has no exported member 'startWorkingOnTask'.
+src/app/dashboard/todo/page_old.tsx(6,89): error TS2305: Module '"./actions"' has no exported member 'stopWorkingOnTask'.
+src/app/dashboard/todo/page_old.tsx(6,108): error TS2724: '"./actions"' has no exported member named 'updateTaskTags'. Did you mean 'updateTaskStatus'?
