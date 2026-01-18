@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Plus, Check, Trash2, Loader2, User, Users, X, ChevronDown, LayoutGrid, List } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { getTasks, createTask, toggleTask, deleteTask, getProfiles, updateTaskStatus, updateTaskTitle } from "./actions";
+import { getTasks, createTask, toggleTask, deleteTask, getProfiles, updateTaskStatus, updateTaskTitle, updateTaskAssignee } from "./actions";
 import { createClient } from "@/utils/supabase/client";
 import { cn } from "@/lib/utils";
 import KanbanBoard from "@/components/dashboard/KanbanBoard";

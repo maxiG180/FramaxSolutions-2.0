@@ -161,6 +161,28 @@ export async function updateTaskTitle(id: number, title: string) {
     return { success: true }
 }
 
+export async function updateTaskAssignee(id: number, assignee: string | null) {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+
+    if (!user) {
+        return { error: 'Unauthorized' }
+    }
+
+    const { error } = await supabase
+        .from('tasks')
+        .update({ assignee })
+        .eq('id', id)
+        .or(`assignee.eq.${user.id},assignee.is.null`)
+
+    if (error) {
+        return { error: error.message }
+    }
+
+    revalidatePath('/dashboard/todo')
+    return { success: true }
+}
+
 export async function updateTaskStatus(id: number, status: 'Todo' | 'Doing' | 'Done') {
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()

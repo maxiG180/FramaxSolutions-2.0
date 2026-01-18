@@ -1,9 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { Trash2, User, Users } from "lucide-react";
+import { Trash2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { updateTaskStatus, deleteTask, updateTaskTitle } from "@/app/dashboard/todo/actions";
+import { updateTaskStatus, deleteTask, updateTaskTitle, updateTaskAssignee } from "@/app/dashboard/todo/actions";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/context/LanguageContext";
 
@@ -99,19 +99,6 @@ export default function KanbanBoard({ tasks, currentUser, profiles, onTasksChang
         }
     };
 
-    const getAssigneeName = (assigneeId: string | null) => {
-        if (!assigneeId) return t.tasks.everyone;
-        if (assigneeId === currentUser) return t.tasks.me;
-        const profile = profiles.find(p => p.id === assigneeId);
-        return profile ? profile.full_name : "Unknown";
-    };
-
-    const getAssigneeAvatar = (assigneeId: string | null) => {
-        if (!assigneeId) return null;
-        const profile = profiles.find(p => p.id === assigneeId);
-        return profile?.avatar_url || null;
-    };
-
     const handleStartEditing = (task: Task) => {
         setEditingTaskId(task.id);
         setEditingTitle(task.title);
@@ -137,6 +124,21 @@ export default function KanbanBoard({ tasks, currentUser, profiles, onTasksChang
 
         // Server update
         const { success } = await updateTaskTitle(taskId, editingTitle);
+        if (!success) {
+            // Revert on failure
+            onTasksChange(tasks);
+        }
+    };
+
+    const handleUpdateAssignee = async (taskId: number, newAssignee: string | null) => {
+        // Optimistic update
+        const updatedTasks = tasks.map(t =>
+            t.id === taskId ? { ...t, assignee: newAssignee } : t
+        );
+        onTasksChange(updatedTasks);
+
+        // Server update
+        const { success } = await updateTaskAssignee(taskId, newAssignee);
         if (!success) {
             // Revert on failure
             onTasksChange(tasks);
@@ -218,27 +220,24 @@ export default function KanbanBoard({ tasks, currentUser, profiles, onTasksChang
                                                     </div>
                                                 )}
                                                 <div className="flex items-center gap-2">
-                                                    <div className="flex items-center gap-1.5 text-xs text-white/60">
-                                                        {task.assignee ? (
-                                                            <>
-                                                                {getAssigneeAvatar(task.assignee) ? (
-                                                                    <img
-                                                                        src={getAssigneeAvatar(task.assignee)!}
-                                                                        alt={getAssigneeName(task.assignee)}
-                                                                        className="w-5 h-5 rounded-full"
-                                                                    />
-                                                                ) : (
-                                                                    <User className="w-3.5 h-3.5" />
-                                                                )}
-                                                                <span>{getAssigneeName(task.assignee)}</span>
-                                                            </>
-                                                        ) : (
-                                                            <>
-                                                                <Users className="w-3.5 h-3.5" />
-                                                                <span>Everyone</span>
-                                                            </>
-                                                        )}
-                                                    </div>
+                                                    <select
+                                                        value={task.assignee || 'everyone'}
+                                                        onChange={(e) => handleUpdateAssignee(task.id, e.target.value === 'everyone' ? null : e.target.value)}
+                                                        onClick={(e) => e.stopPropagation()}
+                                                        className="text-xs bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 rounded px-2 py-1 text-white/80 hover:text-white focus:outline-none focus:ring-1 focus:ring-blue-500/50 transition-colors cursor-pointer"
+                                                    >
+                                                        <option value={currentUser ?? ""} className="bg-gray-900">
+                                                            {t.tasks.me}
+                                                        </option>
+                                                        <option value="everyone" className="bg-gray-900">
+                                                            {t.tasks.everyone}
+                                                        </option>
+                                                        {profiles.filter(p => p.id !== currentUser).map(profile => (
+                                                            <option key={profile.id} value={profile.id} className="bg-gray-900">
+                                                                {profile.full_name}
+                                                            </option>
+                                                        ))}
+                                                    </select>
                                                 </div>
                                             </div>
                                             <button
