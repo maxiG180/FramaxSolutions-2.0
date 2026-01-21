@@ -23,6 +23,7 @@ interface Client {
     contact_person?: string;
     country?: string;
     address?: string; // Should be added if not present in the DB, or just use it if it is
+    preferred_language?: 'pt' | 'en';
 }
 
 export default function ClientsPage() {
@@ -51,7 +52,8 @@ export default function ClientsPage() {
         logo: "",
         contact_person: "",
         country: "",
-        address: ""
+        address: "",
+        preferred_language: "pt"
     });
 
     useEffect(() => {
@@ -83,7 +85,7 @@ export default function ClientsPage() {
     });
 
     const resetForm = () => {
-        setFormData({ name: "", email: "", phone: "", website: "", logo: "", contact_person: "", country: "", address: "" });
+        setFormData({ name: "", email: "", phone: "", website: "", logo: "", contact_person: "", country: "", address: "", preferred_language: "pt" });
         setEditingId(null);
         setCurrentStep(1);
         setIsModalOpen(false);
@@ -104,7 +106,8 @@ export default function ClientsPage() {
             logo: client.logo || "",
             contact_person: client.contact_person || "",
             country: client.country || "",
-            address: client.address || ""
+            address: client.address || "",
+            preferred_language: client.preferred_language || "pt"
         });
         setEditingId(client.id);
         setCurrentStep(1);
@@ -599,6 +602,7 @@ export default function ClientsPage() {
                                                         />
                                                     </div>
                                                 </div>
+
                                             </motion.div>
                                         )}
 
@@ -652,6 +656,52 @@ export default function ClientsPage() {
                                                         onChange={(value) => setFormData({ ...formData, phone: value })}
                                                         placeholder="Phone number"
                                                     />
+                                                </div>
+
+                                                {/* Language Preference - Clean Flags */}
+                                                <div className="space-y-3">
+                                                    <label className="text-sm font-medium text-white/60">Email Language</label>
+                                                    <div className="flex gap-3 justify-center">
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => setFormData({ ...formData, preferred_language: 'pt' })}
+                                                            className={`group relative w-24 h-16 rounded-lg overflow-hidden transition-all ${
+                                                                formData.preferred_language === 'pt'
+                                                                    ? 'ring-2 ring-blue-500 ring-offset-2 ring-offset-gray-900 scale-105'
+                                                                    : 'opacity-60 hover:opacity-100 hover:scale-105'
+                                                            }`}
+                                                            title="Português"
+                                                        >
+                                                            <svg viewBox="0 0 900 600" className="w-full h-full">
+                                                                <rect fill="#060" width="360" height="600"/>
+                                                                <rect fill="#D80027" x="360" width="540" height="600"/>
+                                                                <circle fill="#FFDA44" cx="360" cy="300" r="120"/>
+                                                                <path fill="#D80027" d="M360,180v240m-120-120h240" strokeWidth="20"/>
+                                                            </svg>
+                                                        </button>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => setFormData({ ...formData, preferred_language: 'en' })}
+                                                            className={`group relative w-24 h-16 rounded-lg overflow-hidden transition-all ${
+                                                                formData.preferred_language === 'en'
+                                                                    ? 'ring-2 ring-blue-500 ring-offset-2 ring-offset-gray-900 scale-105'
+                                                                    : 'opacity-60 hover:opacity-100 hover:scale-105'
+                                                            }`}
+                                                            title="English"
+                                                        >
+                                                            <svg viewBox="0 0 60 30" className="w-full h-full">
+                                                                <clipPath id="s"><path d="M0,0 v30 h60 v-30 z"/></clipPath>
+                                                                <clipPath id="t"><path d="M30,15 h30 v15 z v-30 h-30 z h-30 v15 z v-30 h30 z"/></clipPath>
+                                                                <g clipPath="url(#s)">
+                                                                    <path d="M0,0 v30 h60 v-30 z" fill="#012169"/>
+                                                                    <path d="M0,0 L60,30 M60,0 L0,30" stroke="#fff" strokeWidth="6"/>
+                                                                    <path d="M0,0 L60,30 M60,0 L0,30" clipPath="url(#t)" stroke="#C8102E" strokeWidth="4"/>
+                                                                    <path d="M30,0 v30 M0,15 h60" stroke="#fff" strokeWidth="10"/>
+                                                                    <path d="M30,0 v30 M0,15 h60" stroke="#C8102E" strokeWidth="6"/>
+                                                                </g>
+                                                            </svg>
+                                                        </button>
+                                                    </div>
                                                 </div>
                                             </motion.div>
                                         )}

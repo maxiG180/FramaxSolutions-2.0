@@ -229,6 +229,28 @@ export async function toggleTask(id: number, completed: boolean) {
     return { success: true }
 }
 
+export async function updateTaskAlertInterval(id: number, alertInterval: string) {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+
+    if (!user) {
+        return { error: 'Unauthorized' }
+    }
+
+    const { error } = await supabase
+        .from('tasks')
+        .update({ alert_interval: alertInterval })
+        .eq('id', id)
+        .or(`assignee.eq.${user.id},assignee.is.null`)
+
+    if (error) {
+        return { error: error.message }
+    }
+
+    revalidatePath('/dashboard/todo')
+    return { success: true }
+}
+
 export async function deleteTask(id: number) {
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()

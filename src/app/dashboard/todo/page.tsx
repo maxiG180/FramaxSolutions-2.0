@@ -1,9 +1,9 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { Plus, Check, Trash2, Loader2, User, Users, X, ChevronDown, LayoutGrid, List } from "lucide-react";
+import { Plus, Check, Trash2, Loader2, User, Users, X, ChevronDown, LayoutGrid, List, Bell } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { getTasks, createTask, toggleTask, deleteTask, getProfiles, updateTaskStatus, updateTaskTitle, updateTaskAssignee } from "./actions";
+import { getTasks, createTask, toggleTask, deleteTask, getProfiles, updateTaskStatus, updateTaskTitle, updateTaskAssignee, updateTaskAlertInterval } from "./actions";
 import { createClient } from "@/utils/supabase/client";
 import { cn } from "@/lib/utils";
 import KanbanBoard from "@/components/dashboard/KanbanBoard";
@@ -18,6 +18,8 @@ type Task = {
     created_at: string;
     assignee: string | null;
     tags: string[] | null;
+    alert_interval: string | null;
+    last_alert_sent_at: string | null;
 };
 
 type Profile = {
@@ -36,6 +38,7 @@ export default function TodoPage() {
     const [currentUser, setCurrentUser] = useState<string | null>(null);
     const [newTask, setNewTask] = useState("");
     const [selectedAssignee, setSelectedAssignee] = useState<string | null>("everyone");
+    const [reminderEnabled, setReminderEnabled] = useState<boolean>(false);
     const [loading, setLoading] = useState(true);
     const [activeFilter, setActiveFilter] = useState<FilterType>('all');
     const [showFilters, setShowFilters] = useState(false);
@@ -86,10 +89,12 @@ export default function TodoPage() {
             assigneeId = selectedAssignee;
         }
 
-        const { data, error } = await createTask(newTask, assigneeId, [], "None");
+        const alertInterval = reminderEnabled ? "12h" : "None";
+        const { data, error} = await createTask(newTask, assigneeId, [], alertInterval);
         if (data) {
             setTasks([data, ...tasks]);
             setNewTask("");
+            setReminderEnabled(false); // Reset reminder after creating task
         }
     };
 
@@ -125,6 +130,22 @@ export default function TodoPage() {
         }
     };
 
+    const handleUpdateTaskAlertInterval = async (id: number, newAlertInterval: string) => {
+        const currentTask = tasks.find(t => t.id === id);
+        if (!currentTask) return;
+
+        setTasks(tasks.map(t =>
+            t.id === id ? { ...t, alert_interval: newAlertInterval } : t
+        ));
+
+        const { success } = await updateTaskAlertInterval(id, newAlertInterval);
+        if (!success) {
+            setTasks(tasks.map(t =>
+                t.id === id ? { ...t, alert_interval: currentTask.alert_interval } : t
+            ));
+        }
+    };
+
     const handleDeleteTask = async (id: number) => {
         const taskToDelete = tasks.find(t => t.id === id);
         setTasks(tasks.filter(t => t.id !== id));
@@ -140,6 +161,15 @@ export default function TodoPage() {
         if (assigneeId === currentUser) return t.tasks.me;
         const profile = profiles.find(p => p.id === assigneeId);
         return profile ? profile.full_name : "Unknown";
+    };
+
+    const isReminderActive = (alertInterval: string | null) => {
+        return alertInterval && alertInterval !== 'None';
+    };
+
+    const handleToggleReminder = async (taskId: number, currentInterval: string | null) => {
+        const newInterval = isReminderActive(currentInterval) ? 'None' : '12h';
+        await handleUpdateTaskAlertInterval(taskId, newInterval);
     };
 
     const handleStartEditing = (task: Task) => {
@@ -304,6 +334,19 @@ export default function TodoPage() {
                             ))}
                         </select>
                         <button
+                            type="button"
+                            onClick={() => setReminderEnabled(!reminderEnabled)}
+                            className={cn(
+                                "flex items-center gap-2 px-3 py-3 rounded-xl text-sm font-medium transition-all",
+                                reminderEnabled
+                                    ? "bg-yellow-500/20 border border-yellow-500/30 text-yellow-300 hover:bg-yellow-500/30"
+                                    : "bg-white/5 border border-white/10 text-white/60 hover:bg-white/10"
+                            )}
+                            title={reminderEnabled ? t.tasks.reminderOn : t.tasks.reminderOff}
+                        >
+                            <Bell className={cn("w-4 h-4", reminderEnabled && "animate-pulse")} />
+                        </button>
+                        <button
                             type="submit"
                             className="bg-blue-500 text-white px-4 md:px-6 rounded-xl hover:bg-blue-600 transition-colors flex items-center justify-center"
                         >
@@ -373,7 +416,7 @@ export default function TodoPage() {
                                                     {task.title}
                                                 </div>
                                             )}
-                                            <div className="flex items-center gap-3 mt-1.5">
+                                            <div className="flex items-center gap-2 mt-1.5 flex-wrap">
                                                 <span className="text-xs text-white/60 flex items-center gap-1">
                                                     {task.assignee ? <User className="w-3 h-3" /> : <Users className="w-3 h-3" />}
                                                     {getAssigneeName(task.assignee)}
@@ -381,13 +424,29 @@ export default function TodoPage() {
                                                 <select
                                                     value={task.status}
                                                     onChange={(e) => handleUpdateTaskStatus(task.id, e.target.value as 'Todo' | 'Doing' | 'Done')}
-                                                    className="text-xs bg-blue-500/20 border border-blue-500/30 rounded px-2 py-0.5 text-blue-300 hover:text-blue-200 focus:outline-none focus:ring-1 focus:ring-blue-500/50"
+                                                    className="text-xs bg-blue-500/20 border border-blue-500/30 rounded px-2 py-1 text-blue-300 hover:text-blue-200 focus:outline-none focus:ring-1 focus:ring-blue-500/50"
                                                     onClick={(e) => e.stopPropagation()}
                                                 >
                                                     <option value="Todo" className="bg-gray-900">{t.tasks.todo}</option>
                                                     <option value="Doing" className="bg-gray-900">{t.tasks.doing}</option>
                                                     <option value="Done" className="bg-gray-900">{t.tasks.done}</option>
                                                 </select>
+                                                <button
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        handleToggleReminder(task.id, task.alert_interval);
+                                                    }}
+                                                    className={cn(
+                                                        "text-xs rounded-lg px-2.5 py-1 transition-all flex items-center gap-1.5 font-medium",
+                                                        isReminderActive(task.alert_interval)
+                                                            ? "bg-yellow-500/20 border border-yellow-500/50 text-yellow-300 hover:bg-yellow-500/30 shadow-lg shadow-yellow-500/10"
+                                                            : "bg-white/5 border border-white/20 text-white/50 hover:bg-white/10 hover:text-white/70 hover:border-white/30"
+                                                    )}
+                                                    title={isReminderActive(task.alert_interval) ? t.tasks.reminderOn : t.tasks.reminderOff}
+                                                >
+                                                    <Bell className={cn("w-3.5 h-3.5", isReminderActive(task.alert_interval) && "animate-pulse")} />
+                                                    <span>{isReminderActive(task.alert_interval) ? "Reminder" : "Set Reminder"}</span>
+                                                </button>
                                             </div>
                                         </div>
 
@@ -448,7 +507,7 @@ export default function TodoPage() {
                                                 {task.title}
                                             </div>
                                         )}
-                                        <div className="flex items-center gap-3 mt-1.5">
+                                        <div className="flex items-center gap-2 mt-1.5 flex-wrap">
                                             <span className="text-xs text-white/40 flex items-center gap-1">
                                                 {task.assignee ? <User className="w-3 h-3" /> : <Users className="w-3 h-3" />}
                                                 {getAssigneeName(task.assignee)}
@@ -456,13 +515,29 @@ export default function TodoPage() {
                                             <select
                                                 value={task.status}
                                                 onChange={(e) => handleUpdateTaskStatus(task.id, e.target.value as 'Todo' | 'Doing' | 'Done')}
-                                                className="text-xs bg-white/5 border border-white/10 rounded px-2 py-0.5 text-white/60 hover:text-white focus:outline-none focus:ring-1 focus:ring-blue-500/50"
+                                                className="text-xs bg-white/5 border border-white/10 rounded px-2 py-1 text-white/60 hover:text-white focus:outline-none focus:ring-1 focus:ring-blue-500/50"
                                                 onClick={(e) => e.stopPropagation()}
                                             >
                                                 <option value="Todo" className="bg-gray-900">{t.tasks.todo}</option>
                                                 <option value="Doing" className="bg-gray-900">{t.tasks.doing}</option>
                                                 <option value="Done" className="bg-gray-900">{t.tasks.done}</option>
                                             </select>
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    handleToggleReminder(task.id, task.alert_interval);
+                                                }}
+                                                className={cn(
+                                                    "text-xs rounded-lg px-2.5 py-1 transition-all flex items-center gap-1.5 font-medium",
+                                                    isReminderActive(task.alert_interval)
+                                                        ? "bg-yellow-500/20 border border-yellow-500/50 text-yellow-300 hover:bg-yellow-500/30 shadow-lg shadow-yellow-500/10"
+                                                        : "bg-white/5 border border-white/20 text-white/50 hover:bg-white/10 hover:text-white/70 hover:border-white/30"
+                                                )}
+                                                title={isReminderActive(task.alert_interval) ? t.tasks.reminderOn : t.tasks.reminderOff}
+                                            >
+                                                <Bell className={cn("w-3.5 h-3.5", isReminderActive(task.alert_interval) && "animate-pulse")} />
+                                                <span>{isReminderActive(task.alert_interval) ? "Reminder" : "Set Reminder"}</span>
+                                            </button>
                                         </div>
                                     </div>
 

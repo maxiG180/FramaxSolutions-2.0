@@ -128,7 +128,7 @@ export function InvoiceList({ invoices, onAcceptQuote, onDeclineQuote, onDelete,
                                 </span>
                             </td>
                             <td className="p-4 text-right">
-                                <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <div className="flex items-center justify-end gap-2 opacity-60 group-hover:opacity-100 transition-opacity">
                                     {/* Editar - só para quotes em draft */}
                                     {invoice.type === "quote" && invoice.status === "draft" && onEdit && (
                                         <button

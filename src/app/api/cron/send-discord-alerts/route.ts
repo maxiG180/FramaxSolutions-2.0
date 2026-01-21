@@ -82,8 +82,8 @@ export async function GET(request: NextRequest) {
                 const diffHours = diffMs / (1000 * 60 * 60);
 
                 switch (task.alert_interval) {
-                    case '1h':
-                        shouldSend = diffHours >= 1;
+                    case '12h':
+                        shouldSend = diffHours >= 12;
                         break;
                     case '24h':
                         shouldSend = diffHours >= 24;

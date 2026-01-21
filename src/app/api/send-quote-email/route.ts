@@ -6,9 +6,8 @@ import { addCorsHeaders, handleCorsPreFlight } from '@/utils/cors';
 import { logger } from '@/utils/logger';
 import { z } from 'zod';
 import { validateRequest } from '@/utils/validation';
-import { generateQuotePDF } from '@/utils/generateQuotePDF';
-import fs from 'fs';
-import path from 'path';
+import { generateQuotePDFBufferFromHTML } from '@/utils/generateQuotePDFFromHTML.server';
+import { generateEmailTemplateHTML } from '@/utils/emailTemplate';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -28,122 +27,7 @@ const sendQuoteEmailSchema = z.object({
     type: z.enum(['quote', 'invoice']).optional().default('quote'),
 }).strict();
 
-/**
- * Generate email HTML template (based on booking email design)
- */
-function generateEmailTemplate(data: {
-    clientName: string;
-    documentNumber: string;
-    documentType: 'quote' | 'invoice';
-    validUntil?: string;
-}) {
-    const { clientName, documentNumber, documentType, validUntil } = data;
-    const isQuote = documentType === 'quote';
-    const docTypeLabel = isQuote ? 'Orçamento' : 'Fatura';
-    const brandBlue = '#2563eb';
-
-    return `
-<!DOCTYPE html>
-<html lang="pt-PT">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-</head>
-<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif; background-color: #fafafa;">
-    <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #fafafa;">
-        <tr>
-            <td style="padding: 50px 20px;">
-                <table width="100%" cellpadding="0" cellspacing="0" style="max-width: 560px; margin: 0 auto; background-color: #ffffff;">
-
-                    <!-- Header with Logo -->
-                    <tr>
-                        <td style="padding: 56px 40px 32px 40px;">
-                        <img src="https://www.framaxsolutions.com/logos/framax-logo-black.png" 
-                             alt="Framax Solutions" 
-                             width="260" 
-                             style="max-width: 260px; height: auto; margin-bottom: 32px; display: block;" />
-                            <h1 style="margin: 0 0 40px 0; font-size: 28px; font-weight: 400; color: ${brandBlue}; line-height: 1.3; letter-spacing: -0.3px;">${docTypeLabel} ${documentNumber}</h1>
-                        </td>
-                    </tr>
-
-                    <!-- Content -->
-                    <tr>
-                        <td style="padding: 0 40px 40px 40px;">
-                            <p style="margin: 0 0 24px 0; font-size: 16px; color: #1a1a1a; line-height: 1.5;">
-                                Olá ${clientName},
-                            </p>
-
-                            <p style="margin: 0 0 32px 0; font-size: 16px; color: #404040; line-height: 1.6;">
-                                ${isQuote
-            ? 'Segue em anexo o orçamento solicitado. Ficamos à disposição para qualquer esclarecimento.'
-            : 'Segue em anexo a fatura referente aos serviços prestados.'}
-                            </p>
-
-                            <!-- Document Info Block -->
-                            <table width="100%" cellpadding="0" cellspacing="0" style="margin: 0 0 32px 0; border-left: 3px solid ${brandBlue}; background-color: #fafafa;">
-                                <tr>
-                                    <td style="padding: 28px 24px;">
-                                        <table width="100%" cellpadding="0" cellspacing="0">
-                                            <tr>
-                                                <td style="padding-bottom: 14px;">
-                                                    <p style="margin: 0 0 2px 0; font-size: 12px; color: #737373; letter-spacing: 0.8px;">DOCUMENTO</p>
-                                                    <p style="margin: 0; font-size: 15px; color: ${brandBlue}; font-weight: 500;">${documentNumber}</p>
-                                                </td>
-                                            </tr>
-                                            ${validUntil ? `
-                                            <tr>
-                                                <td>
-                                                    <p style="margin: 0 0 2px 0; font-size: 12px; color: #737373; letter-spacing: 0.8px;">VÁLIDO ATÉ</p>
-                                                    <p style="margin: 0; font-size: 15px; color: ${brandBlue}; font-weight: 500;">${new Date(validUntil).toLocaleDateString('pt-PT', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
-                                                </td>
-                                            </tr>
-                                            ` : ''}
-                                        </table>
-                                    </td>
-                                </tr>
-                            </table>
-
-                            <p style="margin: 0 0 20px 0; font-size: 15px; color: #595959; line-height: 1.6;">
-                                O documento encontra-se em anexo neste email.
-                            </p>
-
-                            ${isQuote ? `
-                            <p style="margin: 0 0 32px 0; font-size: 15px; color: #737373; line-height: 1.6; font-style: italic;">
-                                P.S. Para aceitar o orçamento ou esclarecer qualquer dúvida, é só responder a este email.
-                            </p>
-                            ` : `
-                            <p style="margin: 0 0 32px 0; font-size: 15px; color: #737373; line-height: 1.6; font-style: italic;">
-                                P.S. Se tiver alguma questão, não hesite em contactar-nos.
-                            </p>
-                            `}
-
-                            <!-- Separator -->
-                            <div style="height: 1px; background-color: #e5e5e5; margin: 40px 0;"></div>
-
-                            <!-- Signature -->
-                            <p style="margin: 0 0 4px 0; font-size: 15px; color: ${brandBlue}; font-weight: 500;">
-                                Framax Solutions
-                            </p>
-                            <p style="margin: 0; font-size: 14px; color: #737373;">
-                                <a href="https://framaxsolutions.com" style="color: ${brandBlue}; text-decoration: none;">framaxsolutions.com</a>
-                            </p>
-                        </td>
-                    </tr>
-
-                    <!-- Footer -->
-                    <tr>
-                        <td style="padding: 32px 40px; background-color: #fafafa; border-top: 1px solid #e5e5e5;">
-                            <p style="margin: 0; font-size: 12px; color: #a3a3a3;">© 2026 Framax Solutions</p>
-                        </td>
-                    </tr>
-                </table>
-            </td>
-        </tr>
-    </table>
-</body>
-</html>
-    `;
-}
+// Email template is now imported from shared utility
 
 /**
  * Send quote or invoice via email
@@ -222,41 +106,60 @@ export async function POST(request: NextRequest) {
             return addCorsHeaders(response, request);
         }
 
-        // 6. Generate email HTML
-        const emailHtml = generateEmailTemplate({
+        // 6. Generate email HTML using shared template
+        const emailHtml = generateEmailTemplateHTML({
             clientName: document.client_name,
             documentNumber: document[numberField],
             documentType: type,
             validUntil: type === 'quote' ? document.expiry_date : undefined,
         });
 
-        // 6.5. Generate PDF using the same function as QuoteModal
+        // 6.5. Generate PDF using HTML template (ensures consistency with preview)
         try {
-            // Load logo from file system (server-side)
-            const logoPath = path.join(process.cwd(), 'public', 'logos', 'framax-logo-black.png');
-            let logoUrl: string | undefined;
+            // Prepare data for PDF generation
+            const pdfData = {
+                quote_number: type === 'quote' ? document.quote_number : undefined,
+                invoice_number: type === 'invoice' ? document.invoice_number : undefined,
+                client_name: document.client_name,
+                client_contact: document.client_contact,
+                client_email: document.client_email,
+                client_phone: document.client_phone,
+                client_address: document.client_address,
+                client_nif: document.client_nif,
+                quote_date: type === 'quote' ? document.quote_date : undefined,
+                invoice_date: type === 'invoice' ? document.invoice_date : undefined,
+                expiry_date: document.expiry_date,
+                items: document.items || [],
+                subtotal: document.subtotal || 0,
+                tax_rate: document.tax_rate || 0.23,
+                tax_amount: document.tax_amount || 0,
+                total: document.total || 0,
+                notes: document.notes,
+                currency: document.currency || 'EUR'
+            };
 
-            if (fs.existsSync(logoPath)) {
-                logoUrl = `file://${logoPath}`;
-            }
-
-            // Load font from file system (server-side)
-            const fontPath = path.join(process.cwd(), 'public', 'fonts', 'Outfit-Regular.ttf');
-            let fontBase64: string | undefined;
-
-            if (fs.existsSync(fontPath)) {
-                const fontBuffer = fs.readFileSync(fontPath);
-                fontBase64 = fontBuffer.toString('base64');
-            }
-
-            // Generate PDF with logo and custom font
-            const pdfDoc = await generateQuotePDF(document, {
+            // Generate PDF from HTML template (same as preview)
+            const pdfBuffer = await generateQuotePDFBufferFromHTML(pdfData, {
                 type,
-                logoUrl,
-                fontBase64,
+                translations: {
+                    quote: 'ORÇAMENTO',
+                    invoice: 'FATURA',
+                    quoteNumber: 'Número de Orçamento',
+                    invoiceNumber: 'Número de Fatura',
+                    billTo: 'Faturar a',
+                    issueDate: 'Data de Emissão',
+                    validity: 'Validade',
+                    description: 'Descrição',
+                    qty: 'Qtd',
+                    price: 'Preço',
+                    total: 'Total',
+                    subtotal: 'Subtotal',
+                    tax: 'IVA',
+                    notesTerms: 'Notas / Termos',
+                    legalNote: 'Este orçamento não constitui fatura. Após aceitação, será emitida fatura oficial através do Portal das Finanças.',
+                    nif: 'NIF',
+                }
             });
-
-            const pdfBuffer = Buffer.from(pdfDoc.output('arraybuffer'));
 
             // 7. Send email with PDF attachment
             const { data: emailData, error: emailError } = await resend.emails.send({

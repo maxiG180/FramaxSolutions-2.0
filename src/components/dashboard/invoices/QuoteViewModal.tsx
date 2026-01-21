@@ -1,10 +1,11 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { X, ZoomIn, ZoomOut } from "lucide-react";
+import { X, ZoomIn, ZoomOut, Download, Edit } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLanguage } from "@/context/LanguageContext";
-import Image from "next/image";
+import { QuoteTemplate } from "@/components/shared/QuoteTemplate";
+import { QuotePDFData } from "@/utils/generateQuotePDF";
 
 interface QuoteViewModalProps {
     isOpen: boolean;
@@ -48,13 +49,25 @@ export function QuoteViewModal({ isOpen, onClose, quoteId, onEdit, onDownload, o
 
     if (!isOpen) return null;
 
-    const formatCurrency = (amount: number) => {
-        return new Intl.NumberFormat('pt-PT', { style: 'currency', currency: 'EUR' }).format(amount);
-    };
-
-    const subtotal = quote?.subtotal || 0;
-    const tax = quote?.tax_amount || 0;
-    const total = quote?.total || 0;
+    // Prepare quote data for template
+    const quoteData: QuotePDFData | null = quote ? {
+        quote_number: quote.quote_number,
+        client_name: quote.client_name,
+        client_contact: quote.client_contact,
+        client_email: quote.client_email,
+        client_phone: quote.client_phone,
+        client_address: quote.client_address,
+        client_nif: quote.client_nif,
+        quote_date: quote.quote_date,
+        expiry_date: quote.expiry_date,
+        items: quote.items || [],
+        subtotal: quote.subtotal || 0,
+        tax_rate: quote.tax_rate || 0.23,
+        tax_amount: quote.tax_amount || 0,
+        total: quote.total || 0,
+        notes: quote.notes,
+        currency: quote.currency || 'EUR'
+    } : null;
 
     const handleZoomIn = () => {
         setZoom(prev => Math.min(prev + 10, 200));
@@ -81,6 +94,36 @@ export function QuoteViewModal({ isOpen, onClose, quoteId, onEdit, onDownload, o
                         </h2>
 
                         <div className="flex items-center gap-3">
+                            {/* Action Buttons */}
+                            {quoteId && quote?.status === "draft" && onEdit && (
+                                <button
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        onEdit(quoteId);
+                                        onClose();
+                                    }}
+                                    className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-sm font-medium transition-colors"
+                                    title={t.invoices?.editQuote || "Editar"}
+                                >
+                                    <Edit className="w-4 h-4" />
+                                    {t.invoices?.editQuote || "Editar"}
+                                </button>
+                            )}
+
+                            {quoteId && onDownload && (
+                                <button
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        onDownload(quoteId);
+                                    }}
+                                    className="flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg text-sm font-medium transition-colors"
+                                    title={t.invoices?.downloadPdf || "Download PDF"}
+                                >
+                                    <Download className="w-4 h-4" />
+                                    {t.invoices?.downloadPdf || "Download"}
+                                </button>
+                            )}
+
                             {/* Zoom Controls */}
                             <div className="flex items-center gap-2 px-3 py-2 bg-white/10 rounded-lg">
                                 <button
@@ -130,126 +173,37 @@ export function QuoteViewModal({ isOpen, onClose, quoteId, onEdit, onDownload, o
                                     <p className="text-white/60">{t.quoteModal.loading}</p>
                                 </div>
                             </div>
-                        ) : quote ? (
+                        ) : quoteData ? (
                             <div className="min-h-full py-8 flex justify-center items-start">
                                 <div
-                                    className="bg-white text-black shadow-2xl transition-transform duration-200 flex flex-col"
+                                    className="shadow-2xl transition-transform duration-200"
                                     style={{
-                                        width: '210mm',
-                                        minHeight: '297mm',
                                         transform: `scale(${zoom / 100})`,
                                         transformOrigin: 'top center'
                                     }}
                                 >
-                                    <div className="p-12 flex flex-col relative" style={{ minHeight: '297mm' }}>
-                                        {/* Header */}
-                                        <div className="flex justify-between items-start mb-12">
-                                            <div className="w-48">
-                                                {/* Logo */}
-                                                <div className="relative w-full h-16 mb-4">
-                                                    <Image
-                                                        src="/logos/framax-logo-black.png"
-                                                        alt="Framax Solutions"
-                                                        fill
-                                                        className="object-contain object-left"
-                                                        priority
-                                                    />
-                                                </div>
-                                                <div className="text-xs text-gray-500 space-y-1">
-                                                    <p className="font-bold text-gray-900">Framax Solutions</p>
-                                                    <p>contact@framaxsolutions.com</p>
-                                                    <p>framaxsolutions.com</p>
-                                                </div>
-                                            </div>
-                                            <div className="text-right">
-                                                <h1 className="text-4xl font-light text-blue-600 mb-2">{t.quoteModal.quote.toUpperCase()}</h1>
-                                                <p className="text-gray-500 font-medium text-sm uppercase tracking-wide">{t.quoteModal.quoteNumber}</p>
-                                                <p className="text-gray-700 font-bold text-lg">{quote.quote_number}</p>
-                                            </div>
-                                        </div>
-
-                                        {/* Info Grid */}
-                                        <div className="flex justify-between mb-12">
-                                            <div>
-                                                <p className="text-xs font-bold text-gray-400 uppercase mb-2">{t.quoteModal.billTo}</p>
-                                                <div className="text-sm text-gray-800 space-y-1">
-                                                    <p className="font-bold text-base">{quote.client_name}</p>
-                                                    {quote.client_contact && <p className="font-medium">{quote.client_contact}</p>}
-                                                    {quote.client_address && quote.client_address.split('\n').map((line: string, i: number) => <p key={i}>{line}</p>)}
-                                                    {quote.client_email && <p className="text-blue-600">{quote.client_email}</p>}
-                                                    {quote.client_phone && <p className="text-gray-600">{quote.client_phone}</p>}
-                                                    {quote.client_nif && <p className="text-gray-600"><span className="font-medium">{t.quoteModal.nif}:</span> {quote.client_nif}</p>}
-                                                </div>
-                                            </div>
-                                            <div className="text-right space-y-4">
-                                                <div>
-                                                    <p className="text-xs font-bold text-gray-400 uppercase mb-1">{t.quoteModal.issueDate}</p>
-                                                    <p className="text-sm font-medium">{new Date(quote.quote_date).toLocaleDateString('pt-PT')}</p>
-                                                </div>
-                                                {quote.expiry_date && (
-                                                    <div>
-                                                        <p className="text-xs font-bold text-gray-400 uppercase mb-1">{t.quoteModal.validity}</p>
-                                                        <p className="text-sm font-medium">{new Date(quote.expiry_date).toLocaleDateString('pt-PT')}</p>
-                                                    </div>
-                                                )}
-                                            </div>
-                                        </div>
-
-                                        {/* Items Table */}
-                                        <div className="mb-8">
-                                            <div className="border-b-2 border-blue-600 pb-2 mb-4 flex text-xs font-bold text-gray-400 uppercase">
-                                                <div className="flex-1">{t.quoteModal.description}</div>
-                                                <div className="w-20 text-center">{t.quoteModal.qty}</div>
-                                                <div className="w-32 text-right">{t.quoteModal.price}</div>
-                                                <div className="w-32 text-right">{t.quoteModal.total}</div>
-                                            </div>
-                                            <div className="space-y-4">
-                                                {(quote.items || []).map((item: any, index: number) => (
-                                                    <div key={index} className="flex text-sm text-gray-800 border-b border-gray-100 pb-4 last:border-0">
-                                                        <div className="flex-1">
-                                                            <p className="font-medium">{item.description}</p>
-                                                        </div>
-                                                        <div className="w-20 text-center text-gray-500">{item.quantity}</div>
-                                                        <div className="w-32 text-right text-gray-500">{formatCurrency(item.price)}</div>
-                                                        <div className="w-32 text-right font-medium">{formatCurrency(item.quantity * item.price)}</div>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        </div>
-
-                                        {/* Totals */}
-                                        <div className="flex justify-end mb-12">
-                                            <div className="w-64 space-y-2">
-                                                <div className="flex justify-between text-sm text-gray-500">
-                                                    <span>{t.quoteModal.subtotal}</span>
-                                                    <span>{formatCurrency(subtotal)}</span>
-                                                </div>
-                                                <div className="flex justify-between text-sm text-gray-500">
-                                                    <span>{t.quoteModal.tax} (23%)</span>
-                                                    <span>{formatCurrency(tax)}</span>
-                                                </div>
-                                                <div className="border-t border-gray-200 pt-2 flex justify-between text-lg font-bold text-blue-600">
-                                                    <span>{t.quoteModal.total}</span>
-                                                    <span>{formatCurrency(total)}</span>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        {/* Notes */}
-                                        {quote.notes && (
-                                            <div className="pt-8 border-t border-gray-100">
-                                                <p className="text-xs font-bold text-gray-400 uppercase mb-2">{t.quoteModal.notesTerms}</p>
-                                                <p className="text-sm text-gray-600 whitespace-pre-wrap">{quote.notes}</p>
-                                            </div>
-                                        )}
-
-                                        {/* Footer */}
-                                        <div className="mt-auto pt-8 border-t border-gray-200 text-center">
-                                            <p className="text-xs text-gray-500 italic">
-                                                {t.quoteModal.legalNote}
-                                            </p>
-                                        </div>
-                                    </div>
+                                    <QuoteTemplate
+                                        data={quoteData}
+                                        type="quote"
+                                        translations={{
+                                            quote: t.quoteModal.quote,
+                                            invoice: t.invoices?.typeInvoice || 'Fatura',
+                                            quoteNumber: t.quoteModal.quoteNumber,
+                                            invoiceNumber: t.quoteModal.invoiceNumber || 'Número de Fatura',
+                                            billTo: t.quoteModal.billTo,
+                                            issueDate: t.quoteModal.issueDate,
+                                            validity: t.quoteModal.validity,
+                                            description: t.quoteModal.description,
+                                            qty: t.quoteModal.qty,
+                                            price: t.quoteModal.price,
+                                            total: t.quoteModal.total,
+                                            subtotal: t.quoteModal.subtotal,
+                                            tax: t.quoteModal.tax,
+                                            notesTerms: t.quoteModal.notesTerms,
+                                            legalNote: t.quoteModal.legalNote,
+                                            nif: t.quoteModal.nif
+                                        }}
+                                    />
                                 </div>
                             </div>
                         ) : null}

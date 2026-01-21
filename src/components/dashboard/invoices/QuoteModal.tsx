@@ -7,7 +7,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useClients, Client } from "@/hooks/useClients";
 import { Service } from "@/types/service";
 import { useLanguage } from "@/context/LanguageContext";
-import { generateQuotePDF, QuotePDFData } from '@/utils/generateQuotePDF';
+import { generateQuotePDFFromHTML } from '@/utils/generateQuotePDFFromHTML';
+import { QuotePDFData } from '@/utils/generateQuotePDF';
+import { EmailPreviewModal } from './EmailPreviewModal';
 
 interface QuoteItem {
     id: string;
@@ -47,8 +49,11 @@ export function QuoteModal({ isOpen, onClose, onQuoteSaved, editingQuoteId }: Qu
     const [notes, setNotes] = useState("");
     const [items, setItems] = useState<QuoteItem[]>([]);
     const [saving, setSaving] = useState(false);
+    const [sending, setSending] = useState(false);
     const [exporting, setExporting] = useState(false);
     const [saveError, setSaveError] = useState("");
+    const [showEmailConfirmation, setShowEmailConfirmation] = useState(false);
+    const [savedQuoteNumber, setSavedQuoteNumber] = useState<string | null>(null);
 
     const formatPhoneNumber = (value: string) => {
         if (!value) return '';
@@ -205,22 +210,6 @@ export function QuoteModal({ isOpen, onClose, onQuoteSaved, editingQuoteId }: Qu
         }
     }, [isOpen]);
 
-    // Close on click outside (kept as backup, though AnimatePresence usually handles this via overlay click)
-    useEffect(() => {
-        const handleClickOutside = (event: MouseEvent) => {
-            if (modalRef.current && !modalRef.current.contains(event.target as Node)) {
-                onClose();
-            }
-        };
-
-        if (isOpen) {
-            document.addEventListener("mousedown", handleClickOutside);
-        }
-        return () => {
-            document.removeEventListener("mousedown", handleClickOutside);
-        };
-    }, [isOpen, onClose]);
-
     const addItem = () => {
         setItems([...items, { id: Math.random().toString(36).substr(2, 9), description: "", quantity: 1, price: 0 }]);
     };
@@ -285,20 +274,35 @@ export function QuoteModal({ isOpen, onClose, onQuoteSaved, editingQuoteId }: Qu
     };
 
     const handleExportPDF = async () => {
+        // Validate required fields before exporting
+        setSaveError("");
+
+        if (!clientName.trim()) {
+            setSaveError(t.quoteModal.clientNameRequired);
+            // Scroll to top to show error
+            if (modalRef.current) {
+                const scrollContainer = modalRef.current.querySelector('.overflow-y-auto');
+                if (scrollContainer) {
+                    scrollContainer.scrollTop = 0;
+                }
+            }
+            return;
+        }
+
+        if (items.length === 0 || items.every(item => !item.description.trim())) {
+            setSaveError(t.quoteModal.itemRequired);
+            // Scroll to top to show error
+            if (modalRef.current) {
+                const scrollContainer = modalRef.current.querySelector('.overflow-y-auto');
+                if (scrollContainer) {
+                    scrollContainer.scrollTop = 0;
+                }
+            }
+            return;
+        }
+
         try {
-            // Validate required fields before exporting
-            if (!clientName.trim()) {
-                setSaveError(t.quoteModal.clientNameRequired);
-                return;
-            }
-
-            if (items.length === 0 || items.every(item => !item.description.trim())) {
-                setSaveError(t.quoteModal.itemRequired);
-                return;
-            }
-
             setExporting(true);
-            setSaveError("");
 
             // Generate temporary quote number for preview
             const tempQuoteNumber = `ORC-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 1000)).padStart(3, '0')}`;
@@ -327,28 +331,9 @@ export function QuoteModal({ isOpen, onClose, onQuoteSaved, editingQuoteId }: Qu
                 currency: 'EUR'
             };
 
-            // Try to load custom font
-            let fontBase64: string | undefined;
-            try {
-                const response = await fetch('/fonts/Outfit-Regular.ttf');
-                if (response.ok) {
-                    const fontBuffer = await response.arrayBuffer();
-                    const bytes = new Uint8Array(fontBuffer);
-                    let binary = '';
-                    for (let i = 0; i < bytes.byteLength; i++) {
-                        binary += String.fromCharCode(bytes[i]);
-                    }
-                    fontBase64 = btoa(binary);
-                }
-            } catch (err) {
-                console.error('Error loading font:', err);
-            }
-
-            // Generate PDF using shared function
-            const doc = await generateQuotePDF(pdfData, {
+            // Generate PDF from HTML template (same as preview and email)
+            const pdfBlob = await generateQuotePDFFromHTML(pdfData, {
                 type: 'quote',
-                logoUrl: '/logos/framax-logo-black.png',
-                fontBase64,
                 translations: {
                     quote: t.quoteModal.quote,
                     invoice: t.invoices.typeInvoice.toUpperCase(),
@@ -369,8 +354,16 @@ export function QuoteModal({ isOpen, onClose, onQuoteSaved, editingQuoteId }: Qu
                 }
             });
 
-            // Save PDF
-            doc.save(`Quote-${tempQuoteNumber}.pdf`);
+            // Download PDF
+            const fileName = `Quote-${tempQuoteNumber}.pdf`;
+            const url = URL.createObjectURL(pdfBlob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = fileName;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
 
             // Clear any errors
             setSaveError("");
@@ -382,21 +375,37 @@ export function QuoteModal({ isOpen, onClose, onQuoteSaved, editingQuoteId }: Qu
         }
     };
 
-    const handleSaveQuote = async () => {
+    const handleSaveOnly = async () => {
+        // Validate required fields first
+        setSaveError("");
+
+        if (!clientName.trim()) {
+            setSaveError(t.quoteModal.clientNameRequired);
+            // Scroll to top to show error
+            if (modalRef.current) {
+                const scrollContainer = modalRef.current.querySelector('.overflow-y-auto');
+                if (scrollContainer) {
+                    scrollContainer.scrollTop = 0;
+                }
+            }
+            return;
+        }
+
+        if (items.length === 0 || items.every(item => !item.description.trim())) {
+            setSaveError(t.quoteModal.itemRequired);
+            // Scroll to top to show error
+            if (modalRef.current) {
+                const scrollContainer = modalRef.current.querySelector('.overflow-y-auto');
+                if (scrollContainer) {
+                    scrollContainer.scrollTop = 0;
+                }
+            }
+            return;
+        }
+
         try {
             setSaving(true);
             setSaveError("");
-
-            // Validate required fields
-            if (!clientName.trim()) {
-                setSaveError(t.quoteModal.clientNameRequired);
-                return;
-            }
-
-            if (items.length === 0 || items.every(item => !item.description.trim())) {
-                setSaveError(t.quoteModal.itemRequired);
-                return;
-            }
 
             const url = isEditMode && editingQuoteId
                 ? `/api/quotes/${editingQuoteId}`
@@ -429,14 +438,12 @@ export function QuoteModal({ isOpen, onClose, onQuoteSaved, editingQuoteId }: Qu
                 throw new Error(errorData.error || 'Failed to save quote');
             }
 
-            const savedQuote = await response.json();
-
             // Call the callback if provided
             if (onQuoteSaved) {
                 onQuoteSaved();
             }
 
-            // Close the modal
+            // Close the main modal
             onClose();
 
             // Reset form
@@ -449,24 +456,174 @@ export function QuoteModal({ isOpen, onClose, onQuoteSaved, editingQuoteId }: Qu
         }
     };
 
+    const handleSaveAndSendClick = () => {
+        // Validate required fields first
+        setSaveError("");
+
+        if (!clientName.trim()) {
+            setSaveError(t.quoteModal.clientNameRequired);
+            // Scroll to top to show error
+            if (modalRef.current) {
+                const scrollContainer = modalRef.current.querySelector('.overflow-y-auto');
+                if (scrollContainer) {
+                    scrollContainer.scrollTop = 0;
+                }
+            }
+            return;
+        }
+
+        if (items.length === 0 || items.every(item => !item.description.trim())) {
+            setSaveError(t.quoteModal.itemRequired);
+            // Scroll to top to show error
+            if (modalRef.current) {
+                const scrollContainer = modalRef.current.querySelector('.overflow-y-auto');
+                if (scrollContainer) {
+                    scrollContainer.scrollTop = 0;
+                }
+            }
+            return;
+        }
+
+        // Check if email is provided
+        if (!clientEmail.trim()) {
+            setSaveError(t.quoteModal.emailRequired || "Email do cliente é obrigatório para enviar");
+            // Scroll to top to show error
+            if (modalRef.current) {
+                const scrollContainer = modalRef.current.querySelector('.overflow-y-auto');
+                if (scrollContainer) {
+                    scrollContainer.scrollTop = 0;
+                }
+            }
+            return;
+        }
+
+        // Show email modal immediately for smooth transition
+        setShowEmailConfirmation(true);
+    };
+
+    const handleEmailConfirm = async (emailData: { email: string }) => {
+        try {
+            setSending(true);
+            setSaveError("");
+
+            const url = isEditMode && editingQuoteId
+                ? `/api/quotes/${editingQuoteId}`
+                : '/api/quotes';
+
+            const method = isEditMode ? 'PUT' : 'POST';
+
+            const response = await fetch(url, {
+                method,
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    clientName,
+                    clientEmail: emailData.email,
+                    clientPhone,
+                    clientContact,
+                    clientAddress,
+                    clientNif,
+                    quoteDate,
+                    expiryDate: expiryDate || null,
+                    items,
+                    notes,
+                    taxRate
+                }),
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Failed to save quote');
+            }
+
+            const savedQuote = await response.json();
+            setSavedQuoteNumber(savedQuote.quote_number);
+
+            // Send the email
+            try {
+                const emailResponse = await fetch('/api/send-quote-email', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        id: savedQuote.id,
+                        type: 'quote'
+                    }),
+                });
+
+                if (!emailResponse.ok) {
+                    const emailError = await emailResponse.json();
+                    throw new Error(emailError.error || 'Failed to send email');
+                }
+
+                // Email sent successfully
+                console.log('Email sent successfully');
+            } catch (emailErr: any) {
+                console.error('Error sending email:', emailErr);
+                // Show error but don't block the flow - quote was saved
+                setSaveError(`Orçamento guardado, mas erro ao enviar email: ${emailErr.message}`);
+            }
+
+            // Close the email confirmation modal
+            setShowEmailConfirmation(false);
+
+            // Call the callback if provided
+            if (onQuoteSaved) {
+                onQuoteSaved();
+            }
+
+            // Close the main modal
+            onClose();
+
+            // Reset form
+            resetForm();
+        } catch (err: any) {
+            console.error('Error saving quote:', err);
+            setSaveError(err.message || t.quoteModal.failedToSave);
+            setShowEmailConfirmation(false);
+        } finally {
+            setSending(false);
+        }
+    };
+
     return (
-        <AnimatePresence>
-            {isOpen && (
-                <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.2 }}
-                    className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
-                >
+        <>
+            {/* Persistent Backdrop */}
+            <AnimatePresence>
+                {isOpen && (
                     <motion.div
-                        ref={modalRef}
-                        initial={{ scale: 0.9, opacity: 0, y: 20 }}
-                        animate={{ scale: 1, opacity: 1, y: 0 }}
-                        exit={{ scale: 0.95, opacity: 0, y: 10 }}
-                        transition={{ type: "spring", duration: 0.4, bounce: 0.3 }}
-                        className="w-full max-w-7xl h-[90vh] bg-[#0A0A0A] border border-white/10 rounded-2xl shadow-2xl overflow-hidden flex flex-col md:flex-row"
+                        key="modal-backdrop"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.2 }}
+                        className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm"
+                        onClick={(e) => {
+                            if (!showEmailConfirmation) {
+                                onClose();
+                            }
+                        }}
+                    />
+                )}
+            </AnimatePresence>
+
+            {/* Quote Modal */}
+            <AnimatePresence mode="wait">
+                {isOpen && !showEmailConfirmation && (
+                    <motion.div
+                        key="quote-modal-container"
+                        className="fixed inset-0 z-[60] flex items-center justify-center p-4 pointer-events-none"
                     >
+                        <motion.div
+                            ref={modalRef}
+                            initial={{ x: 0 }}
+                            exit={{ x: '-100%', opacity: 0 }}
+                            transition={{ type: "spring", duration: 0.3, bounce: 0 }}
+                            className="w-full max-w-7xl h-[90vh] bg-[#0A0A0A] border border-white/10 rounded-2xl shadow-2xl overflow-hidden flex flex-col md:flex-row pointer-events-auto relative"
+                            onClick={(e) => e.stopPropagation()}
+                        >
                         {/* Left Side - Form Input */}
                         <div className="w-full md:w-1/2 p-6 overflow-y-auto border-b md:border-b-0 md:border-r border-white/10 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
                             {loading ? (
@@ -861,11 +1018,11 @@ export function QuoteModal({ isOpen, onClose, onQuoteSaved, editingQuoteId }: Qu
                     </motion.div>
 
                     {/* Actions Bar (Floating) */}
-                    <div className="absolute bottom-8 left-1/2 -translate-x-1/2 bg-[#1A1A1A] border border-white/10 px-6 py-3 rounded-full shadow-2xl flex items-center gap-4 z-50">
+                    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-[#1A1A1A] border border-white/10 px-6 py-3 rounded-full shadow-2xl flex items-center gap-3 z-[70] pointer-events-auto">
                         <button
                             onClick={handleExportPDF}
                             className="flex items-center gap-2 px-4 py-2 bg-white/5 hover:bg-white/10 text-white rounded-full text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                            disabled={saving || exporting}
+                            disabled={saving || sending || exporting}
                         >
                             {exporting ? (
                                 <>
@@ -875,15 +1032,15 @@ export function QuoteModal({ isOpen, onClose, onQuoteSaved, editingQuoteId }: Qu
                             ) : (
                                 <>
                                     <Download className="w-4 h-4" />
-                                    {t.quoteModal.exportPdf}
+                                    {t.quoteModal.download}
                                 </>
                             )}
                         </button>
                         <div className="w-px h-6 bg-white/10" />
                         <button
-                            onClick={handleSaveQuote}
-                            disabled={saving || exporting}
-                            className="flex items-center gap-2 px-6 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-full text-sm font-bold shadow-lg shadow-blue-500/20 transition-all hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                            onClick={handleSaveOnly}
+                            disabled={saving || sending || exporting}
+                            className="flex items-center gap-2 px-5 py-2 bg-white/5 hover:bg-white/10 text-white rounded-full text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             {saving ? (
                                 <>
@@ -892,14 +1049,47 @@ export function QuoteModal({ isOpen, onClose, onQuoteSaved, editingQuoteId }: Qu
                                 </>
                             ) : (
                                 <>
+                                    <FileText className="w-4 h-4" />
+                                    {t.quoteModal.save}
+                                </>
+                            )}
+                        </button>
+                        <div className="w-px h-6 bg-white/10" />
+                        <button
+                            onClick={handleSaveAndSendClick}
+                            disabled={saving || sending || exporting}
+                            className="flex items-center gap-2 px-6 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-full text-sm font-bold shadow-lg shadow-blue-500/20 transition-all hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                        >
+                            {sending ? (
+                                <>
+                                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                    {t.quoteModal.sending}
+                                </>
+                            ) : (
+                                <>
                                     <Send className="w-4 h-4" />
-                                    {t.quoteModal.saveSend}
+                                    {t.quoteModal.send}
                                 </>
                             )}
                         </button>
                     </div>
                 </motion.div>
             )}
-        </AnimatePresence>
+            </AnimatePresence>
+
+            {/* Email Preview Modal */}
+            <EmailPreviewModal
+                isOpen={showEmailConfirmation}
+                onClose={() => {
+                    setShowEmailConfirmation(false);
+                }}
+                onConfirm={handleEmailConfirm}
+                defaultEmail={clientEmail}
+                clientName={clientName}
+                quoteNumber={savedQuoteNumber || `ORC-${new Date().getFullYear()}-XXX`}
+                validUntil={expiryDate}
+                loading={sending}
+            />
+        </>
     );
 }

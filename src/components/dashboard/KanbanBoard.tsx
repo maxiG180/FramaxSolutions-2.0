@@ -1,9 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { Trash2 } from "lucide-react";
+import { Trash2, Bell } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { updateTaskStatus, deleteTask, updateTaskTitle, updateTaskAssignee } from "@/app/dashboard/todo/actions";
+import { updateTaskStatus, deleteTask, updateTaskTitle, updateTaskAssignee, updateTaskAlertInterval } from "@/app/dashboard/todo/actions";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/context/LanguageContext";
 
@@ -16,6 +16,8 @@ type Task = {
     created_at: string;
     assignee: string | null;
     tags: string[] | null;
+    alert_interval: string | null;
+    last_alert_sent_at: string | null;
 };
 
 type Profile = {
@@ -145,6 +147,27 @@ export default function KanbanBoard({ tasks, currentUser, profiles, onTasksChang
         }
     };
 
+    const isReminderActive = (alertInterval: string | null) => {
+        return alertInterval && alertInterval !== 'None';
+    };
+
+    const handleToggleReminder = async (taskId: number, currentInterval: string | null) => {
+        const newInterval = isReminderActive(currentInterval) ? 'None' : '12h';
+
+        // Optimistic update
+        const updatedTasks = tasks.map(t =>
+            t.id === taskId ? { ...t, alert_interval: newInterval } : t
+        );
+        onTasksChange(updatedTasks);
+
+        // Server update
+        const { success } = await updateTaskAlertInterval(taskId, newInterval);
+        if (!success) {
+            // Revert on failure
+            onTasksChange(tasks);
+        }
+    };
+
     return (
         <div className="overflow-x-auto pb-8 -mx-4 px-4">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 min-w-full md:min-w-0">
@@ -238,6 +261,22 @@ export default function KanbanBoard({ tasks, currentUser, profiles, onTasksChang
                                                             </option>
                                                         ))}
                                                     </select>
+                                                    <button
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            handleToggleReminder(task.id, task.alert_interval);
+                                                        }}
+                                                        className={cn(
+                                                            "text-xs rounded-lg px-2.5 py-1.5 transition-all flex items-center gap-1.5 font-medium whitespace-nowrap",
+                                                            isReminderActive(task.alert_interval)
+                                                                ? "bg-yellow-500/20 border border-yellow-500/50 text-yellow-300 hover:bg-yellow-500/30 shadow-lg shadow-yellow-500/10"
+                                                                : "bg-white/5 border border-white/20 text-white/50 hover:bg-white/10 hover:text-white/70 hover:border-white/30"
+                                                        )}
+                                                        title={isReminderActive(task.alert_interval) ? t.tasks.reminderOn : t.tasks.reminderOff}
+                                                    >
+                                                        <Bell className={cn("w-3.5 h-3.5", isReminderActive(task.alert_interval) && "animate-pulse")} />
+                                                        <span className="hidden sm:inline">{isReminderActive(task.alert_interval) ? "On" : "Off"}</span>
+                                                    </button>
                                                 </div>
                                             </div>
                                             <button

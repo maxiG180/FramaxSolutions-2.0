@@ -307,8 +307,12 @@ export interface Translation {
         addItem: string;
         notesTerms: string;
         exportPdf: string;
+        download: string;
+        save: string;
+        send: string;
         saveSend: string;
         saving: string;
+        sending: string;
         billTo: string;
         date: string;
         description: string;
@@ -344,6 +348,40 @@ export interface Translation {
         exporting: string;
         zoomIn: string;
         zoomOut: string;
+        emailRequired: string;
+    };
+    emailConfirmation: {
+        title: string;
+        subtitle: string;
+        emailLabel: string;
+        emailPlaceholder: string;
+        emailRequired: string;
+        invalidEmail: string;
+        previewLabel: string;
+        showFullPreview: string;
+        hidePreview: string;
+        attachmentInfo: string;
+        willBeSaved: string;
+        cancel: string;
+        confirm: string;
+        sending: string;
+    };
+    emailPreview: {
+        title: string;
+        subtitle: string;
+        recipient: string;
+        edit: string;
+        done: string;
+        emailDetails: string;
+        subject: string;
+        from: string;
+        attachment: string;
+        info: string;
+        footerNote: string;
+        cancel: string;
+        send: string;
+        sending: string;
+        back: string;
     };
     tasks: {
         allTasks: string;
@@ -362,5 +400,8 @@ export interface Translation {
         done: string;
         noTasks: string;
         assignedTo: string;
+        reminder: string;
+        reminderOn: string;
+        reminderOff: string;
     };
 }

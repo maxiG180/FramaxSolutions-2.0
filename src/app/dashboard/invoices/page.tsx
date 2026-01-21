@@ -217,7 +217,7 @@ export default function InvoicesPage() {
             }
 
             // Dynamic import to avoid SSR issues
-            const { generateQuotePDF } = await import('@/utils/generateQuotePDF');
+            const { generateQuotePDFFromHTML } = await import('@/utils/generateQuotePDFFromHTML');
 
             // Prepare data for PDF generation
             const pdfData = {
@@ -241,28 +241,9 @@ export default function InvoicesPage() {
                 currency: doc.rawData.currency || 'EUR'
             };
 
-            // Try to load custom font
-            let fontBase64: string | undefined;
-            try {
-                const response = await fetch('/fonts/Outfit-Regular.ttf');
-                if (response.ok) {
-                    const fontBuffer = await response.arrayBuffer();
-                    const bytes = new Uint8Array(fontBuffer);
-                    let binary = '';
-                    for (let i = 0; i < bytes.byteLength; i++) {
-                        binary += String.fromCharCode(bytes[i]);
-                    }
-                    fontBase64 = btoa(binary);
-                }
-            } catch (err) {
-                console.error('Error loading font:', err);
-            }
-
-            // Generate PDF
-            const pdfDoc = await generateQuotePDF(pdfData, {
+            // Generate PDF from HTML template (same as preview and email)
+            const pdfBlob = await generateQuotePDFFromHTML(pdfData, {
                 type: doc.type,
-                logoUrl: '/logos/framax-logo-black.png',
-                fontBase64,
                 translations: {
                     quote: t.invoices.typeQuote.toUpperCase(),
                     invoice: t.invoices.typeInvoice.toUpperCase(),
@@ -285,7 +266,14 @@ export default function InvoicesPage() {
 
             // Download the PDF
             const fileName = `${doc.displayId || id}.pdf`;
-            pdfDoc.save(fileName);
+            const url = URL.createObjectURL(pdfBlob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = fileName;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
         } catch (err: any) {
             console.error('PDF generation error:', err);
             alert(`Error: ${err.message}`);
