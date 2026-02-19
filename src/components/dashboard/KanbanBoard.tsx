@@ -169,12 +169,12 @@ export default function KanbanBoard({ tasks, currentUser, profiles, onTasksChang
     };
 
     return (
-        <div className="overflow-x-auto pb-8 -mx-4 px-4">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 min-w-full md:min-w-0">
+        <div className="h-full overflow-x-auto pb-8 -mx-4 px-4">
+            <div className="h-full grid grid-cols-1 md:grid-cols-3 gap-4 min-w-full md:min-w-0">
                 {columns.map((column) => (
                     <div
                         key={column.id}
-                        className="flex flex-col min-w-[85vw] md:min-w-0 min-h-[400px]"
+                        className="flex flex-col min-w-[85vw] md:min-w-0 md:h-full"
                         onDragOver={(e) => handleDragOver(e, column.id)}
                         onDragLeave={handleDragLeave}
                         onDrop={(e) => handleDrop(e, column.id)}
@@ -195,7 +195,7 @@ export default function KanbanBoard({ tasks, currentUser, profiles, onTasksChang
 
                         {/* Column Content */}
                         <div className={cn(
-                            "flex-1 p-4 border-2 border-t-0 rounded-b-xl space-y-3 min-h-[300px] max-h-[calc(100vh-300px)] overflow-y-auto transition-all scrollbar-thin",
+                            "flex-1 p-4 border-2 border-t-0 rounded-b-xl space-y-3 min-h-[300px] max-h-[calc(100vh-320px)] overflow-y-auto transition-all scrollbar-thin",
                             column.color,
                             draggedOverColumn === column.id && "bg-white/5 ring-2 ring-white/50"
                         )}>

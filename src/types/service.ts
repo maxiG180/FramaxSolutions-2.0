@@ -29,6 +29,8 @@ export interface Service {
   currency: string;
   user_id: string;
   category?: string | null;
+  icon?: string | null;
+  included_services?: Service[] | null; // Services included in this package
 }
 
 /**
@@ -43,6 +45,8 @@ export interface CreateServiceData {
   recurring_interval?: RecurringInterval | null;
   currency?: string;
   category?: string;
+  icon?: string;
+  included_service_ids?: string[]; // IDs of services to include in this package
 }
 
 /**
@@ -58,4 +62,6 @@ export interface UpdateServiceData {
   recurring_interval?: RecurringInterval | null;
   currency?: string;
   category?: string;
+  icon?: string;
+  included_service_ids?: string[]; // IDs of services to include in this package
 }

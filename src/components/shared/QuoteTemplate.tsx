@@ -17,6 +17,7 @@ interface QuoteTemplateProps {
         billTo: string;
         issueDate: string;
         validity: string;
+        dueDate: string;
         description: string;
         qty: string;
         price: string;
@@ -25,6 +26,7 @@ interface QuoteTemplateProps {
         tax: string;
         notesTerms: string;
         legalNote: string;
+        invoiceLegalNote: string;
         nif: string;
     };
     /** When true, uses img tag instead of Next.js Image (for PDF generation) */
@@ -112,13 +114,24 @@ export function QuoteTemplate({ data, type = 'quote', translations: t, useStatic
                                 {documentDate ? new Date(documentDate).toLocaleDateString('pt-PT') : '-'}
                             </p>
                         </div>
-                        {isQuote && data.expiry_date && (
-                            <div>
-                                <p className="text-xs font-bold text-gray-400 uppercase mb-1">{t.validity}</p>
-                                <p className="text-sm font-medium">
-                                    {new Date(data.expiry_date).toLocaleDateString('pt-PT')}
-                                </p>
-                            </div>
+                        {isQuote ? (
+                            data.expiry_date && (
+                                <div>
+                                    <p className="text-xs font-bold text-gray-400 uppercase mb-1">{t.validity}</p>
+                                    <p className="text-sm font-medium">
+                                        {new Date(data.expiry_date).toLocaleDateString('pt-PT')}
+                                    </p>
+                                </div>
+                            )
+                        ) : (
+                            (data as any).due_date && (
+                                <div>
+                                    <p className="text-xs font-bold text-gray-400 uppercase mb-1">{t.dueDate}</p>
+                                    <p className="text-sm font-medium">
+                                        {new Date((data as any).due_date).toLocaleDateString('pt-PT')}
+                                    </p>
+                                </div>
+                            )
                         )}
                     </div>
                 </div>
@@ -176,7 +189,7 @@ export function QuoteTemplate({ data, type = 'quote', translations: t, useStatic
                 {/* Footer */}
                 <div className="mt-auto pt-8 border-t border-gray-200 text-center">
                     <p className="text-xs text-gray-500 italic">
-                        {t.legalNote}
+                        {isQuote ? t.legalNote : t.invoiceLegalNote}
                     </p>
                 </div>
             </div>
@@ -311,12 +324,21 @@ export function generateQuoteTemplateHTML(
                         <p class="date-label">${t.issueDate}</p>
                         <p class="date-value">${documentDate ? new Date(documentDate).toLocaleDateString('pt-PT') : '-'}</p>
                     </div>
-                    ${isQuote && data.expiry_date ? `
-                    <div class="date-block">
-                        <p class="date-label">${t.validity}</p>
-                        <p class="date-value">${new Date(data.expiry_date).toLocaleDateString('pt-PT')}</p>
-                    </div>
-                    ` : ''}
+                    ${isQuote ? (
+                        data.expiry_date ? `
+                        <div class="date-block">
+                            <p class="date-label">${t.validity}</p>
+                            <p class="date-value">${new Date(data.expiry_date).toLocaleDateString('pt-PT')}</p>
+                        </div>
+                        ` : ''
+                    ) : (
+                        (data as any).due_date ? `
+                        <div class="date-block">
+                            <p class="date-label">${t.dueDate}</p>
+                            <p class="date-value">${new Date((data as any).due_date).toLocaleDateString('pt-PT')}</p>
+                        </div>
+                        ` : ''
+                    )}
                 </div>
             </div>
 
@@ -368,7 +390,7 @@ export function generateQuoteTemplateHTML(
 
             <!-- Footer -->
             <div class="footer">
-                <p>${t.legalNote}</p>
+                <p>${isQuote ? t.legalNote : t.invoiceLegalNote}</p>
             </div>
         </div>
     </div>

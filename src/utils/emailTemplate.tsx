@@ -9,17 +9,50 @@ interface EmailTemplateProps {
     documentType?: 'quote' | 'invoice';
     validUntil?: string;
     brandBlue?: string;
+    language?: 'pt' | 'en';
 }
+
+// Translation strings
+const translations = {
+    pt: {
+        quote: 'ORÇAMENTO',
+        invoice: 'FATURA',
+        dear: 'Caro(a)',
+        quoteMessage: 'Segue em anexo o orçamento solicitado. Ficamos à disposição para qualquer esclarecimento.',
+        invoiceMessage: 'Segue em anexo a fatura referente aos serviços prestados.',
+        document: 'DOCUMENTO',
+        validUntil: 'VÁLIDO ATÉ',
+        attachmentNote: 'O documento encontra-se em anexo neste email.',
+        quotePS: 'P.S. Para aceitar o orçamento ou esclarecer qualquer dúvida, é só responder a este email.',
+        invoicePS: 'P.S. Se tiver alguma questão, não hesite em contactar-nos.',
+        copyright: '© 2026 Framax Solutions'
+    },
+    en: {
+        quote: 'QUOTE',
+        invoice: 'INVOICE',
+        dear: 'Dear',
+        quoteMessage: 'Please find attached the requested quote. We remain at your disposal for any clarification.',
+        invoiceMessage: 'Please find attached the invoice for the services provided.',
+        document: 'DOCUMENT',
+        validUntil: 'VALID UNTIL',
+        attachmentNote: 'The document is attached to this email.',
+        quotePS: 'P.S. To accept the quote or clarify any questions, just reply to this email.',
+        invoicePS: 'P.S. If you have any questions, please do not hesitate to contact us.',
+        copyright: '© 2026 Framax Solutions'
+    }
+};
 
 export function EmailTemplatePreview({
     clientName,
     documentNumber,
     documentType = 'quote',
     validUntil,
-    brandBlue = '#2563eb'
+    brandBlue = '#2563eb',
+    language = 'pt'
 }: EmailTemplateProps) {
     const isQuote = documentType === 'quote';
-    const docTypeLabel = isQuote ? 'ORÇAMENTO' : 'FATURA';
+    const t = translations[language];
+    const docTypeLabel = isQuote ? t.quote : t.invoice;
 
     return (
         <div style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif', backgroundColor: '#fafafa', padding: '50px 20px' }}>
@@ -40,20 +73,18 @@ export function EmailTemplatePreview({
                 {/* Content */}
                 <div style={{ padding: '0 40px 40px 40px' }}>
                     <p style={{ margin: '0 0 24px 0', fontSize: '16px', color: '#1a1a1a', lineHeight: 1.5 }}>
-                        Caro(a) {clientName},
+                        {t.dear} {clientName},
                     </p>
 
                     <p style={{ margin: '0 0 32px 0', fontSize: '16px', color: '#404040', lineHeight: 1.6 }}>
-                        {isQuote
-                            ? 'Segue em anexo o orçamento solicitado. Ficamos à disposição para qualquer esclarecimento.'
-                            : 'Segue em anexo a fatura referente aos serviços prestados.'}
+                        {isQuote ? t.quoteMessage : t.invoiceMessage}
                     </p>
 
                     {/* Document Info Block */}
                     <div style={{ margin: '0 0 32px 0', borderLeft: `3px solid ${brandBlue}`, backgroundColor: '#fafafa', padding: '28px 24px' }}>
                         <div style={{ paddingBottom: validUntil ? '14px' : '0' }}>
                             <p style={{ margin: '0 0 2px 0', fontSize: '12px', color: '#737373', letterSpacing: '0.8px' }}>
-                                DOCUMENTO
+                                {t.document}
                             </p>
                             <p style={{ margin: '0', fontSize: '15px', color: brandBlue, fontWeight: 500 }}>
                                 {documentNumber}
@@ -62,23 +93,21 @@ export function EmailTemplatePreview({
                         {validUntil && (
                             <div>
                                 <p style={{ margin: '0 0 2px 0', fontSize: '12px', color: '#737373', letterSpacing: '0.8px' }}>
-                                    VÁLIDO ATÉ
+                                    {t.validUntil}
                                 </p>
                                 <p style={{ margin: '0', fontSize: '15px', color: brandBlue, fontWeight: 500 }}>
-                                    {new Date(validUntil).toLocaleDateString('pt-PT', { day: 'numeric', month: 'long', year: 'numeric' })}
+                                    {new Date(validUntil).toLocaleDateString(language === 'pt' ? 'pt-PT' : 'en-US', { day: 'numeric', month: 'long', year: 'numeric' })}
                                 </p>
                             </div>
                         )}
                     </div>
 
                     <p style={{ margin: '0 0 20px 0', fontSize: '15px', color: '#595959', lineHeight: 1.6 }}>
-                        O documento encontra-se em anexo neste email.
+                        {t.attachmentNote}
                     </p>
 
                     <p style={{ margin: '0 0 32px 0', fontSize: '15px', color: '#737373', lineHeight: 1.6, fontStyle: 'italic' }}>
-                        {isQuote
-                            ? 'P.S. Para aceitar o orçamento ou esclarecer qualquer dúvida, é só responder a este email.'
-                            : 'P.S. Se tiver alguma questão, não hesite em contactar-nos.'}
+                        {isQuote ? t.quotePS : t.invoicePS}
                     </p>
 
                     {/* Separator */}
@@ -98,7 +127,7 @@ export function EmailTemplatePreview({
                 {/* Footer */}
                 <div style={{ padding: '32px 40px', backgroundColor: '#fafafa', borderTop: '1px solid #e5e5e5' }}>
                     <p style={{ margin: '0', fontSize: '12px', color: '#a3a3a3' }}>
-                        © 2026 Framax Solutions
+                        {t.copyright}
                     </p>
                 </div>
             </div>
@@ -110,14 +139,16 @@ export function EmailTemplatePreview({
  * Generate HTML email template string for actual email sending
  */
 export function generateEmailTemplateHTML(data: EmailTemplateProps): string {
-    const { clientName, documentNumber, documentType = 'quote', validUntil } = data;
+    const { clientName, documentNumber, documentType = 'quote', validUntil, language = 'pt' } = data;
     const isQuote = documentType === 'quote';
-    const docTypeLabel = isQuote ? 'Orçamento' : 'Fatura';
+    const t = translations[language];
+    const docTypeLabel = isQuote ? t.quote : t.invoice;
     const brandBlue = '#2563eb';
+    const locale = language === 'pt' ? 'pt-PT' : 'en-US';
 
     return `
 <!DOCTYPE html>
-<html lang="pt-PT">
+<html lang="${locale}">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -143,13 +174,11 @@ export function generateEmailTemplateHTML(data: EmailTemplateProps): string {
                     <tr>
                         <td style="padding: 0 40px 40px 40px;">
                             <p style="margin: 0 0 24px 0; font-size: 16px; color: #1a1a1a; line-height: 1.5;">
-                                Caro(a) ${clientName},
+                                ${t.dear} ${clientName},
                             </p>
 
                             <p style="margin: 0 0 32px 0; font-size: 16px; color: #404040; line-height: 1.6;">
-                                ${isQuote
-            ? 'Segue em anexo o orçamento solicitado. Ficamos à disposição para qualquer esclarecimento.'
-            : 'Segue em anexo a fatura referente aos serviços prestados.'}
+                                ${isQuote ? t.quoteMessage : t.invoiceMessage}
                             </p>
 
                             <!-- Document Info Block -->
@@ -159,15 +188,15 @@ export function generateEmailTemplateHTML(data: EmailTemplateProps): string {
                                         <table width="100%" cellpadding="0" cellspacing="0">
                                             <tr>
                                                 <td style="padding-bottom: ${validUntil ? '14px' : '0'};">
-                                                    <p style="margin: 0 0 2px 0; font-size: 12px; color: #737373; letter-spacing: 0.8px;">DOCUMENTO</p>
+                                                    <p style="margin: 0 0 2px 0; font-size: 12px; color: #737373; letter-spacing: 0.8px;">${t.document}</p>
                                                     <p style="margin: 0; font-size: 15px; color: ${brandBlue}; font-weight: 500;">${documentNumber}</p>
                                                 </td>
                                             </tr>
                                             ${validUntil ? `
                                             <tr>
                                                 <td>
-                                                    <p style="margin: 0 0 2px 0; font-size: 12px; color: #737373; letter-spacing: 0.8px;">VÁLIDO ATÉ</p>
-                                                    <p style="margin: 0; font-size: 15px; color: ${brandBlue}; font-weight: 500;">${new Date(validUntil).toLocaleDateString('pt-PT', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
+                                                    <p style="margin: 0 0 2px 0; font-size: 12px; color: #737373; letter-spacing: 0.8px;">${t.validUntil}</p>
+                                                    <p style="margin: 0; font-size: 15px; color: ${brandBlue}; font-weight: 500;">${new Date(validUntil).toLocaleDateString(locale, { day: 'numeric', month: 'long', year: 'numeric' })}</p>
                                                 </td>
                                             </tr>
                                             ` : ''}
@@ -177,18 +206,12 @@ export function generateEmailTemplateHTML(data: EmailTemplateProps): string {
                             </table>
 
                             <p style="margin: 0 0 20px 0; font-size: 15px; color: #595959; line-height: 1.6;">
-                                O documento encontra-se em anexo neste email.
+                                ${t.attachmentNote}
                             </p>
 
-                            ${isQuote ? `
                             <p style="margin: 0 0 32px 0; font-size: 15px; color: #737373; line-height: 1.6; font-style: italic;">
-                                P.S. Para aceitar o orçamento ou esclarecer qualquer dúvida, é só responder a este email.
+                                ${isQuote ? t.quotePS : t.invoicePS}
                             </p>
-                            ` : `
-                            <p style="margin: 0 0 32px 0; font-size: 15px; color: #737373; line-height: 1.6; font-style: italic;">
-                                P.S. Se tiver alguma questão, não hesite em contactar-nos.
-                            </p>
-                            `}
 
                             <!-- Separator -->
                             <div style="height: 1px; background-color: #e5e5e5; margin: 40px 0;"></div>
@@ -206,7 +229,7 @@ export function generateEmailTemplateHTML(data: EmailTemplateProps): string {
                     <!-- Footer -->
                     <tr>
                         <td style="padding: 32px 40px; background-color: #fafafa; border-top: 1px solid #e5e5e5;">
-                            <p style="margin: 0; font-size: 12px; color: #a3a3a3;">© 2026 Framax Solutions</p>
+                            <p style="margin: 0; font-size: 12px; color: #a3a3a3;">${t.copyright}</p>
                         </td>
                     </tr>
                 </table>

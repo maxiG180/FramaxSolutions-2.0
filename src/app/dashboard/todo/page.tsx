@@ -358,17 +358,19 @@ export default function TodoPage() {
 
             {/* Kanban Board View */}
             {viewMode === 'kanban' && (
-                <KanbanBoard
-                    tasks={filteredTasks}
-                    currentUser={currentUser}
-                    profiles={profiles}
-                    onTasksChange={setTasks}
-                />
+                <div className="flex-1 overflow-hidden">
+                    <KanbanBoard
+                        tasks={filteredTasks}
+                        currentUser={currentUser}
+                        profiles={profiles}
+                        onTasksChange={setTasks}
+                    />
+                </div>
             )}
 
             {/* List View */}
             {viewMode === 'list' && (
-                <div className="flex-1 overflow-y-auto space-y-6 pb-8">
+                <div className="flex-1 space-y-6 pb-8 overflow-y-auto scrollbar-thin">
                     {/* Doing Tasks - Highlighted */}
                     {doingTasks.length > 0 && (
                         <div className="space-y-2">

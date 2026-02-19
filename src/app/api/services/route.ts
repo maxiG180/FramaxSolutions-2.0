@@ -44,7 +44,7 @@ export async function GET(request: NextRequest) {
             return addCorsHeaders(response, request);
         }
 
-        // 3. Fetch services from database
+        // 3. Fetch services from database with included services
         const { data: services, error } = await supabase
             .from("services")
             .select('*')
@@ -59,13 +59,38 @@ export async function GET(request: NextRequest) {
             return addCorsHeaders(response, request);
         }
 
+        // 4. Fetch included services for each service
+        const servicesWithInclusions = await Promise.all(
+            (services || []).map(async (service) => {
+                const { data: inclusions } = await supabase
+                    .from('service_inclusions')
+                    .select('included_service_id')
+                    .eq('parent_service_id', service.id);
+
+                if (!inclusions || inclusions.length === 0) {
+                    return { ...service, included_services: [] };
+                }
+
+                const includedServiceIds = inclusions.map(inc => inc.included_service_id);
+                const { data: includedServices } = await supabase
+                    .from('services')
+                    .select('*')
+                    .in('id', includedServiceIds);
+
+                return {
+                    ...service,
+                    included_services: includedServices || []
+                };
+            })
+        );
+
         logger.logInfo('Services fetched successfully', {
             endpoint: '/api/services',
             userId: user.id,
-            count: services?.length || 0,
+            count: servicesWithInclusions?.length || 0,
         });
 
-        const response = NextResponse.json(services || []);
+        const response = NextResponse.json(servicesWithInclusions || []);
         return addCorsHeaders(response, request);
 
     } catch (error: any) {

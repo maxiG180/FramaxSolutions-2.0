@@ -22,12 +22,31 @@ const acceptQuoteSchema = z.object({
 }).strict();
 
 /**
- * Generate invoice number
+ * Generate sequential invoice number
  */
-function generateInvoiceNumber(): string {
+async function generateInvoiceNumber(supabase: any): Promise<string> {
     const year = new Date().getFullYear();
-    const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
-    return `FAT-${year}-${random}`;
+
+    // Get the last invoice number for the current year
+    const { data: lastInvoice } = await supabase
+        .from('invoices')
+        .select('invoice_number')
+        .like('invoice_number', `FAT-${year}-%`)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .single();
+
+    let nextNumber = 1;
+
+    if (lastInvoice?.invoice_number) {
+        // Extract the number from the last invoice (e.g., "FAT-2026-005" -> 5)
+        const lastNumber = parseInt(lastInvoice.invoice_number.split('-')[2], 10);
+        nextNumber = lastNumber + 1;
+    }
+
+    // Format with leading zeros (001, 002, etc.)
+    const formattedNumber = nextNumber.toString().padStart(3, '0');
+    return `FAT-${year}-${formattedNumber}`;
 }
 
 /**
@@ -108,12 +127,15 @@ export async function POST(request: NextRequest) {
             return addCorsHeaders(response, request);
         }
 
-        // 6. Generate unique invoice number
-        let invoiceNumber = generateInvoiceNumber();
+        // 6. Generate unique sequential invoice number with retry logic
+        let invoiceNumber: string | undefined;
         let attempts = 0;
         const maxAttempts = 10;
 
         while (attempts < maxAttempts) {
+            invoiceNumber = await generateInvoiceNumber(supabase);
+
+            // Check if this number already exists (race condition protection)
             const { data: existing } = await supabase
                 .from('invoices')
                 .select('invoice_number')
@@ -122,11 +144,12 @@ export async function POST(request: NextRequest) {
 
             if (!existing) break;
 
-            invoiceNumber = generateInvoiceNumber();
             attempts++;
+            // Small delay to avoid tight loop in case of conflicts
+            await new Promise(resolve => setTimeout(resolve, 100));
         }
 
-        if (attempts === maxAttempts) {
+        if (attempts === maxAttempts || !invoiceNumber) {
             const response = NextResponse.json(
                 { error: 'Failed to generate unique invoice number' },
                 { status: 500 }
@@ -147,6 +170,7 @@ export async function POST(request: NextRequest) {
                 client_contact: quote.client_contact,
                 client_address: quote.client_address,
                 client_nif: quote.client_nif,
+                client_language: quote.client_language || 'pt', // Preserve language preference
                 invoice_date: new Date().toISOString().split('T')[0], // Today's date
                 due_date: null, // Can be set later
                 items: quote.items,
@@ -156,7 +180,16 @@ export async function POST(request: NextRequest) {
                 total: quote.total,
                 currency: quote.currency || 'EUR', // Use quote currency or default to EUR
                 notes: quote.notes,
-                status: 'pending' // Invoice starts as pending payment
+                status: 'pending', // Invoice starts as pending payment
+                // Payment fields - null until payment is received
+                payment_method: null,
+                payment_date: null,
+                payment_reference: null,
+                payment_notes: null,
+                // Banking information - Framax Solutions defaults
+                bank_name: 'Millennium BCP',
+                iban: 'PT50 0033 0000 0000 0000 0000 0', // TODO: Replace with real IBAN
+                swift_bic: 'BCOMPTPL'
             })
             .select()
             .single();

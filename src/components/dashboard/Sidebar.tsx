@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { LayoutDashboard, Users, ShoppingBag, CreditCard, Settings, LogOut, Globe, FileText, CheckSquare, Folder, Target, Calendar, Briefcase, FolderKanban, ChevronDown, ChevronRight, BarChart3, PanelLeftClose, PanelLeftOpen, ReceiptText } from "lucide-react";
+import { LayoutDashboard, Users, ShoppingBag, CreditCard, Settings, LogOut, Globe, FileText, CheckSquare, Folder, Target, Calendar, Briefcase, FolderKanban, ChevronDown, ChevronRight, BarChart3, PanelLeftClose, PanelLeftOpen, ReceiptText, FileSignature } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/utils/supabase/client";
@@ -32,9 +32,9 @@ export function Sidebar({ isCollapsed, onToggle, isMobileOpen = false, onMobileC
     ];
 
     const FINANCE_ITEMS = [
+        { name: t.dashboard.menu.quotes, icon: FileSignature, href: "/dashboard/quotes" },
         { name: t.dashboard.menu.invoices, icon: ReceiptText, href: "/dashboard/invoices" },
         { name: t.dashboard.menu.payments, icon: CreditCard, href: "/dashboard/payments" },
-        { name: t.dashboard.menu.orders, icon: ShoppingBag, href: "/dashboard/orders" },
     ];
 
     const PRODUCTIVITY_ITEMS = [

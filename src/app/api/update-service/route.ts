@@ -2,7 +2,7 @@ import { createClient } from "@/utils/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
 import { rateLimit, RATE_LIMITS } from '@/utils/rate-limit';
 import { addCorsHeaders, handleCorsPreFlight } from '@/utils/cors';
-import { validateRequest, updateServiceSchema, sanitizeString } from '@/utils/validation';
+import { validateRequest, updateServiceSchema } from '@/utils/validation';
 import { logger } from '@/utils/logger';
 
 /**
@@ -64,16 +64,16 @@ export async function PUT(request: NextRequest) {
             return addCorsHeaders(response, request);
         }
 
-        const { id, title, description, billing_type, price_type, base_price, recurring_interval, currency, category } = validation.data;
+        const { id, title, description, billing_type, price_type, base_price, recurring_interval, currency, category, icon, included_service_ids } = validation.data;
 
-        // 4. Build update object with only provided fields
+        // 4. Build update object with only provided fields (React handles XSS protection when rendering)
         const updateData: any = {};
 
         if (title !== undefined) {
-            updateData.title = sanitizeString(title);
+            updateData.title = title;
         }
         if (description !== undefined) {
-            updateData.description = description ? sanitizeString(description) : null;
+            updateData.description = description || null;
         }
         if (billing_type !== undefined) {
             updateData.billing_type = billing_type;
@@ -91,7 +91,10 @@ export async function PUT(request: NextRequest) {
             updateData.currency = currency;
         }
         if (category !== undefined) {
-            updateData.category = category ? sanitizeString(category) : null;
+            updateData.category = category || null;
+        }
+        if (icon !== undefined) {
+            updateData.icon = icon || null;
         }
 
         // 5. Update service in database (RLS policies ensure user can only update their own services)
@@ -126,10 +129,41 @@ export async function PUT(request: NextRequest) {
             return addCorsHeaders(response, request);
         }
 
+        // 6. Update service inclusions if provided
+        if (included_service_ids !== undefined) {
+            // Delete existing inclusions
+            await supabase
+                .from('service_inclusions')
+                .delete()
+                .eq('parent_service_id', id);
+
+            // Insert new inclusions if any
+            if (included_service_ids.length > 0) {
+                const inclusions = included_service_ids.map(includedId => ({
+                    parent_service_id: id,
+                    included_service_id: includedId,
+                }));
+
+                const { error: inclusionError } = await supabase
+                    .from('service_inclusions')
+                    .insert(inclusions);
+
+                if (inclusionError) {
+                    logger.logApiError('/api/update-service', inclusionError, {
+                        userId: user.id,
+                        serviceId: id,
+                        message: 'Failed to update service inclusions'
+                    });
+                    // Don't fail the entire request, just log the error
+                }
+            }
+        }
+
         logger.logInfo('Service updated successfully', {
             endpoint: '/api/update-service',
             userId: user.id,
             serviceId: id,
+            includedServicesCount: included_service_ids?.length || 0,
         });
 
         const response = NextResponse.json(data);

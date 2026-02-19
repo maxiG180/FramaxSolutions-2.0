@@ -6,8 +6,10 @@ import { ServiceCard } from "@/components/dashboard/services/ServiceCard";
 import { ServiceModal } from "@/components/dashboard/services/ServiceModal";
 import { Plus } from "lucide-react";
 import { Service } from "@/types/service";
+import { useLanguage } from "@/context/LanguageContext";
 
 export default function ServicesPage() {
+    const { t } = useLanguage();
     const [mounted, setMounted] = useState(false);
     const [loading, setLoading] = useState(true);
     const [services, setServices] = useState<Service[]>([]);
@@ -64,7 +66,7 @@ export default function ServicesPage() {
 
     // Handle delete service
     const handleDeleteService = async (serviceId: string) => {
-        if (!confirm('Are you sure you want to delete this service?')) {
+        if (!confirm(t.services.deleteConfirm)) {
             return;
         }
 
@@ -108,15 +110,15 @@ export default function ServicesPage() {
         <div className="space-y-8">
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-3xl font-bold mb-2">Services</h1>
-                    <p className="text-white/60">Manage your agency's service offerings and pricing.</p>
+                    <h1 className="text-3xl font-bold mb-2">{t.services.title}</h1>
+                    <p className="text-white/60">{t.services.subtitle}</p>
                 </div>
                 <button
                     onClick={handleAddService}
                     className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-medium transition-all shadow-lg shadow-blue-500/20"
                 >
                     <Plus className="w-5 h-5" />
-                    Add New Service
+                    {t.services.addNewService}
                 </button>
             </div>
 
@@ -129,8 +131,8 @@ export default function ServicesPage() {
             {loading ? (
                 <Loader />
             ) : services.length === 0 ? (
-                <div className="text-center py-12">
-                    <p className="text-white/40">No services found. Create your first service to get started.</p>
+                <div className="flex items-center justify-center min-h-[60vh]">
+                    <p className="text-white/40 text-center">{t.services.noServices}</p>
                 </div>
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

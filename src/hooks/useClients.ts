@@ -12,6 +12,7 @@ export interface Client {
     contact_person?: string;
     country?: string;
     address?: string;
+    preferred_language?: 'pt' | 'en';
 }
 
 export function useClients() {

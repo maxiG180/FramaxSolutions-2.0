@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { X, Plus, Trash2, Download, Send, FileText, Calendar, User, MapPin, Hash, Package } from "lucide-react";
+import { X, Plus, Trash2, Download, Send, FileText, Calendar, User, MapPin, Hash, Package, ChevronDown } from "lucide-react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { useClients, Client } from "@/hooks/useClients";
@@ -10,6 +10,8 @@ import { useLanguage } from "@/context/LanguageContext";
 import { generateQuotePDFFromHTML } from '@/utils/generateQuotePDFFromHTML';
 import { QuotePDFData } from '@/utils/generateQuotePDF';
 import { EmailPreviewModal } from './EmailPreviewModal';
+import { pt } from '@/locales/pt';
+import { en } from '@/locales/en';
 
 interface QuoteItem {
     id: string;
@@ -27,15 +29,22 @@ interface QuoteModalProps {
 }
 
 export function QuoteModal({ isOpen, onClose, onQuoteSaved, editingQuoteId }: QuoteModalProps) {
-    const { t } = useLanguage();
+    const { t, language } = useLanguage();
     const [isEditMode, setIsEditMode] = useState(false);
     const [loading, setLoading] = useState(false);
+
+    // Helper function to get translations for specific language
+    const getTranslations = (lang: 'pt' | 'en') => {
+        return lang === 'pt' ? pt : en;
+    };
+
     const [clientName, setClientName] = useState("");
     const [clientContact, setClientContact] = useState("");
     const [clientEmail, setClientEmail] = useState("");
     const [clientPhone, setClientPhone] = useState("");
     const [clientAddress, setClientAddress] = useState("");
     const [clientNif, setClientNif] = useState("");
+    const [clientLanguage, setClientLanguage] = useState<'pt' | 'en'>(language as 'pt' | 'en');
     const [quoteDate, setQuoteDate] = useState(new Date().toISOString().split('T')[0]);
 
     // Calculate expiry date (30 days from today)
@@ -47,13 +56,17 @@ export function QuoteModal({ isOpen, onClose, onQuoteSaved, editingQuoteId }: Qu
 
     const [expiryDate, setExpiryDate] = useState(getExpiryDate(new Date().toISOString().split('T')[0]));
     const [notes, setNotes] = useState("");
-    const [items, setItems] = useState<QuoteItem[]>([]);
+    const [items, setItems] = useState<QuoteItem[]>([{ id: "1", description: "", quantity: 1, price: 0, serviceId: null }]);
     const [saving, setSaving] = useState(false);
     const [sending, setSending] = useState(false);
     const [exporting, setExporting] = useState(false);
     const [saveError, setSaveError] = useState("");
     const [showEmailConfirmation, setShowEmailConfirmation] = useState(false);
     const [savedQuoteNumber, setSavedQuoteNumber] = useState<string | null>(null);
+    const [isNotesExpanded, setIsNotesExpanded] = useState(false);
+    const [isClientDetailsExpanded, setIsClientDetailsExpanded] = useState(true);
+    const [isItemsExpanded, setIsItemsExpanded] = useState(false);
+    const [manuallyExpandedClient, setManuallyExpandedClient] = useState(false);
 
     const formatPhoneNumber = (value: string) => {
         if (!value) return '';
@@ -98,6 +111,23 @@ export function QuoteModal({ isOpen, onClose, onQuoteSaved, editingQuoteId }: Qu
         setClientPhone(formatPhoneNumber(input));
     };
 
+    // Check if essential client details are filled
+    const isClientDetailsFilled = () => {
+        return clientName.trim() !== '' && clientEmail.trim() !== '';
+    };
+
+    // Auto-collapse client details when filled
+    useEffect(() => {
+        if (isClientDetailsFilled() && isClientDetailsExpanded && !manuallyExpandedClient) {
+            // Add a small delay to make the collapse feel natural
+            const timer = setTimeout(() => {
+                setIsClientDetailsExpanded(false);
+                setIsItemsExpanded(true); // Expand items when client details collapse
+            }, 500);
+            return () => clearTimeout(timer);
+        }
+    }, [clientName, clientEmail, isClientDetailsExpanded, manuallyExpandedClient]);
+
     const { clients, loading: loadingClients } = useClients();
     const [showClientDropdown, setShowClientDropdown] = useState(false);
     const [clientSearch, setClientSearch] = useState("");
@@ -129,6 +159,7 @@ export function QuoteModal({ isOpen, onClose, onQuoteSaved, editingQuoteId }: Qu
                 setClientPhone(formatPhoneNumber(quote.client_phone || ""));
                 setClientAddress(quote.client_address || "");
                 setClientNif(quote.client_nif || "");
+                setClientLanguage(quote.client_language || language as 'pt' | 'en');
                 setQuoteDate(quote.quote_date || new Date().toISOString().split('T')[0]);
                 setExpiryDate(quote.expiry_date || getExpiryDate(quote.quote_date));
                 setNotes(quote.notes || "");
@@ -181,6 +212,11 @@ export function QuoteModal({ isOpen, onClose, onQuoteSaved, editingQuoteId }: Qu
         }
         setClientAddress(fullAddress);
 
+        // Load client's preferred language
+        if (client.preferred_language) {
+            setClientLanguage(client.preferred_language);
+        }
+
         setShowClientDropdown(false);
     };
 
@@ -190,12 +226,15 @@ export function QuoteModal({ isOpen, onClose, onQuoteSaved, editingQuoteId }: Qu
             setLoadingServices(true);
             const response = await fetch('/api/services');
             if (!response.ok) {
-                throw new Error('Failed to fetch services');
+                console.warn('Failed to fetch services, continuing without services list');
+                setServices([]);
+                return;
             }
             const data = await response.json();
-            setServices(data);
+            setServices(data || []);
         } catch (err) {
-            console.error('Error fetching services:', err);
+            console.warn('Error fetching services, continuing without services list:', err);
+            setServices([]);
         } finally {
             setLoadingServices(false);
         }
@@ -253,6 +292,9 @@ export function QuoteModal({ isOpen, onClose, onQuoteSaved, editingQuoteId }: Qu
     const tax = subtotal * taxRate;
     const total = subtotal + tax;
 
+    // Get preview translations based on clientLanguage
+    const previewT = getTranslations(clientLanguage);
+
     const formatCurrency = (amount: number) => {
         return new Intl.NumberFormat('pt-PT', { style: 'currency', currency: 'EUR' }).format(amount);
     };
@@ -264,13 +306,18 @@ export function QuoteModal({ isOpen, onClose, onQuoteSaved, editingQuoteId }: Qu
         setClientContact("");
         setClientAddress("");
         setClientNif("");
+        setClientLanguage(language as 'pt' | 'en');
         const newQuoteDate = new Date().toISOString().split('T')[0];
         setQuoteDate(newQuoteDate);
         setExpiryDate(getExpiryDate(newQuoteDate));
         setNotes("");
-        setItems([]);
+        setItems([{ id: "1", description: "", quantity: 1, price: 0, serviceId: null }]);
         setSaveError("");
         setIsEditMode(false);
+        setIsClientDetailsExpanded(true);
+        setIsNotesExpanded(false);
+        setIsItemsExpanded(false);
+        setManuallyExpandedClient(false);
     };
 
     const handleExportPDF = async () => {
@@ -331,26 +378,31 @@ export function QuoteModal({ isOpen, onClose, onQuoteSaved, editingQuoteId }: Qu
                 currency: 'EUR'
             };
 
+            // Get translations for the client's language
+            const clientTranslations = getTranslations(clientLanguage);
+
             // Generate PDF from HTML template (same as preview and email)
             const pdfBlob = await generateQuotePDFFromHTML(pdfData, {
                 type: 'quote',
                 translations: {
-                    quote: t.quoteModal.quote,
-                    invoice: t.invoices.typeInvoice.toUpperCase(),
-                    quoteNumber: t.quoteModal.quoteNumber,
-                    invoiceNumber: t.quoteModal.invoiceNumber,
-                    billTo: t.quoteModal.billTo,
-                    issueDate: t.quoteModal.issueDate,
-                    validity: t.quoteModal.validity,
-                    description: t.quoteModal.description,
-                    qty: t.quoteModal.qty,
-                    price: t.quoteModal.price,
-                    total: t.quoteModal.total,
-                    subtotal: t.quoteModal.subtotal,
-                    tax: t.quoteModal.tax,
-                    notesTerms: t.quoteModal.notesTerms,
-                    legalNote: t.quoteModal.legalNote,
-                    nif: t.quoteModal.nif
+                    quote: clientTranslations.quoteModal.quote,
+                    invoice: clientTranslations.invoices.typeInvoice.toUpperCase(),
+                    quoteNumber: clientTranslations.quoteModal.quoteNumber,
+                    invoiceNumber: clientTranslations.quoteModal.invoiceNumber,
+                    billTo: clientTranslations.quoteModal.billTo,
+                    issueDate: clientTranslations.quoteModal.issueDate,
+                    validity: clientTranslations.quoteModal.validity,
+                    dueDate: clientTranslations.quoteModal.dueDate,
+                    description: clientTranslations.quoteModal.description,
+                    qty: clientTranslations.quoteModal.qty,
+                    price: clientTranslations.quoteModal.price,
+                    total: clientTranslations.quoteModal.total,
+                    subtotal: clientTranslations.quoteModal.subtotal,
+                    tax: clientTranslations.quoteModal.tax,
+                    notesTerms: clientTranslations.quoteModal.notesTerms,
+                    legalNote: clientTranslations.quoteModal.legalNote,
+                    invoiceLegalNote: clientTranslations.quoteModal.invoiceLegalNote,
+                    nif: clientTranslations.quoteModal.nif
                 }
             });
 
@@ -425,6 +477,7 @@ export function QuoteModal({ isOpen, onClose, onQuoteSaved, editingQuoteId }: Qu
                     clientContact,
                     clientAddress,
                     clientNif,
+                    clientLanguage,
                     quoteDate,
                     expiryDate: expiryDate || null,
                     items,
@@ -655,9 +708,72 @@ export function QuoteModal({ isOpen, onClose, onQuoteSaved, editingQuoteId }: Qu
                                     </div>
                                 )}
 
+                                {/* Quote Details */}
+                                <div className="space-y-4">
+                                    <h3 className="text-sm font-medium text-white/40 uppercase tracking-wider">{t.quoteModal.quoteDetails}</h3>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div className="space-y-2">
+                                            <label className="text-sm text-white/60">{t.quoteModal.quoteDate}</label>
+                                            <div className="relative">
+                                                <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
+                                                <input
+                                                    type="date"
+                                                    value={quoteDate}
+                                                    onChange={(e) => {
+                                                        setQuoteDate(e.target.value);
+                                                        // Auto-update expiry date to 30 days after quote date
+                                                        setExpiryDate(getExpiryDate(e.target.value));
+                                                    }}
+                                                    className="w-full bg-white/5 border border-white/10 rounded-lg py-2 pl-10 pr-4 text-white placeholder-white/20 focus:outline-none focus:border-blue-500/50 transition-colors appearance-none"
+                                                />
+                                            </div>
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="text-sm text-white/60">{t.quoteModal.validUntil}</label>
+                                            <div className="relative">
+                                                <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
+                                                <input
+                                                    type="date"
+                                                    value={expiryDate}
+                                                    onChange={(e) => setExpiryDate(e.target.value)}
+                                                    className="w-full bg-white/5 border border-white/10 rounded-lg py-2 pl-10 pr-4 text-white placeholder-white/20 focus:outline-none focus:border-blue-500/50 transition-colors appearance-none"
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
                                 {/* Client Details */}
                                 <div className="space-y-4">
-                                    <h3 className="text-sm font-medium text-white/40 uppercase tracking-wider">{t.quoteModal.clientDetails}</h3>
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            const newState = !isClientDetailsExpanded;
+                                            setIsClientDetailsExpanded(newState);
+                                            if (newState && isClientDetailsFilled()) {
+                                                // User manually expanded, so disable auto-collapse
+                                                setManuallyExpandedClient(true);
+                                            }
+                                        }}
+                                        className="w-full flex items-center justify-between text-left"
+                                    >
+                                        <h3 className="text-sm font-medium text-white/40 uppercase tracking-wider">{t.quoteModal.clientDetails}</h3>
+                                        <motion.div
+                                            animate={{ rotate: isClientDetailsExpanded ? 180 : 0 }}
+                                            transition={{ duration: 0.2 }}
+                                        >
+                                            <ChevronDown className="w-4 h-4 text-white/40" />
+                                        </motion.div>
+                                    </button>
+                                    <AnimatePresence>
+                                        {isClientDetailsExpanded && (
+                                            <motion.div
+                                                initial={{ opacity: 0, height: 0 }}
+                                                animate={{ opacity: 1, height: "auto" }}
+                                                exit={{ opacity: 0, height: 0 }}
+                                                transition={{ duration: 0.2 }}
+                                                className="overflow-hidden"
+                                            >
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <div className="space-y-2">
                                             <label className="text-sm text-white/60">{t.quoteModal.clientName}</label>
@@ -754,47 +870,64 @@ export function QuoteModal({ isOpen, onClose, onQuoteSaved, editingQuoteId }: Qu
                                             />
                                         </div>
                                     </div>
-                                </div>
-
-                                {/* Quote Details */}
-                                <div className="space-y-4">
-                                    <h3 className="text-sm font-medium text-white/40 uppercase tracking-wider">{t.quoteModal.quoteDetails}</h3>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        <div className="space-y-2">
-                                            <label className="text-sm text-white/60">{t.quoteModal.quoteDate}</label>
-                                            <div className="relative">
-                                                <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
-                                                <input
-                                                    type="date"
-                                                    value={quoteDate}
-                                                    onChange={(e) => {
-                                                        setQuoteDate(e.target.value);
-                                                        // Auto-update expiry date to 30 days after quote date
-                                                        setExpiryDate(getExpiryDate(e.target.value));
-                                                    }}
-                                                    className="w-full bg-white/5 border border-white/10 rounded-lg py-2 pl-10 pr-4 text-white placeholder-white/20 focus:outline-none focus:border-blue-500/50 transition-colors appearance-none"
-                                                />
-                                            </div>
-                                        </div>
-                                        <div className="space-y-2">
-                                            <label className="text-sm text-white/60">{t.quoteModal.validUntil}</label>
-                                            <div className="relative">
-                                                <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
-                                                <input
-                                                    type="date"
-                                                    value={expiryDate}
-                                                    onChange={(e) => setExpiryDate(e.target.value)}
-                                                    className="w-full bg-white/5 border border-white/10 rounded-lg py-2 pl-10 pr-4 text-white placeholder-white/20 focus:outline-none focus:border-blue-500/50 transition-colors appearance-none"
-                                                />
-                                            </div>
+                                    <div className="space-y-2">
+                                        <label className="text-sm text-white/60">{t.quoteModal.preferredLanguage}</label>
+                                        <div className="grid grid-cols-2 gap-2">
+                                            <button
+                                                type="button"
+                                                onClick={() => setClientLanguage('pt')}
+                                                className={`py-2.5 px-4 rounded-lg text-sm font-medium transition-all ${
+                                                    clientLanguage === 'pt'
+                                                        ? 'bg-blue-500 text-white'
+                                                        : 'bg-white/5 border border-white/10 text-white/60 hover:bg-white/10'
+                                                }`}
+                                            >
+                                                {t.quoteModal.languagePortuguese}
+                                            </button>
+                                            <button
+                                                type="button"
+                                                onClick={() => setClientLanguage('en')}
+                                                className={`py-2.5 px-4 rounded-lg text-sm font-medium transition-all ${
+                                                    clientLanguage === 'en'
+                                                        ? 'bg-blue-500 text-white'
+                                                        : 'bg-white/5 border border-white/10 text-white/60 hover:bg-white/10'
+                                                }`}
+                                            >
+                                                {t.quoteModal.languageEnglish}
+                                            </button>
                                         </div>
                                     </div>
+                                            </motion.div>
+                                        )}
+                                    </AnimatePresence>
                                 </div>
 
                                 {/* Items */}
                                 <div className="space-y-4">
-                                    <div className="flex items-center justify-between">
+                                    <button
+                                        type="button"
+                                        onClick={() => setIsItemsExpanded(!isItemsExpanded)}
+                                        className="w-full flex items-center justify-between text-left"
+                                    >
                                         <h3 className="text-sm font-medium text-white/40 uppercase tracking-wider">{t.quoteModal.items}</h3>
+                                        <motion.div
+                                            animate={{ rotate: isItemsExpanded ? 180 : 0 }}
+                                            transition={{ duration: 0.2 }}
+                                        >
+                                            <ChevronDown className="w-4 h-4 text-white/40" />
+                                        </motion.div>
+                                    </button>
+                                    <AnimatePresence>
+                                        {isItemsExpanded && (
+                                            <motion.div
+                                                initial={{ opacity: 0, height: 0 }}
+                                                animate={{ opacity: 1, height: "auto" }}
+                                                exit={{ opacity: 0, height: 0 }}
+                                                transition={{ duration: 0.2 }}
+                                                className="overflow-hidden space-y-4"
+                                            >
+                                    <div className="flex items-center justify-between">
+                                        <span className="text-xs text-white/40">{items.length} {items.length === 1 ? 'item' : 'itens'}</span>
                                         <button
                                             onClick={addItem}
                                             className="text-xs flex items-center gap-1 text-blue-400 hover:text-blue-300 transition-colors font-medium"
@@ -884,17 +1017,44 @@ export function QuoteModal({ isOpen, onClose, onQuoteSaved, editingQuoteId }: Qu
                                             ))}
                                         </AnimatePresence>
                                     </div>
+                                            </motion.div>
+                                        )}
+                                    </AnimatePresence>
                                 </div>
 
                                 {/* Notes */}
-                                <div className="space-y-2">
-                                    <label className="text-sm text-white/60">{t.quoteModal.notesTerms}</label>
-                                    <textarea
-                                        value={notes}
-                                        onChange={(e) => setNotes(e.target.value)}
-                                        className="w-full bg-white/5 border border-white/10 rounded-lg py-2 px-4 text-white placeholder-white/20 focus:outline-none focus:border-blue-500/50 transition-colors resize-none h-24"
-                                        placeholder={t.quoteModal.notesPlaceholder}
-                                    />
+                                <div className="space-y-4">
+                                    <button
+                                        type="button"
+                                        onClick={() => setIsNotesExpanded(!isNotesExpanded)}
+                                        className="w-full flex items-center justify-between text-left"
+                                    >
+                                        <h3 className="text-sm font-medium text-white/40 uppercase tracking-wider">{t.quoteModal.notesTerms}</h3>
+                                        <motion.div
+                                            animate={{ rotate: isNotesExpanded ? 180 : 0 }}
+                                            transition={{ duration: 0.2 }}
+                                        >
+                                            <ChevronDown className="w-4 h-4 text-white/40" />
+                                        </motion.div>
+                                    </button>
+                                    <AnimatePresence>
+                                        {isNotesExpanded && (
+                                            <motion.div
+                                                initial={{ opacity: 0, height: 0 }}
+                                                animate={{ opacity: 1, height: "auto" }}
+                                                exit={{ opacity: 0, height: 0 }}
+                                                transition={{ duration: 0.2 }}
+                                                className="overflow-hidden"
+                                            >
+                                                <textarea
+                                                    value={notes}
+                                                    onChange={(e) => setNotes(e.target.value)}
+                                                    className="w-full bg-white/5 border border-white/10 rounded-lg py-2 px-4 text-white placeholder-white/20 focus:outline-none focus:border-blue-500/50 transition-colors resize-none h-32"
+                                                    placeholder={t.quoteModal.notesPlaceholder}
+                                                />
+                                            </motion.div>
+                                        )}
+                                    </AnimatePresence>
                                 </div>
                             </div>
                                 </>
@@ -924,9 +1084,9 @@ export function QuoteModal({ isOpen, onClose, onQuoteSaved, editingQuoteId }: Qu
                                         </div>
                                     </div>
                                     <div className="text-right">
-                                        <h1 className="text-4xl font-light text-blue-600 mb-2">{t.quoteModal.quote}</h1>
+                                        <h1 className="text-4xl font-light text-blue-600 mb-2">{previewT.quoteModal.quote}</h1>
                                         <p className="text-gray-500 font-medium text-sm uppercase tracking-wide">
-                                            {t.quoteModal.quoteNumber}
+                                            {previewT.quoteModal.quoteNumber}
                                         </p>
                                         <p className="text-gray-700 font-bold text-lg">ORC-{new Date().getFullYear()}-{String(Math.floor(Math.random() * 1000)).padStart(3, '0')}</p>
                                     </div>
@@ -935,27 +1095,27 @@ export function QuoteModal({ isOpen, onClose, onQuoteSaved, editingQuoteId }: Qu
                                 {/* Info Grid */}
                                 <div className="flex justify-between mb-12">
                                     <div>
-                                        <p className="text-xs font-bold text-gray-400 uppercase mb-2">{t.quoteModal.billTo}</p>
+                                        <p className="text-xs font-bold text-gray-400 uppercase mb-2">{previewT.quoteModal.billTo}</p>
                                         <div className="text-sm text-gray-800 space-y-1">
-                                            {clientName ? <p className="font-bold text-base">{clientName}</p> : <p className="text-gray-300 italic">{t.quoteModal.clientName}</p>}
+                                            {clientName ? <p className="font-bold text-base">{clientName}</p> : <p className="text-gray-300 italic">{previewT.quoteModal.clientName}</p>}
                                             {clientContact && <p className="font-medium">{clientContact}</p>}
                                             {clientAddress ? (
                                                 clientAddress.split('\n').map((line, i) => <p key={i}>{line}</p>)
                                             ) : (
-                                                <p className="text-gray-300 italic">{t.quoteModal.addressPlaceholder}</p>
+                                                <p className="text-gray-300 italic">{previewT.quoteModal.addressPlaceholder}</p>
                                             )}
                                             {clientEmail && <p className="text-blue-600">{clientEmail}</p>}
                                             {clientPhone && <p className="text-gray-600">{clientPhone}</p>}
-                                            {clientNif && <p className="text-gray-600"><span className="font-medium">{t.quoteModal.nif}:</span> {clientNif}</p>}
+                                            {clientNif && <p className="text-gray-600"><span className="font-medium">{previewT.quoteModal.nif}:</span> {clientNif}</p>}
                                         </div>
                                     </div>
                                     <div className="text-right space-y-4">
                                         <div>
-                                            <p className="text-xs font-bold text-gray-400 uppercase mb-1">{t.quoteModal.issueDate}</p>
+                                            <p className="text-xs font-bold text-gray-400 uppercase mb-1">{previewT.quoteModal.issueDate}</p>
                                             <p className="text-sm font-medium">{quoteDate ? new Date(quoteDate).toLocaleDateString('pt-PT') : '-'}</p>
                                         </div>
                                         <div>
-                                            <p className="text-xs font-bold text-gray-400 uppercase mb-1">{t.quoteModal.validity}</p>
+                                            <p className="text-xs font-bold text-gray-400 uppercase mb-1">{previewT.quoteModal.validity}</p>
                                             <p className="text-sm font-medium">{expiryDate ? new Date(expiryDate).toLocaleDateString('pt-PT') : '-'}</p>
                                         </div>
                                     </div>
@@ -964,16 +1124,16 @@ export function QuoteModal({ isOpen, onClose, onQuoteSaved, editingQuoteId }: Qu
                                 {/* Items Table */}
                                 <div className="mb-8">
                                     <div className="border-b-2 border-blue-600 pb-2 mb-4 flex text-xs font-bold text-gray-400 uppercase">
-                                        <div className="flex-1">{t.quoteModal.description}</div>
-                                        <div className="w-20 text-center">{t.quoteModal.qty}</div>
-                                        <div className="w-32 text-right">{t.quoteModal.price}</div>
-                                        <div className="w-32 text-right">{t.quoteModal.total}</div>
+                                        <div className="flex-1">{previewT.quoteModal.description}</div>
+                                        <div className="w-20 text-center">{previewT.quoteModal.qty}</div>
+                                        <div className="w-32 text-right">{previewT.quoteModal.price}</div>
+                                        <div className="w-32 text-right">{previewT.quoteModal.total}</div>
                                     </div>
                                     <div className="space-y-4">
                                         {items.map((item) => (
                                             <div key={item.id} className="flex text-sm text-gray-800 border-b border-gray-100 pb-4 last:border-0">
                                                 <div className="flex-1">
-                                                    <p className="font-medium">{item.description || <span className="text-gray-300 italic">{t.quoteModal.itemDescriptionPlaceholder}</span>}</p>
+                                                    <p className="font-medium">{item.description || <span className="text-gray-300 italic">{previewT.quoteModal.itemDescriptionPlaceholder}</span>}</p>
                                                 </div>
                                                 <div className="w-20 text-center text-gray-500">{item.quantity}</div>
                                                 <div className="w-32 text-right text-gray-500">{formatCurrency(item.price)}</div>
@@ -987,15 +1147,15 @@ export function QuoteModal({ isOpen, onClose, onQuoteSaved, editingQuoteId }: Qu
                                 <div className="flex justify-end mb-12">
                                     <div className="w-64 space-y-2">
                                         <div className="flex justify-between text-sm text-gray-500">
-                                            <span>{t.quoteModal.subtotal}</span>
+                                            <span>{previewT.quoteModal.subtotal}</span>
                                             <span>{formatCurrency(subtotal)}</span>
                                         </div>
                                         <div className="flex justify-between text-sm text-gray-500">
-                                            <span>{t.quoteModal.tax} ({taxRate * 100}%)</span>
+                                            <span>{previewT.quoteModal.tax} ({taxRate * 100}%)</span>
                                             <span>{formatCurrency(tax)}</span>
                                         </div>
                                         <div className="border-t border-gray-200 pt-2 flex justify-between text-lg font-bold text-blue-600">
-                                            <span>{t.quoteModal.total}</span>
+                                            <span>{previewT.quoteModal.total}</span>
                                             <span>{formatCurrency(total)}</span>
                                         </div>
                                     </div>
@@ -1004,14 +1164,14 @@ export function QuoteModal({ isOpen, onClose, onQuoteSaved, editingQuoteId }: Qu
                                 {/* Notes */}
                                 {notes && (
                                     <div className="pt-8 border-t border-gray-100">
-                                        <p className="text-xs font-bold text-gray-400 uppercase mb-2">{t.quoteModal.notesTerms}</p>
+                                        <p className="text-xs font-bold text-gray-400 uppercase mb-2">{previewT.quoteModal.notesTerms}</p>
                                         <p className="text-sm text-gray-600 whitespace-pre-wrap">{notes}</p>
                                     </div>
                                 )}
 
                                 {/* Footer */}
                                 <div className="mt-auto pt-8 border-t border-gray-200 text-center">
-                                    <p className="text-xs text-gray-500 italic">{t.quoteModal.legalNote}</p>
+                                    <p className="text-xs text-gray-500 italic">{previewT.quoteModal.legalNote}</p>
                                 </div>
                             </div>
                         </div>
@@ -1089,6 +1249,7 @@ export function QuoteModal({ isOpen, onClose, onQuoteSaved, editingQuoteId }: Qu
                 quoteNumber={savedQuoteNumber || `ORC-${new Date().getFullYear()}-XXX`}
                 validUntil={expiryDate}
                 loading={sending}
+                defaultLanguage={clientLanguage}
             />
         </>
     );

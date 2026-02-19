@@ -25,6 +25,8 @@ export async function OPTIONS(request: NextRequest) {
 const sendQuoteEmailSchema = z.object({
     id: z.string().uuid('Invalid quote ID format'),
     type: z.enum(['quote', 'invoice']).optional().default('quote'),
+    email: z.string().email('Invalid email format').optional(),
+    language: z.enum(['pt', 'en']).optional(),
 }).strict();
 
 // Email template is now imported from shared utility
@@ -76,7 +78,7 @@ export async function POST(request: NextRequest) {
             return addCorsHeaders(response, request);
         }
 
-        const { id, type } = validation.data;
+        const { id, type, email: customEmail, language: customLanguage } = validation.data;
         const tableName = type === 'quote' ? 'quotes' : 'invoices';
         const numberField = type === 'quote' ? 'quote_number' : 'invoice_number';
 
@@ -98,7 +100,8 @@ export async function POST(request: NextRequest) {
         }
 
         // 5. Validate client email
-        if (!document.client_email) {
+        const clientEmail = customEmail || document.client_email;
+        if (!clientEmail) {
             const response = NextResponse.json(
                 { error: 'Client email not found in document' },
                 { status: 400 }
@@ -106,12 +109,16 @@ export async function POST(request: NextRequest) {
             return addCorsHeaders(response, request);
         }
 
+        // Get language preference (priority: custom > document > default)
+        const languagePreference = customLanguage || document.client_language || 'pt';
+
         // 6. Generate email HTML using shared template
         const emailHtml = generateEmailTemplateHTML({
             clientName: document.client_name,
             documentNumber: document[numberField],
             documentType: type,
             validUntil: type === 'quote' ? document.expiry_date : undefined,
+            language: languagePreference,
         });
 
         // 6.5. Generate PDF using HTML template (ensures consistency with preview)
@@ -138,34 +145,67 @@ export async function POST(request: NextRequest) {
                 currency: document.currency || 'EUR'
             };
 
+            // Get PDF translations based on language
+            const pdfTranslations = languagePreference === 'en' ? {
+                quote: 'QUOTE',
+                invoice: 'INVOICE',
+                quoteNumber: 'Quote Number',
+                invoiceNumber: 'Invoice Number',
+                billTo: 'Bill To',
+                issueDate: 'Issue Date',
+                validity: 'Valid Until',
+                dueDate: 'Due Date',
+                description: 'Description',
+                qty: 'Qty',
+                price: 'Price',
+                total: 'Total',
+                subtotal: 'Subtotal',
+                tax: 'VAT',
+                notesTerms: 'Notes / Terms',
+                legalNote: 'This quote does not constitute an invoice. After acceptance, an official invoice will be issued through the Portuguese Tax Portal.',
+                invoiceLegalNote: 'This invoice has been computer processed and is valid without signature.',
+                nif: 'Tax ID',
+            } : {
+                quote: 'ORÇAMENTO',
+                invoice: 'FATURA',
+                quoteNumber: 'Número de Orçamento',
+                invoiceNumber: 'Número de Fatura',
+                billTo: 'Faturar a',
+                issueDate: 'Data de Emissão',
+                validity: 'Validade',
+                dueDate: 'Data de Vencimento',
+                description: 'Descrição',
+                qty: 'Qtd',
+                price: 'Preço',
+                total: 'Total',
+                subtotal: 'Subtotal',
+                tax: 'IVA',
+                notesTerms: 'Notas / Termos',
+                legalNote: 'Este orçamento não constitui fatura. Após aceitação, será emitida fatura oficial através do Portal das Finanças.',
+                invoiceLegalNote: 'Esta fatura foi processada por computador e é válida sem assinatura.',
+                nif: 'NIF',
+            };
+
             // Generate PDF from HTML template (same as preview)
             const pdfBuffer = await generateQuotePDFBufferFromHTML(pdfData, {
                 type,
-                translations: {
-                    quote: 'ORÇAMENTO',
-                    invoice: 'FATURA',
-                    quoteNumber: 'Número de Orçamento',
-                    invoiceNumber: 'Número de Fatura',
-                    billTo: 'Faturar a',
-                    issueDate: 'Data de Emissão',
-                    validity: 'Validade',
-                    description: 'Descrição',
-                    qty: 'Qtd',
-                    price: 'Preço',
-                    total: 'Total',
-                    subtotal: 'Subtotal',
-                    tax: 'IVA',
-                    notesTerms: 'Notas / Termos',
-                    legalNote: 'Este orçamento não constitui fatura. Após aceitação, será emitida fatura oficial através do Portal das Finanças.',
-                    nif: 'NIF',
-                }
+                translations: pdfTranslations,
             });
+
+            // Get translations based on language
+            const translations = languagePreference === 'en' ? {
+                quoteSubject: 'Quote',
+                invoiceSubject: 'Invoice',
+            } : {
+                quoteSubject: 'Orçamento',
+                invoiceSubject: 'Fatura',
+            };
 
             // 7. Send email with PDF attachment
             const { data: emailData, error: emailError } = await resend.emails.send({
                 from: 'Framax Solutions <contact@framaxsolutions.com>',
-                to: document.client_email,
-                subject: `${type === 'quote' ? 'Orçamento' : 'Fatura'} ${document[numberField]} - Framax Solutions`,
+                to: clientEmail,
+                subject: `${type === 'quote' ? translations.quoteSubject : translations.invoiceSubject} ${document[numberField]} - Framax Solutions`,
                 html: emailHtml,
                 attachments: [{
                     filename: `${document[numberField]}.pdf`,

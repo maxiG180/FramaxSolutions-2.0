@@ -11,62 +11,73 @@ interface QuoteViewModalProps {
     isOpen: boolean;
     onClose: () => void;
     quoteId: string | null;
+    documentType?: 'quote' | 'invoice';
     onEdit?: (id: string) => void;
     onDownload?: (id: string) => void;
     onSend?: (id: string) => void;
 }
 
-export function QuoteViewModal({ isOpen, onClose, quoteId, onEdit, onDownload, onSend }: QuoteViewModalProps) {
+export function QuoteViewModal({ isOpen, onClose, quoteId, documentType = 'quote', onEdit, onDownload, onSend }: QuoteViewModalProps) {
     const { t } = useLanguage();
-    const [quote, setQuote] = useState<any>(null);
+    const [document, setDocument] = useState<any>(null);
     const [loading, setLoading] = useState(false);
     const [zoom, setZoom] = useState(100);
 
     useEffect(() => {
-        const loadQuote = async () => {
+        const loadDocument = async () => {
             if (!quoteId || !isOpen) return;
 
             setLoading(true);
             try {
-                const response = await fetch(`/api/quotes/${quoteId}`);
+                // Fetch from appropriate endpoint based on document type
+                const endpoint = documentType === 'invoice' ? `/api/invoices/${quoteId}` : `/api/quotes/${quoteId}`;
+                const response = await fetch(endpoint);
                 if (!response.ok) {
-                    throw new Error('Failed to load quote');
+                    const errorData = await response.json().catch(() => ({}));
+                    console.error(`Failed to load ${documentType}:`, {
+                        status: response.status,
+                        statusText: response.statusText,
+                        error: errorData
+                    });
+                    throw new Error(errorData.error || `Failed to load ${documentType}: ${response.status}`);
                 }
 
                 const data = await response.json();
-                setQuote(data);
-            } catch (error) {
-                console.error('Error loading quote:', error);
-                alert(t.quoteModal.errorLoading);
+                setDocument(data);
+            } catch (error: any) {
+                console.error(`Error loading ${documentType}:`, error);
+                alert(`${t.quoteModal.errorLoading}: ${error.message}`);
                 onClose();
             } finally {
                 setLoading(false);
             }
         };
 
-        loadQuote();
-    }, [quoteId, isOpen]);
+        loadDocument();
+    }, [quoteId, isOpen, documentType]);
 
     if (!isOpen) return null;
 
-    // Prepare quote data for template
-    const quoteData: QuotePDFData | null = quote ? {
-        quote_number: quote.quote_number,
-        client_name: quote.client_name,
-        client_contact: quote.client_contact,
-        client_email: quote.client_email,
-        client_phone: quote.client_phone,
-        client_address: quote.client_address,
-        client_nif: quote.client_nif,
-        quote_date: quote.quote_date,
-        expiry_date: quote.expiry_date,
-        items: quote.items || [],
-        subtotal: quote.subtotal || 0,
-        tax_rate: quote.tax_rate || 0.23,
-        tax_amount: quote.tax_amount || 0,
-        total: quote.total || 0,
-        notes: quote.notes,
-        currency: quote.currency || 'EUR'
+    // Prepare document data for template
+    const documentData: QuotePDFData | null = document ? {
+        quote_number: documentType === 'quote' ? document.quote_number : undefined,
+        invoice_number: documentType === 'invoice' ? document.invoice_number : undefined,
+        client_name: document.client_name,
+        client_contact: document.client_contact,
+        client_email: document.client_email,
+        client_phone: document.client_phone,
+        client_address: document.client_address,
+        client_nif: document.client_nif,
+        quote_date: documentType === 'quote' ? document.quote_date : undefined,
+        invoice_date: documentType === 'invoice' ? document.invoice_date : undefined,
+        expiry_date: document.expiry_date,
+        items: document.items || [],
+        subtotal: document.subtotal || 0,
+        tax_rate: document.tax_rate || 0.23,
+        tax_amount: document.tax_amount || 0,
+        total: document.total || 0,
+        notes: document.notes,
+        currency: document.currency || 'EUR'
     } : null;
 
     const handleZoomIn = () => {
@@ -90,12 +101,15 @@ export function QuoteViewModal({ isOpen, onClose, quoteId, onEdit, onDownload, o
                     {/* Top Toolbar */}
                     <div className="absolute top-0 left-0 right-0 flex items-center justify-between px-6 py-4 bg-black/50 backdrop-blur-sm border-b border-white/10">
                         <h2 className="text-lg font-medium text-white">
-                            {quote?.quote_number || t.quoteModal.quote}
+                            {documentType === 'invoice'
+                                ? (document?.invoice_number || t.invoices?.typeInvoice || 'Invoice')
+                                : (document?.quote_number || t.quoteModal.quote)
+                            }
                         </h2>
 
                         <div className="flex items-center gap-3">
                             {/* Action Buttons */}
-                            {quoteId && quote?.status === "draft" && onEdit && (
+                            {quoteId && document?.status === "draft" && documentType === 'quote' && onEdit && (
                                 <button
                                     onClick={(e) => {
                                         e.stopPropagation();
@@ -173,7 +187,7 @@ export function QuoteViewModal({ isOpen, onClose, quoteId, onEdit, onDownload, o
                                     <p className="text-white/60">{t.quoteModal.loading}</p>
                                 </div>
                             </div>
-                        ) : quoteData ? (
+                        ) : documentData ? (
                             <div className="min-h-full py-8 flex justify-center items-start">
                                 <div
                                     className="shadow-2xl transition-transform duration-200"
@@ -183,8 +197,8 @@ export function QuoteViewModal({ isOpen, onClose, quoteId, onEdit, onDownload, o
                                     }}
                                 >
                                     <QuoteTemplate
-                                        data={quoteData}
-                                        type="quote"
+                                        data={documentData}
+                                        type={documentType}
                                         translations={{
                                             quote: t.quoteModal.quote,
                                             invoice: t.invoices?.typeInvoice || 'Fatura',
@@ -193,6 +207,7 @@ export function QuoteViewModal({ isOpen, onClose, quoteId, onEdit, onDownload, o
                                             billTo: t.quoteModal.billTo,
                                             issueDate: t.quoteModal.issueDate,
                                             validity: t.quoteModal.validity,
+                                            dueDate: t.quoteModal.dueDate,
                                             description: t.quoteModal.description,
                                             qty: t.quoteModal.qty,
                                             price: t.quoteModal.price,
@@ -201,6 +216,7 @@ export function QuoteViewModal({ isOpen, onClose, quoteId, onEdit, onDownload, o
                                             tax: t.quoteModal.tax,
                                             notesTerms: t.quoteModal.notesTerms,
                                             legalNote: t.quoteModal.legalNote,
+                                            invoiceLegalNote: t.quoteModal.invoiceLegalNote,
                                             nif: t.quoteModal.nif
                                         }}
                                     />

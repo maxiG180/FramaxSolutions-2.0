@@ -1,11 +1,69 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
 
-// Generate quote number
-function generateQuoteNumber(): string {
+// Generate sequential quote number
+async function generateQuoteNumber(supabase: any): Promise<string> {
   const year = new Date().getFullYear();
-  const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
-  return `ORC-${year}-${random}`;
+
+  // Get the last quote number for the current year
+  const { data: lastQuote } = await supabase
+    .from('quotes')
+    .select('quote_number')
+    .like('quote_number', `ORC-${year}-%`)
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .single();
+
+  let nextNumber = 1;
+
+  if (lastQuote?.quote_number) {
+    // Extract the number from the last quote (e.g., "ORC-2026-005" -> 5)
+    const lastNumber = parseInt(lastQuote.quote_number.split('-')[2], 10);
+    nextNumber = lastNumber + 1;
+  }
+
+  // Format with leading zeros (001, 002, etc.)
+  const formattedNumber = nextNumber.toString().padStart(3, '0');
+  return `ORC-${year}-${formattedNumber}`;
+}
+
+export async function GET(request: Request) {
+  try {
+    const supabase = await createClient();
+
+    // Get authenticated user
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
+
+    if (userError || !user) {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
+      );
+    }
+
+    // Fetch all quotes for the current user
+    const { data: quotes, error: fetchError } = await supabase
+      .from('quotes')
+      .select('*')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false });
+
+    if (fetchError) {
+      console.error('Error fetching quotes:', fetchError);
+      return NextResponse.json(
+        { error: 'Failed to fetch quotes', details: fetchError.message },
+        { status: 500 }
+      );
+    }
+
+    return NextResponse.json(quotes || [], { status: 200 });
+  } catch (error: any) {
+    console.error('Error in quotes GET API:', error);
+    return NextResponse.json(
+      { error: 'Internal server error', details: error.message },
+      { status: 500 }
+    );
+  }
 }
 
 export async function POST(request: Request) {
@@ -30,6 +88,7 @@ export async function POST(request: Request) {
       clientContact,
       clientAddress,
       clientNif,
+      clientLanguage = 'pt',
       quoteDate,
       expiryDate,
       items,
@@ -53,12 +112,15 @@ export async function POST(request: Request) {
     const taxAmount = subtotal * taxRate;
     const total = subtotal + taxAmount;
 
-    // Generate unique quote number
-    let quoteNumber = generateQuoteNumber();
+    // Generate unique sequential quote number with retry logic
+    let quoteNumber: string | undefined;
     let attempts = 0;
     const maxAttempts = 10;
 
     while (attempts < maxAttempts) {
+      quoteNumber = await generateQuoteNumber(supabase);
+
+      // Check if this number already exists (race condition protection)
       const { data: existing } = await supabase
         .from('quotes')
         .select('quote_number')
@@ -67,11 +129,12 @@ export async function POST(request: Request) {
 
       if (!existing) break;
 
-      quoteNumber = generateQuoteNumber();
       attempts++;
+      // Small delay to avoid tight loop in case of conflicts
+      await new Promise(resolve => setTimeout(resolve, 100));
     }
 
-    if (attempts === maxAttempts) {
+    if (attempts === maxAttempts || !quoteNumber) {
       return NextResponse.json(
         { error: 'Failed to generate unique quote number' },
         { status: 500 }
@@ -90,6 +153,7 @@ export async function POST(request: Request) {
         client_contact: clientContact || null,
         client_address: clientAddress || null,
         client_nif: clientNif || null,
+        client_language: clientLanguage || 'pt',
         quote_date: quoteDate,
         expiry_date: expiryDate || null,
         items: items,

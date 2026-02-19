@@ -2,7 +2,7 @@ import { createClient } from "@/utils/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
 import { rateLimit, RATE_LIMITS } from '@/utils/rate-limit';
 import { addCorsHeaders, handleCorsPreFlight } from '@/utils/cors';
-import { validateRequest, createServiceSchema, sanitizeString } from '@/utils/validation';
+import { validateRequest, createServiceSchema } from '@/utils/validation';
 import { logger } from '@/utils/logger';
 
 /**
@@ -63,26 +63,22 @@ export async function POST(request: NextRequest) {
             return addCorsHeaders(response, request);
         }
 
-        const { title, description, billing_type, price_type, base_price, recurring_interval, currency, category } = validation.data;
+        const { title, description, billing_type, price_type, base_price, recurring_interval, currency, category, icon, included_service_ids } = validation.data;
 
-        // 4. Sanitize string inputs for XSS protection
-        const sanitizedTitle = sanitizeString(title);
-        const sanitizedDescription = description ? sanitizeString(description) : null;
-        const sanitizedCategory = category ? sanitizeString(category) : null;
-
-        // 5. Insert service into database
+        // 4. Insert service into database (React handles XSS protection when rendering text)
         const { data, error } = await supabase
             .from("services")
             .insert({
                 user_id: user.id,
-                title: sanitizedTitle,
-                description: sanitizedDescription,
+                title,
+                description: description || null,
                 billing_type,
                 price_type,
                 base_price: base_price ?? null,
                 recurring_interval: recurring_interval ?? null,
                 currency: currency || 'EUR',
-                category: sanitizedCategory,
+                category: category || null,
+                icon: icon || 'Layers',
             })
             .select()
             .single();
@@ -96,10 +92,32 @@ export async function POST(request: NextRequest) {
             return addCorsHeaders(response, request);
         }
 
+        // 5. Insert service inclusions if any
+        if (included_service_ids && included_service_ids.length > 0) {
+            const inclusions = included_service_ids.map(includedId => ({
+                parent_service_id: data.id,
+                included_service_id: includedId,
+            }));
+
+            const { error: inclusionError } = await supabase
+                .from('service_inclusions')
+                .insert(inclusions);
+
+            if (inclusionError) {
+                logger.logApiError('/api/create-service', inclusionError, {
+                    userId: user.id,
+                    serviceId: data.id,
+                    message: 'Failed to create service inclusions'
+                });
+                // Don't fail the entire request, just log the error
+            }
+        }
+
         logger.logInfo('Service created successfully', {
             endpoint: '/api/create-service',
             userId: user.id,
             serviceId: data.id,
+            includedServicesCount: included_service_ids?.length || 0,
         });
 
         const response = NextResponse.json(data);

@@ -19,8 +19,8 @@ interface InvoiceListProps {
     onDelete?: (id: string, type: "invoice" | "quote") => void;
     onDownload?: (id: string) => void;
     onSend?: (id: string) => void;
-    onEdit?: (id: string) => void;
-    onView?: (id: string) => void;
+    onEdit?: (id: string, type: "invoice" | "quote") => void;
+    onView?: (id: string, type: "invoice" | "quote") => void;
 }
 
 export function InvoiceList({ invoices, onAcceptQuote, onDeclineQuote, onDelete, onDownload, onSend, onEdit, onView }: InvoiceListProps) {
@@ -108,7 +108,7 @@ export function InvoiceList({ invoices, onAcceptQuote, onDeclineQuote, onDelete,
                         <tr key={invoice.id} className="hover:bg-white/5 transition-colors group">
                             <td className="p-4">
                                 <button
-                                    onClick={() => onView?.(invoice.id)}
+                                    onClick={() => onView?.(invoice.id, invoice.type)}
                                     className="font-medium text-blue-400 hover:text-blue-300 transition-colors hover:underline cursor-pointer"
                                 >
                                     {translateDocumentId(invoice.displayId || invoice.id)}
@@ -129,12 +129,13 @@ export function InvoiceList({ invoices, onAcceptQuote, onDeclineQuote, onDelete,
                             </td>
                             <td className="p-4 text-right">
                                 <div className="flex items-center justify-end gap-2 opacity-60 group-hover:opacity-100 transition-opacity">
-                                    {/* Editar - só para quotes em draft */}
-                                    {invoice.type === "quote" && invoice.status === "draft" && onEdit && (
+                                    {/* Editar - quotes em draft ou faturas não pagas */}
+                                    {((invoice.type === "quote" && invoice.status === "draft") ||
+                                      (invoice.type === "invoice" && invoice.status !== "paid")) && onEdit && (
                                         <button
-                                            onClick={() => onEdit(invoice.id)}
+                                            onClick={() => onEdit(invoice.id, invoice.type)}
                                             className="p-2 hover:bg-blue-500/20 rounded-lg text-blue-400 hover:text-blue-300 transition-colors"
-                                            title={t.invoices.editQuote}
+                                            title={invoice.type === "quote" ? t.invoices.editQuote : t.invoices.editInvoice}
                                         >
                                             <Edit className="w-4 h-4" />
                                         </button>

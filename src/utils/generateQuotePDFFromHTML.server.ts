@@ -16,6 +16,7 @@ const DEFAULT_TRANSLATIONS = {
     billTo: 'Faturar a',
     issueDate: 'Data de Emissão',
     validity: 'Validade',
+    dueDate: 'Data de Vencimento',
     description: 'Descrição',
     qty: 'Qtd',
     price: 'Preço',
@@ -24,6 +25,7 @@ const DEFAULT_TRANSLATIONS = {
     tax: 'IVA',
     notesTerms: 'Notas / Termos',
     legalNote: 'Este orçamento não constitui fatura. Após aceitação, será emitida fatura oficial através do Portal das Finanças.',
+    invoiceLegalNote: 'Esta fatura foi processada por computador e é válida sem assinatura.',
     nif: 'NIF',
 };
 

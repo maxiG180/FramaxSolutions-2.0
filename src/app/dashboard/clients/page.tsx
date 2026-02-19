@@ -161,7 +161,8 @@ export default function ClientsPage() {
                     logo: formData.logo,
                     contact_person: formData.contact_person,
                     country: formData.country,
-                    address: formData.address
+                    address: formData.address,
+                    preferred_language: formData.preferred_language
                 })
                 .eq('id', editingId);
 
@@ -186,7 +187,8 @@ export default function ClientsPage() {
                     logo: formData.logo || "",
                     contact_person: formData.contact_person || "",
                     country: formData.country || "",
-                    address: formData.address || ""
+                    address: formData.address || "",
+                    preferred_language: formData.preferred_language || "pt"
                 }])
                 .select()
                 .single();
@@ -660,7 +662,7 @@ export default function ClientsPage() {
 
                                                 {/* Language Preference - Clean Flags */}
                                                 <div className="space-y-3">
-                                                    <label className="text-sm font-medium text-white/60">Email Language</label>
+                                                    <label className="text-sm font-medium text-white/60">Content Language</label>
                                                     <div className="flex gap-3 justify-center">
                                                         <button
                                                             type="button"

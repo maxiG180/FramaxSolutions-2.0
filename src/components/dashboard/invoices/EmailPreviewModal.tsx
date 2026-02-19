@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { X, Send, Mail, User, Edit2, Eye, ArrowLeft } from "lucide-react";
+import { X, Send, Mail, User, Edit2, Eye, ArrowLeft, Languages } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLanguage } from "@/context/LanguageContext";
 import { EmailTemplatePreview } from "@/utils/emailTemplate";
@@ -9,12 +9,13 @@ import { EmailTemplatePreview } from "@/utils/emailTemplate";
 interface EmailPreviewModalProps {
     isOpen: boolean;
     onClose: () => void;
-    onConfirm: (emailData: { email: string }) => void;
+    onConfirm: (emailData: { email: string; language: 'pt' | 'en' }) => void;
     defaultEmail: string;
     clientName: string;
     quoteNumber: string;
     validUntil?: string;
     loading?: boolean;
+    defaultLanguage?: 'pt' | 'en';
 }
 
 export function EmailPreviewModal({
@@ -25,12 +26,14 @@ export function EmailPreviewModal({
     clientName,
     quoteNumber,
     validUntil,
-    loading = false
+    loading = false,
+    defaultLanguage
 }: EmailPreviewModalProps) {
-    const { t } = useLanguage();
+    const { t, language } = useLanguage();
     const [email, setEmail] = useState(defaultEmail);
     const [emailError, setEmailError] = useState("");
     const [isEditingEmail, setIsEditingEmail] = useState(false);
+    const [selectedLanguage, setSelectedLanguage] = useState<'pt' | 'en'>(defaultLanguage || language as 'pt' | 'en');
     const modalRef = useRef<HTMLDivElement>(null);
 
     const validateEmail = (email: string) => {
@@ -51,7 +54,7 @@ export function EmailPreviewModal({
             return;
         }
 
-        onConfirm({ email });
+        onConfirm({ email, language: selectedLanguage });
     };
 
     // Reset email when modal opens or defaultEmail changes
@@ -60,8 +63,9 @@ export function EmailPreviewModal({
             setEmail(defaultEmail);
             setEmailError("");
             setIsEditingEmail(false);
+            setSelectedLanguage(defaultLanguage || language as 'pt' | 'en');
         }
-    }, [isOpen, defaultEmail]);
+    }, [isOpen, defaultEmail, defaultLanguage, language]);
 
     return (
         <AnimatePresence>
@@ -178,6 +182,40 @@ export function EmailPreviewModal({
                                         )}
                                     </div>
 
+                                    {/* Language Selector */}
+                                    <div className="space-y-3">
+                                        <label className="text-sm font-medium text-white/80 flex items-center gap-2">
+                                            <Languages className="w-4 h-4" />
+                                            {t.emailPreview?.language || "Idioma do Email"}
+                                        </label>
+                                        <div className="grid grid-cols-2 gap-2">
+                                            <button
+                                                type="button"
+                                                onClick={() => setSelectedLanguage('pt')}
+                                                disabled={loading}
+                                                className={`py-2.5 px-3 rounded-lg text-sm font-medium transition-all ${
+                                                    selectedLanguage === 'pt'
+                                                        ? 'bg-blue-500 text-white'
+                                                        : 'bg-white/5 border border-white/10 text-white/60 hover:bg-white/10'
+                                                }`}
+                                            >
+                                                {t.emailPreview?.languagePortuguese || "Português"}
+                                            </button>
+                                            <button
+                                                type="button"
+                                                onClick={() => setSelectedLanguage('en')}
+                                                disabled={loading}
+                                                className={`py-2.5 px-3 rounded-lg text-sm font-medium transition-all ${
+                                                    selectedLanguage === 'en'
+                                                        ? 'bg-blue-500 text-white'
+                                                        : 'bg-white/5 border border-white/10 text-white/60 hover:bg-white/10'
+                                                }`}
+                                            >
+                                                {t.emailPreview?.languageEnglish || "Inglês"}
+                                            </button>
+                                        </div>
+                                    </div>
+
                                     {/* Email Details */}
                                     <div className="space-y-3">
                                         <label className="text-sm font-medium text-white/80 flex items-center gap-2">
@@ -220,6 +258,7 @@ export function EmailPreviewModal({
                                             documentNumber={quoteNumber}
                                             documentType="quote"
                                             validUntil={validUntil}
+                                            language={selectedLanguage}
                                         />
                                     </div>
                                 </div>

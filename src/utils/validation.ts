@@ -252,6 +252,13 @@ export const createServiceSchema = z.object({
     category: z.string()
         .max(100, 'Category is too long')
         .optional(),
+    icon: z.string()
+        .max(50, 'Icon name is too long')
+        .optional()
+        .default('Layers'),
+    included_service_ids: z.array(z.string().uuid('Invalid service ID format'))
+        .max(20, 'Too many included services')
+        .optional(),
 }).strict();
 
 export const updateServiceSchema = z.object({
@@ -272,4 +279,11 @@ export const updateServiceSchema = z.object({
         .max(100, 'Category is too long')
         .optional()
         .nullable(),
+    icon: z.string()
+        .max(50, 'Icon name is too long')
+        .optional()
+        .nullable(),
+    included_service_ids: z.array(z.string().uuid('Invalid service ID format'))
+        .max(20, 'Too many included services')
+        .optional(),
 }).strict();
