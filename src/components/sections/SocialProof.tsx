@@ -16,9 +16,9 @@ const companies = [
 ];
 
 const stats = [
-    { label: "Happy Clients", value: "50+", icon: Users },
-    { label: "Revenue Generated", value: "$10M+", icon: TrendingUp },
-    { label: "Project Success", value: "100%", icon: CheckCircle2 },
+    { label: "Clientes Satisfeitos", value: "50+", icon: Users },
+    { label: "Receita Gerada", value: "$10M+", icon: TrendingUp },
+    { label: "Sucesso nos Projetos", value: "100%", icon: CheckCircle2 },
 ];
 
 export function SocialProof() {
@@ -42,10 +42,10 @@ export function SocialProof() {
                     className="mb-16 text-center max-w-3xl mx-auto"
                 >
                     <h2 className="mb-6 text-3xl font-bold text-foreground sm:text-4xl md:text-5xl">
-                        Trusted by <span className="text-primary">Industry Leaders</span>
+                        Confiado por <span className="text-primary">Líderes da Indústria</span>
                     </h2>
                     <p className="text-lg text-muted-foreground">
-                        We've helped dozens of businesses scale their digital presence.
+                        Já ajudámos dezenas de empresas a escalar a sua presença digital.
                     </p>
                 </motion.div>
 

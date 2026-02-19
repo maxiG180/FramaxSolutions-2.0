@@ -8,108 +8,108 @@ export type PresetQuestion = {
 };
 
 export const PRESET_QUESTIONS: PresetQuestion[] = [
-    { id: 'timeline', text: 'How long does a project take?', icon: Clock },
-    { id: 'pricing', text: 'How does pricing work?', icon: CreditCard },
-    { id: 'maintenance', text: 'Do you offer maintenance?', icon: Wrench },
-    { id: 'services', text: 'What services do you offer?', icon: Briefcase },
-    { id: 'contact', text: 'How can I contact you?', icon: Phone },
+    { id: 'timeline', text: 'Quanto tempo demora um projeto?', icon: Clock },
+    { id: 'pricing', text: 'Como funciona o preço?', icon: CreditCard },
+    { id: 'maintenance', text: 'Oferecem manutenção?', icon: Wrench },
+    { id: 'services', text: 'Que serviços oferecem?', icon: Briefcase },
+    { id: 'contact', text: 'Como posso contactar-vos?', icon: Phone },
 ];
 
 export const ANSWERS: Record<string, string> = {
-    timeline: `⏱️ **Project timelines:**
-- Website (Standard): 2-4 weeks
-- Website Redesign: 3-4 weeks
-- Custom Web App: 4-8 weeks
-- Booking System / Blog Add-ons: 1-2 weeks
+    timeline: `⏱️ **Prazos dos projetos:**
+- Website (Standard): 2-4 semanas
+- Redesign de Website: 3-4 semanas
+- Aplicação Web Personalizada: 4-8 semanas
+- Sistemas de Reservas / Blog Add-ons: 1-2 semanas
 
-We provide customized timelines in our proposal.`,
+Fornecemos prazos personalizados na nossa proposta.`,
 
-    pricing: `💳 **Our Pricing Structure:**
+    pricing: `💳 **Estrutura de Preços:**
 
-**Core Services (Custom Quote):**
-- Website (Design & Dev)
-- Website Redesign
-- Custom Web Applications
+**Serviços Core (Orçamento Personalizado):**
+- Website (Design & Desenvolvimento)
+- Redesign de Website
+- Aplicações Web Personalizadas
 
-**Add-Ons (Starting at):**
-- Advanced SEO: 299€
+**Add-Ons (A partir de):**
+- SEO Avançado: 299€
 - Blog/CMS: 399€+
-- Booking System: 499€+
+- Sistema de Reservas: 499€+
 
-**Monthly Plans:**
-- Maintenance: 20€/month
-- Domain & Hosting: 29€/month
+**Planos Mensais:**
+- Manutenção: 20€/mês
+- Domínio & Alojamento: 29€/mês
 
-Book a discovery call for a precise quote!`,
+Marque uma chamada de descoberta para um orçamento preciso!`,
 
-    maintenance: `🔧 **Maintenance Plan:**
+    maintenance: `🔧 **Plano de Manutenção:**
 
-**Price:** 20€/month
-**Setup:** Immediate
-**Includes:**
-- Regular updates
-- Security patches
-- Technical support
+**Preço:** 20€/mês
+**Configuração:** Imediata
+**Inclui:**
+- Atualizações regulares
+- Patches de segurança
+- Suporte técnico
 
-We also offer **Domain & Hosting** for 29€/month.`,
+Oferecemos também **Domínio & Alojamento** por 29€/mês.`,
 
-    services: `💼 **Our Services:**
+    services: `💼 **Os Nossos Serviços:**
 
 **Core:**
-- Full Websites (Domain + Hosting + Basic SEO)
-- Custom Web Applications
-- Website Redesigns
+- Websites Completos (Domínio + Alojamento + SEO Básico)
+- Aplicações Web Personalizadas
+- Redesigns de Websites
 
 **Add-Ons:**
-- Advanced SEO Strategies
-- Booking Systems
-- Blog/CMS Integration
+- Estratégias de SEO Avançado
+- Sistemas de Reservas
+- Integração de Blog/CMS
 
-**Monthly:**
-- Maintenance (20€/mo)
-- Domain & Hosting (29€/mo)`,
+**Mensais:**
+- Manutenção (20€/mês)
+- Domínio & Alojamento (29€/mês)`,
 
-    contact: `📞 **Let's connect:**
+    contact: `📞 **Vamos ligar-nos:**
 - Email: contact@framaxsolutions.com
-- Book a discovery call on our website
+- Marque uma chamada de descoberta no nosso site
 - Facebook: Framax Solutions
 
-How else can I help you?`,
+Como posso ajudá-lo mais?`,
 
 
 
-    portfolio: `🎨 **Our Work:**
+    portfolio: `🎨 **O Nosso Trabalho:**
 
-Our portfolio section is currently under maintenance as we curate our latest projects. 
-However, here are some of our recent high-impact solutions:
+A nossa sessão de portfólio está atualmente em manutenção enquanto selecionamos os nossos projetos mais recentes.
+No entanto, aqui estão algumas das nossas soluções mais impactantes:
 
-- **Lumina Finance** (Fintech Dashboard)
-- **Velvet & Oak** (Luxury E-commerce)
-- **Nexus Health** (SaaS Platform)
+- **Lumina Finance** (Dashboard Fintech)
+- **Velvet & Oak** (E-commerce de Luxo)
+- **Nexus Health** (Plataforma SaaS)
 
-Check back soon for the full visual showcase!`,
+Volte em breve para a montra visual completa!`,
 
-    team: `👥 **About Us:**
+    team: `👥 **Sobre Nós:**
 
-We're a team of software developers from **Portugal**, also based in the **Netherlands**. 
+Somos uma equipa de programadores de **Portugal**, também com presença nos **Países Baixos**.
 
-We build custom solutions based on your actual business needs:
-- Automation systems
-- Management dashboards
-- Booking platforms
-- Business tools
+Construímos soluções personalizadas com base nas suas necessidades reais:
+- Sistemas de automação
+- Dashboards de gestão
+- Plataformas de reservas
+- Ferramentas de negócio
 
-Real people, real code, real results.`,
+Pessoas reais, código real, resultados reais.`,
 
-    hiring: `🚀 **Join the Team:**
+    hiring: `🚀 **Junte-se à Equipa:**
 
-We are primarily looking for creative **Marketing Specialists** and **Designers** to help our clients grow. 
+Procuramos principalmente **Especialistas de Marketing** e **Designers** criativos para ajudar os nossos clientes a crescer.
 
-We are also open to talented Developers, though our current focus is on growth and design roles.
+Estamos também abertos a Programadores talentosos, embora o nosso foco atual seja em funções de crescimento e design.
 
-Please send your portfolio/CV to: careers@framaxsolutions.com`,
+Envie o seu portfólio/CV para: careers@framaxsolutions.com`,
 
-    default: `I can help you with questions about our **Services**, **Pricing**, **Timelines**, or **Maintenance**. What would you like to know?`
+    default: `Posso ajudá-lo com perguntas sobre os nossos **Serviços**, **Preços**, **Prazos** ou **Manutenção**. O que gostaria de saber?`
 };
 
 type QuestionMatcher = {
@@ -314,4 +314,4 @@ export function findBestMatch(input: string): string {
     return 'default';
 }
 
-export const INITIAL_MESSAGE = `👋 Hey! How can I help you today?`;
+export const INITIAL_MESSAGE = `👋 Olá! Como posso ajudá-lo hoje?`;

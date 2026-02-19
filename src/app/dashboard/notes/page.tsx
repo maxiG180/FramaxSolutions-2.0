@@ -104,7 +104,7 @@ export default function NotesPage() {
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
                         <input
                             type="text"
-                            placeholder="Search"
+                            placeholder="Pesquisar"
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                             className="w-full bg-black/20 border border-white/5 rounded-lg pl-9 pr-4 py-2 text-sm text-white focus:outline-none focus:ring-1 focus:ring-yellow-400/50 transition-all placeholder:text-white/20"
@@ -124,7 +124,7 @@ export default function NotesPage() {
                                 }`}
                         >
                             <div className={`font-bold mb-1 truncate ${selectedNoteId === note.id ? "text-yellow-400" : "text-white"}`}>
-                                {note.title || "Untitled Note"}
+                                {note.title || "Nota sem título"}
                             </div>
                             <div className="flex items-center gap-2 text-xs text-white/40">
                                 <span>{formatDistanceToNow(new Date(note.created_at), { addSuffix: true })}</span>
@@ -143,7 +143,7 @@ export default function NotesPage() {
                         <div className="p-6 border-b border-white/10 flex items-center justify-between">
                             <span className="text-xs font-mono text-white/30 uppercase tracking-widest flex items-center gap-2">
                                 {formatDistanceToNow(new Date(selectedNote.created_at), { addSuffix: true })} • {(selectedNote.content || "").length} chars
-                                {saving && <span className="text-yellow-400 animate-pulse">Saving...</span>}
+                                {saving && <span className="text-yellow-400 animate-pulse">A guardar...</span>}
                             </span>
                             <div className="flex gap-2">
                                 <button className="p-2 hover:bg-white/10 rounded-lg transition-colors text-white/40 hover:text-white">
@@ -164,19 +164,19 @@ export default function NotesPage() {
                                 value={selectedNote.title}
                                 onChange={(e) => handleUpdateNote(selectedNote.id, { title: e.target.value })}
                                 className="w-full bg-transparent text-4xl font-bold text-white mb-6 focus:outline-none placeholder:text-white/20"
-                                placeholder="Title"
+                                placeholder="Título"
                             />
                             <textarea
                                 value={selectedNote.content || ""}
                                 onChange={(e) => handleUpdateNote(selectedNote.id, { content: e.target.value })}
                                 className="w-full min-h-[calc(100vh-20rem)] bg-transparent text-lg text-white/80 leading-relaxed focus:outline-none resize-none placeholder:text-white/20 font-sans"
-                                placeholder="Start typing..."
+                                placeholder="Comece a escrever..."
                             />
                         </div>
                     </>
                 ) : (
                     <div className="flex-1 flex items-center justify-center text-white/20">
-                        Select a note to view
+                        Selecione uma nota para visualizar
                     </div>
                 )}
             </div>

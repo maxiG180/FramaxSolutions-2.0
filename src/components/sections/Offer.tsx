@@ -33,7 +33,7 @@ export function Offer() {
                                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
                                 <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
                             </span>
-                            Limited spots available for December
+                            Vagas limitadas disponíveis para Dezembro
                         </motion.div>
 
                         <motion.h2
@@ -43,7 +43,7 @@ export function Offer() {
                             transition={{ delay: 0.1 }}
                             className="text-5xl md:text-7xl font-bold tracking-tight text-foreground leading-[1.1]"
                         >
-                            Ready to <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">ship</span> your dream?
+                            Pronto para <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">concretizar</span> o seu sonho?
                         </motion.h2>
 
                         <motion.p
@@ -53,7 +53,7 @@ export function Offer() {
                             transition={{ delay: 0.2 }}
                             className="text-xl text-muted-foreground max-w-lg"
                         >
-                            No more complicated forms. No more endless meetings. Just pure execution. We build high-converting websites that make you look like a genius.
+                            Sem formulários complicados. Sem reuniões intermitáveis. Apenas execução pura. Criamos websites de alta conversão que fazem de si uma referência no mercado.
                         </motion.p>
 
                         <motion.div
@@ -67,7 +67,7 @@ export function Offer() {
                                 href="mailto:hello@framaxsolutions.com"
                                 className="group relative inline-flex h-14 items-center justify-center overflow-hidden rounded-2xl bg-foreground px-8 text-lg font-bold text-background transition-all hover:scale-105 hover:bg-foreground/90 hover:shadow-2xl hover:shadow-primary/20"
                             >
-                                <span className="mr-2">🚀</span> Book a Call
+                                <span className="mr-2">🚀</span> Marcar uma Chamada
                                 <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
                             </a>
 
@@ -76,16 +76,16 @@ export function Offer() {
                                 className="inline-flex h-14 items-center justify-center rounded-2xl border-2 border-muted bg-background px-8 text-lg font-bold text-muted-foreground transition-all hover:border-primary hover:text-primary hover:bg-primary/5"
                             >
                                 <Coffee className="mr-2 h-5 w-5" />
-                                Don't press this
+                                Não carregar aqui
                             </button>
                         </motion.div>
 
                         <div className="grid grid-cols-2 gap-4 pt-8">
                             {[
-                                { icon: Zap, label: "Lightning Fast Delivery" },
-                                { icon: Check, label: "Top-Tier Quality" },
-                                { icon: Rocket, label: "SEO Optimized" },
-                                { icon: Coffee, label: "Async Communication" }
+                                { icon: Zap, label: "Entrega Ultra-Rápida" },
+                                { icon: Check, label: "Qualidade de Topo" },
+                                { icon: Rocket, label: "Otimizado para SEO" },
+                                { icon: Coffee, label: "Comunicação Assíncrona" }
                             ].map((item, i) => (
                                 <motion.div
                                     key={i}
@@ -118,8 +118,8 @@ export function Offer() {
 
                             <div className="relative z-10 space-y-8">
                                 <div className="space-y-2">
-                                    <h3 className="text-2xl font-bold">The "I want it all" Package</h3>
-                                    <p className="text-muted-foreground">Everything you need to dominate your niche.</p>
+                                    <h3 className="text-2xl font-bold">O Pacote "Quero Tudo"</h3>
+                                    <p className="text-muted-foreground">Tudo o que precisa para dominar o seu nicho.</p>
                                 </div>
 
                                 <div className="space-y-4">
@@ -128,17 +128,17 @@ export function Offer() {
                                         <span className="text-muted-foreground line-through">€5,000</span>
                                     </div>
                                     <p className="text-sm text-green-500 font-bold bg-green-500/10 inline-block px-3 py-1 rounded-full">
-                                        Save €2,003 this month
+                                        Poupe €2.003 este mês
                                     </p>
                                 </div>
 
                                 <ul className="space-y-3">
                                     {[
-                                        "Custom Design & Development",
-                                        "Mobile Responsive & Fast",
-                                        "SEO & Performance Optimization",
-                                        "CMS Integration (Easy edits)",
-                                        "1 Month of Support"
+                                        "Design & Desenvolvimento Personalizado",
+                                        "Mobile Responsivo & Rápido",
+                                        "SEO & Otimização de Performance",
+                                        "Integração CMS (Edições fáceis)",
+                                        "1 Mês de Suporte"
                                     ].map((feature, i) => (
                                         <li key={i} className="flex items-center gap-3">
                                             <div className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center">
@@ -150,14 +150,14 @@ export function Offer() {
                                 </ul>
 
                                 <a
-                                    href="mailto:hello@framaxsolutions.com?subject=I want the package!"
+                                    href="mailto:hello@framaxsolutions.com?subject=Quero o pacote!"
                                     className="block w-full py-4 text-center bg-primary text-primary-foreground font-bold rounded-xl hover:bg-primary/90 transition-all shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/40 transform hover:-translate-y-1"
                                 >
-                                    Get Started Now
+                                    Começar Agora
                                 </a>
 
                                 <p className="text-center text-xs text-muted-foreground">
-                                    100% Satisfaction Guarantee. No questions asked.
+                                    100% Garantia de Satisfação. Sem perguntas.
                                 </p>
                             </div>
                         </div>

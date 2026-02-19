@@ -307,7 +307,7 @@ export default function CalendarPage() {
                     {isLoading ? (
                         <div className="text-center py-12">
                             <Loader2 className="w-8 h-8 animate-spin mx-auto text-red-400" />
-                            <p className="text-white/40 mt-4">Loading events...</p>
+                            <p className="text-white/40 mt-4">A carregar eventos...</p>
                         </div>
                     ) : selectedEvents.length > 0 ? (
                         selectedEvents.map(event => (

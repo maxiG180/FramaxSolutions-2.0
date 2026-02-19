@@ -129,8 +129,8 @@ export default function Chatbot() {
                                     </div>
                                 </div>
                                 <div>
-                                    <h3 className="font-semibold text-white text-sm">Framax Assistant</h3>
-                                    <p className="text-xs text-white/50">Online now</p>
+                                    <h3 className="font-semibold text-white text-sm">Framax Assistente</h3>
+                                    <p className="text-xs text-white/50">Online agora</p>
                                 </div>
                             </div>
                             <div className="flex items-center gap-1">
@@ -216,7 +216,7 @@ export default function Chatbot() {
             */}
                         {!isTyping && messages[messages.length - 1]?.role === 'bot' && (
                             <div className="px-4 pb-2 hidden md:block">
-                                <p className="text-xs text-white/40 mb-2 font-medium uppercase tracking-wider">Suggested questions</p>
+                                <p className="text-xs text-white/40 mb-2 font-medium uppercase tracking-wider">Perguntas sugeridas</p>
                                 <div className="flex flex-wrap gap-2">
                                     {PRESET_QUESTIONS.slice(0, 4).map((q) => (
                                         <button
@@ -242,7 +242,7 @@ export default function Chatbot() {
                                     type="text"
                                     value={inputValue}
                                     onChange={(e) => setInputValue(e.target.value)}
-                                    placeholder="Ask a question..."
+                                    placeholder="Faça uma pergunta..."
                                     className="flex-1 bg-transparent border-none outline-none text-sm text-white placeholder-white/30"
                                 />
                                 <button
@@ -269,7 +269,7 @@ export default function Chatbot() {
                             className="pointer-events-auto bg-white text-blue-600 px-4 py-2 rounded-xl rounded-br-none shadow-xl mb-2 font-medium text-sm flex items-center gap-2 cursor-pointer"
                             onClick={toggleOpen}
                         >
-                            <span>👋 Questions? Ask me!</span>
+                            <span>👋 Tem dúvidas? Pergunte-me!</span>
                         </motion.div>
                     )}
                 </AnimatePresence>

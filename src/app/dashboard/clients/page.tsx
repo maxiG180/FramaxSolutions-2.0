@@ -293,7 +293,7 @@ export default function ClientsPage() {
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
                     <input
                         type="text"
-                        placeholder="Search clients..."
+                        placeholder="Pesquisar clientes..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         className="w-full bg-white/5 border border-white/10 rounded-xl pl-10 pr-4 py-3 text-white focus:outline-none focus:border-blue-500/50 transition-colors"
@@ -667,39 +667,37 @@ export default function ClientsPage() {
                                                         <button
                                                             type="button"
                                                             onClick={() => setFormData({ ...formData, preferred_language: 'pt' })}
-                                                            className={`group relative w-24 h-16 rounded-lg overflow-hidden transition-all ${
-                                                                formData.preferred_language === 'pt'
+                                                            className={`group relative w-24 h-16 rounded-lg overflow-hidden transition-all ${formData.preferred_language === 'pt'
                                                                     ? 'ring-2 ring-blue-500 ring-offset-2 ring-offset-gray-900 scale-105'
                                                                     : 'opacity-60 hover:opacity-100 hover:scale-105'
-                                                            }`}
+                                                                }`}
                                                             title="Português"
                                                         >
                                                             <svg viewBox="0 0 900 600" className="w-full h-full">
-                                                                <rect fill="#060" width="360" height="600"/>
-                                                                <rect fill="#D80027" x="360" width="540" height="600"/>
-                                                                <circle fill="#FFDA44" cx="360" cy="300" r="120"/>
-                                                                <path fill="#D80027" d="M360,180v240m-120-120h240" strokeWidth="20"/>
+                                                                <rect fill="#060" width="360" height="600" />
+                                                                <rect fill="#D80027" x="360" width="540" height="600" />
+                                                                <circle fill="#FFDA44" cx="360" cy="300" r="120" />
+                                                                <path fill="#D80027" d="M360,180v240m-120-120h240" strokeWidth="20" />
                                                             </svg>
                                                         </button>
                                                         <button
                                                             type="button"
                                                             onClick={() => setFormData({ ...formData, preferred_language: 'en' })}
-                                                            className={`group relative w-24 h-16 rounded-lg overflow-hidden transition-all ${
-                                                                formData.preferred_language === 'en'
+                                                            className={`group relative w-24 h-16 rounded-lg overflow-hidden transition-all ${formData.preferred_language === 'en'
                                                                     ? 'ring-2 ring-blue-500 ring-offset-2 ring-offset-gray-900 scale-105'
                                                                     : 'opacity-60 hover:opacity-100 hover:scale-105'
-                                                            }`}
+                                                                }`}
                                                             title="English"
                                                         >
                                                             <svg viewBox="0 0 60 30" className="w-full h-full">
-                                                                <clipPath id="s"><path d="M0,0 v30 h60 v-30 z"/></clipPath>
-                                                                <clipPath id="t"><path d="M30,15 h30 v15 z v-30 h-30 z h-30 v15 z v-30 h30 z"/></clipPath>
+                                                                <clipPath id="s"><path d="M0,0 v30 h60 v-30 z" /></clipPath>
+                                                                <clipPath id="t"><path d="M30,15 h30 v15 z v-30 h-30 z h-30 v15 z v-30 h30 z" /></clipPath>
                                                                 <g clipPath="url(#s)">
-                                                                    <path d="M0,0 v30 h60 v-30 z" fill="#012169"/>
-                                                                    <path d="M0,0 L60,30 M60,0 L0,30" stroke="#fff" strokeWidth="6"/>
-                                                                    <path d="M0,0 L60,30 M60,0 L0,30" clipPath="url(#t)" stroke="#C8102E" strokeWidth="4"/>
-                                                                    <path d="M30,0 v30 M0,15 h60" stroke="#fff" strokeWidth="10"/>
-                                                                    <path d="M30,0 v30 M0,15 h60" stroke="#C8102E" strokeWidth="6"/>
+                                                                    <path d="M0,0 v30 h60 v-30 z" fill="#012169" />
+                                                                    <path d="M0,0 L60,30 M60,0 L0,30" stroke="#fff" strokeWidth="6" />
+                                                                    <path d="M0,0 L60,30 M60,0 L0,30" clipPath="url(#t)" stroke="#C8102E" strokeWidth="4" />
+                                                                    <path d="M30,0 v30 M0,15 h60" stroke="#fff" strokeWidth="10" />
+                                                                    <path d="M30,0 v30 M0,15 h60" stroke="#C8102E" strokeWidth="6" />
                                                                 </g>
                                                             </svg>
                                                         </button>

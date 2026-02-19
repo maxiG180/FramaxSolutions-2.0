@@ -70,7 +70,7 @@ export function DiscountOffer() {
                 }, 250);
             }
         } catch (error) {
-            alert("Failed to send discount code. Please try again.");
+            alert("Erro ao enviar o código de desconto. Por favor, tente novamente.");
         } finally {
             setIsSubmitting(false);
         }
@@ -91,7 +91,7 @@ export function DiscountOffer() {
                         className="fixed bottom-6 left-6 z-40 flex items-center gap-2 bg-primary text-primary-foreground px-4 py-3 rounded-full shadow-lg hover:shadow-primary/25 transition-shadow"
                     >
                         <Gift className="w-5 h-5" />
-                        <span className="font-medium">Get 100€ Off</span>
+                        <span className="font-medium">Poupar 100€</span>
                     </motion.button>
                 )}
             </AnimatePresence>
@@ -121,55 +121,55 @@ export function DiscountOffer() {
                                         <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center text-primary mx-auto mb-6">
                                             <Gift className="w-8 h-8" />
                                         </div>
-                                        <h3 className="text-2xl font-bold mb-2">Unlock 100€ Discount</h3>
+                                        <h3 className="text-2xl font-bold mb-2">Desbloqueie 100€ de Desconto</h3>
                                         <p className="text-muted-foreground mb-8">
-                                            Answer a few quick questions about your business to unlock an exclusive discount on your first project.
+                                            Responda a algumas perguntas rápidas sobre o seu negócio para desbloquear um desconto exclusivo no seu primeiro projeto.
                                         </p>
                                         <button
                                             onClick={() => setStep("form")}
                                             className="w-full bg-primary text-primary-foreground py-3 rounded-xl font-medium hover:bg-primary/90 transition-all flex items-center justify-center gap-2"
                                         >
-                                            Unlock Now <ArrowRight className="w-4 h-4" />
+                                            Desbloquear Agora <ArrowRight className="w-4 h-4" />
                                         </button>
                                     </div>
                                 )}
 
                                 {step === "form" && (
                                     <div>
-                                        <h3 className="text-xl font-bold mb-6">Tell us about you</h3>
+                                        <h3 className="text-xl font-bold mb-6">Fale-nos sobre si</h3>
                                         <form onSubmit={handleFormSubmit} className="space-y-4">
                                             <div>
-                                                <label className="block text-sm font-medium mb-1">Company Name</label>
+                                                <label className="block text-sm font-medium mb-1">Nome da Empresa</label>
                                                 <input
                                                     required
                                                     type="text"
                                                     value={formData.company}
                                                     onChange={e => setFormData({ ...formData, company: e.target.value })}
                                                     className="w-full px-4 py-2 rounded-lg border border-border bg-background focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"
-                                                    placeholder="Acme Inc."
+                                                    placeholder="Acme Lda."
                                                 />
                                             </div>
                                             <div className="grid grid-cols-2 gap-4">
                                                 <div>
-                                                    <label className="block text-sm font-medium mb-1">Role</label>
+                                                    <label className="block text-sm font-medium mb-1">Função</label>
                                                     <input
                                                         required
                                                         type="text"
                                                         value={formData.role}
                                                         onChange={e => setFormData({ ...formData, role: e.target.value })}
                                                         className="w-full px-4 py-2 rounded-lg border border-border bg-background focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"
-                                                        placeholder="Founder"
+                                                        placeholder="Fundador"
                                                     />
                                                 </div>
                                                 <div>
-                                                    <label className="block text-sm font-medium mb-1">Team Size</label>
+                                                    <label className="block text-sm font-medium mb-1">Dimensão da Equipa</label>
                                                     <select
                                                         required
                                                         value={formData.teamSize}
                                                         onChange={e => setFormData({ ...formData, teamSize: e.target.value })}
                                                         className="w-full px-4 py-2 rounded-lg border border-border bg-background focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"
                                                     >
-                                                        <option value="">Select...</option>
+                                                        <option value="">Selecionar...</option>
                                                         <option value="1-5">1-5</option>
                                                         <option value="6-20">6-20</option>
                                                         <option value="21-50">21-50</option>
@@ -178,20 +178,20 @@ export function DiscountOffer() {
                                                 </div>
                                             </div>
                                             <div>
-                                                <label className="block text-sm font-medium mb-1">Biggest Challenge</label>
+                                                <label className="block text-sm font-medium mb-1">Principal Desafio</label>
                                                 <input
                                                     type="text"
                                                     value={formData.challenge}
                                                     onChange={e => setFormData({ ...formData, challenge: e.target.value })}
                                                     className="w-full px-4 py-2 rounded-lg border border-border bg-background focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"
-                                                    placeholder="e.g. Low conversion rate"
+                                                    placeholder="ex. Taxa de conversão baixa"
                                                 />
                                             </div>
                                             <button
                                                 type="submit"
                                                 className="w-full bg-primary text-primary-foreground py-3 rounded-xl font-medium hover:bg-primary/90 transition-all mt-2 flex items-center justify-center gap-2"
                                             >
-                                                Continue <ArrowRight className="w-4 h-4" />
+                                                Continuar <ArrowRight className="w-4 h-4" />
                                             </button>
                                         </form>
                                     </div>
@@ -203,18 +203,18 @@ export function DiscountOffer() {
                                             <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center text-primary mx-auto mb-4">
                                                 <Gift className="w-6 h-6" />
                                             </div>
-                                            <h3 className="text-xl font-bold">Where should we send your code?</h3>
+                                            <h3 className="text-xl font-bold">Para onde enviamos o seu código?</h3>
                                         </div>
                                         <form onSubmit={handleFinalSubmit} className="space-y-4">
                                             <div>
-                                                <label className="block text-sm font-medium mb-1">Email Address</label>
+                                                <label className="block text-sm font-medium mb-1">Endereço de Email</label>
                                                 <input
                                                     required
                                                     type="email"
                                                     value={formData.email}
                                                     onChange={e => setFormData({ ...formData, email: e.target.value })}
                                                     className="w-full px-4 py-2 rounded-lg border border-border bg-background focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"
-                                                    placeholder="you@company.com"
+                                                    placeholder="voce@empresa.pt"
                                                 />
                                             </div>
                                             <button
@@ -222,7 +222,7 @@ export function DiscountOffer() {
                                                 disabled={isSubmitting}
                                                 className="w-full bg-primary text-primary-foreground py-3 rounded-xl font-medium hover:bg-primary/90 transition-all mt-2 disabled:opacity-50 disabled:cursor-not-allowed"
                                             >
-                                                {isSubmitting ? "Sending..." : "Unlock My 100€ Code"}
+                                                {isSubmitting ? "A enviar..." : "Desbloquear o Meu Código de 100€"}
                                             </button>
                                         </form>
                                     </div>
@@ -233,18 +233,18 @@ export function DiscountOffer() {
                                         <div className="w-16 h-16 bg-green-500/10 rounded-full flex items-center justify-center text-green-500 mx-auto mb-6">
                                             <Check className="w-8 h-8" />
                                         </div>
-                                        <h3 className="text-2xl font-bold mb-2">Code Sent!</h3>
+                                        <h3 className="text-2xl font-bold mb-2">Código Enviado!</h3>
                                         <p className="text-muted-foreground mb-8">
-                                            We've sent your unique 100€ discount code to <strong>{formData.email}</strong>.
+                                            Enviamos o seu código exclusivo de desconto de 100€ para <strong>{formData.email}</strong>.
                                             <br /><br />
-                                            Please check your inbox (and spam folder) to retrieve it before booking your call.
+                                            Por favor, verifique a sua caixa de entrada (e pasta de spam) para o recuperar antes de marcar a sua chamada.
                                         </p>
 
                                         <button
                                             onClick={() => setIsOpen(false)}
                                             className="w-full bg-muted text-foreground py-3 rounded-xl font-medium hover:bg-muted/80 transition-all"
                                         >
-                                            Close
+                                            Fechar
                                         </button>
                                     </div>
                                 )}

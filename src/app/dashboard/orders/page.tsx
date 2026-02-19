@@ -42,7 +42,7 @@ export default function OrdersPage() {
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
                     <input
                         type="text"
-                        placeholder="Search orders..."
+                        placeholder="Pesquisar encomendas..."
                         className="w-full bg-white/5 border border-white/10 rounded-xl pl-10 pr-4 py-3 text-white focus:outline-none focus:border-white/30 transition-colors"
                     />
                 </div>

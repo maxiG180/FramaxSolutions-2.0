@@ -7,32 +7,32 @@ import { Lightbulb, Compass, Code2, Rocket } from "lucide-react";
 const steps = [
     {
         id: "01",
-        title: "Discovery",
-        description: "We dive deep into your business goals, target audience, and competitive landscape to uncover unique opportunities.",
+        title: "Descoberta",
+        description: "Mergulhamos profundamente nos objetivos do seu negócio, público-alvo e panorama competitivo para descobrir oportunidades únicas.",
         icon: Lightbulb,
         color: "text-yellow-500",
         bg: "bg-yellow-500/10",
     },
     {
         id: "02",
-        title: "Strategy & Design",
-        description: "We craft a tailored roadmap and stunning visuals that align with your brand identity and user needs.",
+        title: "Estratégia & Design",
+        description: "Criamos um roteiro personalizado e visuais impressionantes que se alinham com a identidade da sua marca e as necessidades dos utilizadores.",
         icon: Compass,
         color: "text-blue-500",
         bg: "bg-blue-500/10",
     },
     {
         id: "03",
-        title: "Development",
-        description: "Our engineers build your solution using cutting-edge technologies, ensuring speed, security, and scalability.",
+        title: "Desenvolvimento",
+        description: "Os nossos engenheiros constroem a sua solução usando tecnologias de ponta, garantindo velocidade, segurança e escalabilidade.",
         icon: Code2,
         color: "text-blue-600",
         bg: "bg-blue-600/10",
     },
     {
         id: "04",
-        title: "Launch & Scale",
-        description: "We deploy your project with zero downtime and provide ongoing support to help you grow and evolve.",
+        title: "Lançamento & Escala",
+        description: "Implementamos o seu projeto sem tempo de inatividade e fornecemos suporte contínuo para o ajudar a crescer e evoluir.",
         icon: Rocket,
         color: "text-green-500",
         bg: "bg-green-500/10",
@@ -56,10 +56,10 @@ export function Process() {
                     className="mb-20 text-center max-w-3xl mx-auto"
                 >
                     <h2 className="mb-6 text-3xl font-bold text-foreground sm:text-4xl md:text-5xl">
-                        How We <span className="text-primary">Bring Ideas to Life</span>
+                        Como <span className="text-primary">Damos Vida às Ideias</span>
                     </h2>
                     <p className="text-lg text-muted-foreground">
-                        A proven methodology that delivers consistent, high-quality results for every project.
+                        Uma metodologia comprovada que garante resultados consistentes e de alta qualidade em cada projeto.
                     </p>
                 </motion.div>
 

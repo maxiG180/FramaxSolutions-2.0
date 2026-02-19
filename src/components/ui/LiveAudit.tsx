@@ -36,8 +36,8 @@ export function LiveAudit() {
     const metrics = [
         { label: "Performance", icon: Zap, color: "text-green-500", score: 100, delay: 0.2 },
         { label: "SEO", icon: Search, color: "text-blue-500", score: 100, delay: 0.4 },
-        { label: "Accessibility", icon: MousePointer2, color: "text-orange-500", score: 100, delay: 0.6 },
-        { label: "Best Practices", icon: ShieldCheck, color: "text-blue-600", score: 100, delay: 0.8 },
+        { label: "Acessibilidade", icon: MousePointer2, color: "text-orange-500", score: 100, delay: 0.6 },
+        { label: "Boas Práticas", icon: ShieldCheck, color: "text-blue-600", score: 100, delay: 0.8 },
     ];
 
     return (
@@ -52,7 +52,7 @@ export function LiveAudit() {
                 <div className="flex items-center justify-center w-6 h-6 rounded bg-muted text-xs font-bold font-mono text-muted-foreground border border-border">
                     L
                 </div>
-                <span className="text-sm font-medium text-muted-foreground">to audit this page</span>
+                <span className="text-sm font-medium text-muted-foreground">para auditar esta página</span>
             </motion.div>
 
             {/* Modal Overlay */}
@@ -76,7 +76,7 @@ export function LiveAudit() {
                             <div className="flex items-center justify-between p-6 border-b border-border bg-muted/30">
                                 <div className="flex items-center gap-2">
                                     <Activity className="w-5 h-5 text-primary animate-pulse" />
-                                    <h3 className="font-bold text-lg">Live Site Audit</h3>
+                                    <h3 className="font-bold text-lg">Auditoria ao Vivo</h3>
                                 </div>
                                 <button
                                     onClick={() => setIsOpen(false)}
@@ -101,8 +101,8 @@ export function LiveAudit() {
                                             </div>
                                         </div>
                                         <div className="text-center space-y-2">
-                                            <h4 className="text-xl font-semibold">Analyzing Core Web Vitals...</h4>
-                                            <p className="text-muted-foreground">Checking LCP, FID, and CLS metrics</p>
+                                            <h4 className="text-xl font-semibold">A analisar Core Web Vitals...</h4>
+                                            <p className="text-muted-foreground">A verificar métricas LCP, FID e CLS</p>
                                         </div>
                                     </div>
                                 ) : (
@@ -132,10 +132,10 @@ export function LiveAudit() {
                                             className="text-center space-y-4"
                                         >
                                             <p className="text-lg font-medium">
-                                                This is the standard we deliver for <span className="text-primary font-bold">every client</span>.
+                                                Este é o padrão que entregamos a <span className="text-primary font-bold">cada cliente</span>.
                                             </p>
                                             <button className="inline-flex items-center justify-center px-8 py-3 text-sm font-medium text-primary-foreground bg-primary rounded-full hover:bg-primary/90 transition-all hover:scale-105 active:scale-95 shadow-lg shadow-primary/25">
-                                                Get Your Perfect Score
+                                                Obter a Sua Pontuação Perfeita
                                             </button>
                                         </motion.div>
                                     </div>

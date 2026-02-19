@@ -152,7 +152,7 @@ export default function SettingsPage() {
     ];
 
     if (loading) {
-        return <div className="p-8 text-center text-white/40">Loading settings...</div>;
+        return <div className="p-8 text-center text-white/40">A carregar definições...</div>;
     }
 
     return (
