@@ -22,10 +22,10 @@ export async function OPTIONS(request: NextRequest) {
  */
 export async function GET(
     request: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
-        const { id } = params;
+        const { id } = await params;
 
         // 1. Rate limiting (IP-based)
         const rateLimitResponse = rateLimit(request, RATE_LIMITS.API_CALL);
@@ -73,7 +73,7 @@ export async function GET(
         return addCorsHeaders(response, request);
 
     } catch (error: any) {
-        logger.logApiError(`/api/invoices/${params.id}`, error);
+        logger.logApiError('/api/invoices/[id]', error);
         const response = NextResponse.json(
             { error: 'Internal server error' },
             { status: 500 }
@@ -122,10 +122,10 @@ const updateInvoiceSchema = z.object({
  */
 export async function PUT(
     request: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
-        const { id } = params;
+        const { id } = await params;
 
         // 1. Rate limiting (IP-based)
         const rateLimitResponse = rateLimit(request, RATE_LIMITS.API_CALL);
@@ -261,7 +261,7 @@ export async function PUT(
         return addCorsHeaders(response, request);
 
     } catch (error: any) {
-        logger.logApiError(`/api/invoices/${params.id}`, error);
+        logger.logApiError('/api/invoices/[id]', error);
         const response = NextResponse.json(
             { error: 'Internal server error' },
             { status: 500 }
