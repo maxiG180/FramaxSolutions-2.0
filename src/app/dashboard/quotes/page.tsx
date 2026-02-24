@@ -191,7 +191,7 @@ export default function QuotesPage() {
 
     const stats = calculateStats();
 
-    const handleDeleteDocument = async (id: string, type: "quote") => {
+    const handleDeleteDocument = async (id: string, type: "invoice" | "quote") => {
         if (!confirm(t.invoices.deleteQuoteConfirm)) return;
 
         try {
