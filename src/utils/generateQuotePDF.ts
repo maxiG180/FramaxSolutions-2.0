@@ -18,6 +18,7 @@ export interface QuotePDFData {
     quote_date?: string;
     invoice_date?: string;
     expiry_date?: string;
+    due_date?: string;
     items: Array<{
         description: string;
         quantity: number;
