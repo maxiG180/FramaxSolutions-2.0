@@ -304,6 +304,14 @@ export interface Translation {
         paymentOther: string;
         paymentReferencePlaceholder: string;
         paymentNotesPlaceholder: string;
+        status: string;
+        bankingDetails: string;
+        bankName: string;
+        paymentDetails: string;
+        paymentDate: string;
+        paymentMethod: string;
+        paymentNotes: string;
+        paymentReference: string;
     };
     quoteModal: {
         title: string;
