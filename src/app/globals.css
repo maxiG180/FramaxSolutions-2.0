@@ -39,8 +39,100 @@ body {
     font-family: var(--font-sans), Arial, Helvetica, sans-serif;
 }
 
-html {
-    scroll-behavior: smooth;
+@media (prefers-reduced-motion: no-preference) {
+    html {
+        scroll-behavior: smooth;
+    }
+}
+
+/* Performance-optimized CSS animations (replacing JS-driven framer-motion) */
+@keyframes gentle-bounce {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-6px);
+    }
+}
+
+@keyframes speed-bar-pulse {
+
+    0%,
+    100% {
+        transform: scaleY(1);
+    }
+
+    50% {
+        transform: scaleY(0.4);
+    }
+}
+
+@keyframes cursor-blink {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0;
+    }
+}
+
+@keyframes cta-pulse {
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.05);
+    }
+}
+
+.animate-gentle-bounce {
+    animation: gentle-bounce 2s ease-in-out infinite;
+    will-change: transform;
+}
+
+.animate-speed-bar {
+    animation: speed-bar-pulse 1.6s ease-in-out infinite alternate;
+    will-change: transform;
+    transform-origin: bottom;
+}
+
+.animate-cursor-blink {
+    animation: cursor-blink 1s step-end infinite;
+}
+
+.animate-cta-pulse {
+    animation: cta-pulse 2s ease-in-out infinite;
+    will-change: transform;
+}
+
+@keyframes click-cursor {
+
+    0%,
+    100% {
+        transform: translate(0, 0) scale(1);
+    }
+
+    40% {
+        transform: translate(-10px, -10px) scale(0.9);
+    }
+
+    60% {
+        transform: translate(-10px, -10px) scale(0.9);
+    }
+}
+
+.animate-click-cursor {
+    animation: click-cursor 3s ease-in-out infinite;
+    will-change: transform;
 }
 
 /* Custom Scrollbar Styles */

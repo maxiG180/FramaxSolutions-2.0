@@ -4,7 +4,7 @@ import { Zap, Search, Globe, Star, Bot, FileText, Settings, CheckCircle, MousePo
 
 import { useState, useEffect, useRef } from "react";
 import createGlobe from "cobe";
-import { motion, useMotionValue, useTransform, useSpring, useInView, useAnimation, animate, AnimatePresence } from "framer-motion";
+import { motion, useInView, useAnimation, AnimatePresence } from "framer-motion";
 
 import { useLanguage } from "@/context/LanguageContext";
 
@@ -49,21 +49,6 @@ export function Features() {
         seoControls.start("visible");
     };
 
-    // Design Card 3D Tilt Logic
-    const x = useMotionValue(0);
-    const y = useMotionValue(0);
-    const mouseX = useSpring(x, { stiffness: 500, damping: 100 });
-    const mouseY = useSpring(y, { stiffness: 500, damping: 100 });
-
-    function onMouseMove({ currentTarget, clientX, clientY }: React.MouseEvent) {
-        const { left, top, width, height } = currentTarget.getBoundingClientRect();
-        x.set((clientX - left) / width - 0.5);
-        y.set((clientY - top) / height - 0.5);
-    }
-
-    const rotateX = useTransform(mouseY, [-0.5, 0.5], [15, -15]);
-    const rotateY = useTransform(mouseX, [-0.5, 0.5], [-15, 15]);
-
     const containerVariants = {
         hidden: { opacity: 0 },
         visible: {
@@ -90,43 +75,49 @@ export function Features() {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const pointerInteracting = useRef(null);
     const pointerInteractionMovement = useRef(0);
-    const [r, setR] = useState(0);
+    const globeRef = useRef<ReturnType<typeof createGlobe> | null>(null);
+    const globeInitialized = useRef(false);
 
     useEffect(() => {
+        // Only create globe when in view (lazy init)
+        if (!isInView || globeInitialized.current || !canvasRef.current) return;
+        globeInitialized.current = true;
+
         let phi = 0;
         let width = 0;
         const onResize = () => canvasRef.current && (width = canvasRef.current.offsetWidth);
         window.addEventListener('resize', onResize);
         onResize();
         const globe = createGlobe(canvasRef.current!, {
-            devicePixelRatio: 2,
+            devicePixelRatio: 1.5,
             width: width * 2,
             height: width * 2,
             phi: 0,
             theta: 0.3,
             dark: 1,
             diffuse: 1.2,
-            mapSamples: 16000,
+            mapSamples: 10000,
             mapBrightness: 3,
-            baseColor: [0.3, 0.3, 0.3], // Monochrome base
-            markerColor: [0.8, 0.8, 0.8], // White/Gray markers
-            glowColor: [0.5, 0.5, 0.5], // Monochrome glow
+            baseColor: [0.3, 0.3, 0.3],
+            markerColor: [0.8, 0.8, 0.8],
+            glowColor: [0.5, 0.5, 0.5],
             markers: [],
             onRender: (state) => {
                 if (!pointerInteracting.current) {
                     phi += 0.005;
                 }
-                state.phi = phi + r;
+                state.phi = phi;
                 state.width = width * 2;
                 state.height = width * 2;
             }
         });
+        globeRef.current = globe;
         setTimeout(() => canvasRef.current!.style.opacity = '1');
         return () => {
             globe.destroy();
             window.removeEventListener('resize', onResize);
         }
-    }, [r]);
+    }, [isInView]);
 
     return (
         <section id="features" className="py-24 bg-background relative overflow-hidden">
@@ -220,14 +211,12 @@ export function Features() {
                                     <div className="w-1/2 h-4 bg-gradient-to-r from-slate-700 via-slate-600 to-slate-700 rounded-lg mb-2" />
                                     <div className="w-2/3 h-2 bg-slate-800 rounded-full" />
 
-                                    {/* Animated CTA Button */}
-                                    <motion.div
-                                        className="mt-4 px-6 py-2 bg-indigo-600 rounded-md shadow-lg shadow-indigo-500/25 flex items-center gap-2"
-                                        animate={{ scale: [1, 1.05, 1] }}
-                                        transition={{ duration: 2, repeat: Infinity }}
+                                    {/* Animated CTA Button — CSS animation */}
+                                    <div
+                                        className="mt-4 px-6 py-2 bg-indigo-600 rounded-md shadow-lg shadow-indigo-500/25 flex items-center gap-2 animate-cta-pulse"
                                     >
                                         <div className="w-24 h-2 bg-white/90 rounded-full" />
-                                    </motion.div>
+                                    </div>
                                 </div>
 
                                 {/* Feature Grid (Below Fold) */}
@@ -240,18 +229,12 @@ export function Features() {
                                     ))}
                                 </div>
 
-                                {/* Floating Cursor Clicking CTA */}
-                                <motion.div
-                                    className="absolute top-[130px] left-[55%] z-20"
-                                    animate={{
-                                        x: [0, -10, -10, 0],
-                                        y: [0, -10, -10, 0],
-                                        scale: [1, 0.9, 0.9, 1]
-                                    }}
-                                    transition={{ duration: 3, repeat: Infinity, times: [0, 0.4, 0.6, 1] }}
+                                {/* Floating Cursor Clicking CTA — CSS animation */}
+                                <div
+                                    className="absolute top-[130px] left-[55%] z-20 animate-click-cursor"
                                 >
                                     <MousePointerClick className="w-8 h-8 text-white fill-black drop-shadow-xl" />
-                                </motion.div>
+                                </div>
                             </div>
                         </div>
 
@@ -427,30 +410,20 @@ export function Features() {
                     {/* Card 3: Automation (Small) */}
                     <motion.div
                         variants={itemVariants}
-                        onMouseMove={onMouseMove}
-                        onMouseLeave={() => {
-                            x.set(0);
-                            y.set(0);
-                        }}
-                        style={{
-                            rotateX,
-                            rotateY,
-                            transformStyle: "preserve-3d",
-                        }}
                         className="group relative overflow-hidden rounded-3xl border border-border bg-card p-8 transition-all hover:shadow-xl perspective-1000 col-span-1 md:col-span-2"
                     >
                         <div className="relative z-10 w-2/3">
-                            <div className="mb-4 inline-flex rounded-lg bg-purple-500/10 p-3 text-purple-500" style={{ transform: "translateZ(20px)" }}>
+                            <div className="mb-4 inline-flex rounded-lg bg-purple-500/10 p-3 text-purple-500">
                                 <Bot className="h-6 w-6" />
                             </div>
-                            <h3 className="mb-2 text-xl font-bold text-foreground" style={{ transform: "translateZ(20px)" }} suppressHydrationWarning>{t.features.automationTitle}</h3>
-                            <p className="text-sm text-muted-foreground" style={{ transform: "translateZ(20px)" }} suppressHydrationWarning>
+                            <h3 className="mb-2 text-xl font-bold text-foreground" suppressHydrationWarning>{t.features.automationTitle}</h3>
+                            <p className="text-sm text-muted-foreground" suppressHydrationWarning>
                                 {t.features.automationDesc}
                             </p>
                         </div>
 
                         {/* Visual: Automated Task Stream */}
-                        <div className="absolute top-8 right-0 w-[240px] h-full flex flex-col gap-3 p-4 perspective-[1000px]" style={{ transformStyle: "preserve-3d" }}>
+                        <div className="absolute top-8 right-0 w-[240px] h-full flex flex-col gap-3 p-4" style={{ perspective: '1000px' }}>
                             <AnimatePresence mode="popLayout" initial={false}>
                                 {visibleNotifications.map((idx) => {
                                     const item = NOTIFICATIONS[idx];
@@ -458,7 +431,7 @@ export function Features() {
                                         <motion.div
                                             key={`${idx}-${item.text}`}
                                             layout
-                                            className="relative flex items-center gap-3 p-3 rounded-xl bg-slate-900/80 border border-white/10 shadow-lg backdrop-blur-md"
+                                            className="relative flex items-center gap-3 p-3 rounded-xl bg-slate-900/80 border border-white/10 shadow-lg"
                                             style={{
                                                 transform: "rotateY(-10deg) rotateX(5deg)",
                                                 transformOrigin: "right center"

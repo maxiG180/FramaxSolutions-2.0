@@ -1,11 +1,16 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Calendar, Clock, ArrowRight, Check, ChevronLeft, ChevronRight } from "lucide-react";
-import confetti from "canvas-confetti";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/context/LanguageContext";
+
+// Dynamic import confetti (40KB) — only loaded when user submits successfully
+const triggerConfetti = async (options: any) => {
+    const confetti = (await import("canvas-confetti")).default;
+    confetti(options);
+};
 
 const TIME_SLOTS_12H = [
     "09:00 AM", "10:00 AM", "11:00 AM", "12:00 PM",
@@ -165,11 +170,11 @@ export function Booking() {
     };
 
     // Easter Egg: Party Mode
-    const handleTitleClick = () => {
+    const handleTitleClick = async () => {
         const newClicks = titleClicks + 1;
         setTitleClicks(newClicks);
         if (newClicks === 5) {
-            confetti({
+            triggerConfetti({
                 particleCount: 150,
                 spread: 100,
                 origin: { y: 0.6 },
@@ -261,8 +266,8 @@ export function Booking() {
                 }
 
                 const particleCount = 50 * (timeLeft / duration);
-                confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } });
-                confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } });
+                triggerConfetti({ ...defaults, particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } });
+                triggerConfetti({ ...defaults, particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } });
             }, 250);
 
             setStep("success");
@@ -273,25 +278,25 @@ export function Booking() {
         }
     };
 
-    // Calendar Logic
-    const getDaysInMonth = (date: Date) => {
-        const year = date.getFullYear();
-        const month = date.getMonth();
+    // Calendar Logic — memoized to prevent creating 30+ Date objects every render
+    const calendarDays = useMemo(() => {
+        const year = currentDate.getFullYear();
+        const month = currentDate.getMonth();
         const daysInMonth = new Date(year, month + 1, 0).getDate();
         const firstDayOfMonth = new Date(year, month, 1).getDay();
 
-        const days = [];
+        const days: (Date | null)[] = [];
         for (let i = 0; i < firstDayOfMonth; i++) days.push(null);
         for (let i = 1; i <= daysInMonth; i++) days.push(new Date(year, month, i));
         return days;
-    };
+    }, [currentDate]);
 
     return (
         <section id="booking" className="py-24 md:py-32 bg-background relative overflow-hidden">
             {/* Background Gradients */}
             <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
-                <div className="absolute top-[-10%] right-[-5%] w-[500px] h-[500px] bg-primary/5 rounded-full blur-[100px]" />
-                <div className="absolute bottom-[-10%] left-[-5%] w-[500px] h-[500px] bg-blue-500/5 rounded-full blur-[100px]" />
+                <div className="absolute top-[-10%] right-[-5%] w-[500px] h-[500px] bg-primary/5 rounded-full blur-[100px]" style={{ willChange: 'filter' }} />
+                <div className="absolute bottom-[-10%] left-[-5%] w-[500px] h-[500px] bg-blue-500/5 rounded-full blur-[100px]" style={{ willChange: 'filter' }} />
             </div>
 
             <div className="container mx-auto px-4 relative z-10">
@@ -383,7 +388,7 @@ export function Booking() {
                                             </div>
 
                                             <div className="grid grid-cols-7 gap-1 md:gap-2">
-                                                {getDaysInMonth(currentDate).map((date, i) => (
+                                                {calendarDays.map((date, i) => (
                                                     <div key={i} className="aspect-square">
                                                         {date ? (
                                                             <button

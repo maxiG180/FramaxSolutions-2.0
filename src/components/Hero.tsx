@@ -1,9 +1,9 @@
 "use client";
 
-import React, { useRef } from "react";
+import React, { useRef, useMemo } from "react";
 import Link from "next/link";
-import { motion, useInView, useMotionValue, useTransform, useSpring } from "framer-motion";
-import { ArrowRight, TrendingUp, ShoppingCart, Users, Zap, Bell, FileText, Calendar } from "lucide-react";
+import { motion, useInView } from "framer-motion";
+import { ArrowRight, TrendingUp, Users, Zap, Bell, FileText, Calendar } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 
 const Typewriter = ({ text }: { text: string[] }) => {
@@ -36,18 +36,12 @@ const Typewriter = ({ text }: { text: string[] }) => {
     return () => clearTimeout(timeout);
   }, [subIndex, index, reverse, text]);
 
-  // Cursor blink
-  React.useEffect(() => {
-    const timeout2 = setInterval(() => {
-      setBlink((prev) => !prev);
-    }, 500);
-    return () => clearInterval(timeout2);
-  }, []);
+  // Cursor blink — use CSS animation instead of state to avoid re-renders
 
   return (
     <span className="relative inline-block text-blue-500">
       {`${text[index].substring(0, subIndex)}`}
-      <span className={`${blink ? "opacity-100" : "opacity-0"} absolute top-0 -right-2 text-blue-500`}>|</span>
+      <span className="absolute top-0 -right-2 text-blue-500 animate-cursor-blink">|</span>
       <svg
         className="absolute w-full h-3 sm:h-4 -bottom-1 sm:-bottom-2 left-0 text-blue-500"
         viewBox="0 0 100 10"
@@ -72,20 +66,6 @@ const Hero = () => {
   const containerRef = useRef(null);
   const isInView = useInView(containerRef, { once: true, margin: "-100px" });
 
-  // 3D Tilt Effect
-  const x = useMotionValue(0);
-  const y = useMotionValue(0);
-  const mouseX = useSpring(x, { stiffness: 500, damping: 100 });
-  const mouseY = useSpring(y, { stiffness: 500, damping: 100 });
-
-  function onMouseMove({ currentTarget, clientX, clientY }: React.MouseEvent) {
-    const { left, top, width, height } = currentTarget.getBoundingClientRect();
-    x.set((clientX - left) / width - 0.5);
-    y.set((clientY - top) / height - 0.5);
-  }
-
-  const rotateX = useTransform(mouseY, [-0.5, 0.5], [8, -8]);
-  const rotateY = useTransform(mouseX, [-0.5, 0.5], [-8, 8]);
 
   return (
     <section
@@ -203,17 +183,13 @@ const Hero = () => {
                 <div className="text-xl font-bold text-white mb-1">{t.hero.heroVisuals.activeGrowth}</div>
                 <div className="text-xs text-blue-400 font-medium">{t.hero.heroVisuals.trendingUp}</div>
 
-                {/* Simple arrow going up */}
+                {/* Simple arrow going up — CSS animation */}
                 <div className="absolute bottom-2 right-2 w-12 h-12">
-                  <motion.div
-                    animate={{ y: [0, -6, 0] }}
-                    transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-                    className="w-full h-full flex items-center justify-center"
-                  >
+                  <div className="w-full h-full flex items-center justify-center animate-gentle-bounce">
                     <svg className="w-10 h-10 text-blue-500/40" fill="currentColor" viewBox="0 0 24 24">
                       <path d="M7 14l5-5 5 5z" />
                     </svg>
-                  </motion.div>
+                  </div>
                 </div>
               </motion.div>
 
@@ -228,20 +204,15 @@ const Hero = () => {
                 <div className="text-xs font-semibold text-white mb-1">{t.hero.alwaysOpen}</div>
                 <div className="text-[10px] text-yellow-400 font-mono font-bold">{t.hero.alwaysOnline}</div>
 
-                {/* Speed bars animation */}
+                {/* Speed bars animation — CSS only */}
                 <div className="absolute bottom-2 right-2 flex items-end gap-0.5 h-6">
                   {[40, 70, 55, 85, 60].map((height, i) => (
-                    <motion.div
+                    <div
                       key={i}
-                      className="w-1 bg-gradient-to-t from-yellow-500 to-yellow-300 rounded-full"
-                      initial={{ height: '20%' }}
-                      animate={{ height: `${height}%` }}
-                      transition={{
-                        duration: 0.8,
-                        delay: 0.8 + i * 0.1,
-                        repeat: Infinity,
-                        repeatType: 'reverse',
-                        repeatDelay: 0.5
+                      className="w-1 bg-gradient-to-t from-yellow-500 to-yellow-300 rounded-full animate-speed-bar"
+                      style={{
+                        height: `${height}%`,
+                        animationDelay: `${0.8 + i * 0.1}s`,
                       }}
                     />
                   ))}
@@ -315,15 +286,16 @@ const Hero = () => {
                 <div className="text-xs font-semibold text-white mb-1">{t.hero.heroVisuals.revenueScale}</div>
                 <div className="text-xl font-bold text-orange-400">{t.hero.heroVisuals.scaleStatus}</div>
 
-                {/* Growth chart */}
+                {/* Growth chart — CSS animation */}
                 <div className="absolute bottom-0 left-0 right-0 h-8 flex items-end gap-0.5 px-2 pb-2">
                   {[30, 40, 35, 55, 50, 70, 95].map((height, i) => (
-                    <motion.div
+                    <div
                       key={i}
-                      className="flex-1 bg-orange-500/40 rounded-t"
-                      initial={{ height: 0 }}
-                      animate={isInView ? { height: `${height}%` } : { height: 0 }}
-                      transition={{ duration: 0.8, delay: 1.2 + i * 0.1 }}
+                      className={`flex-1 bg-orange-500/40 rounded-t transition-all duration-700 ease-out ${isInView ? '' : '!h-0'}`}
+                      style={{
+                        height: isInView ? `${height}%` : 0,
+                        transitionDelay: `${1.2 + i * 0.1}s`,
+                      }}
                     />
                   ))}
                 </div>
@@ -350,18 +322,15 @@ const Hero = () => {
 
                   <div className="flex items-baseline gap-1.5">
                     <div className="text-2xl font-bold text-green-400">4.9</div>
-                    <div className="flex gap-0.5">
+                    <div className={`flex gap-0.5 transition-all duration-500 ${isInView ? 'scale-100 rotate-0 opacity-100' : 'scale-0 -rotate-180 opacity-0'}`} style={{ transitionDelay: '1.3s' }}>
                       {[...Array(5)].map((_, i) => (
-                        <motion.svg
+                        <svg
                           key={i}
-                          initial={{ scale: 0, rotate: -180 }}
-                          animate={isInView ? { scale: 1, rotate: 0 } : { scale: 0, rotate: -180 }}
-                          transition={{ delay: 1.3 + i * 0.08, type: "spring", stiffness: 200 }}
                           className="w-3 h-3 text-yellow-400 fill-current"
                           viewBox="0 0 20 20"
                         >
                           <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z" />
-                        </motion.svg>
+                        </svg>
                       ))}
                     </div>
                   </div>
@@ -373,8 +342,8 @@ const Hero = () => {
 
             </div>
 
-            {/* Floating Glow */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] bg-primary/10 rounded-full blur-[100px] pointer-events-none -z-10" />
+            {/* Floating Glow — GPU optimized */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] bg-primary/10 rounded-full blur-[80px] pointer-events-none -z-10" style={{ willChange: 'filter' }} />
           </motion.div>
 
           {/* Right Visual - Business Benefits Showcase */}
@@ -423,17 +392,13 @@ const Hero = () => {
                   <div className="text-sm font-medium text-blue-400">{t.hero.heroVisuals.trendingUp}</div>
                 </div>
 
-                {/* Simple arrow going up */}
+                {/* Simple arrow going up — CSS animation */}
                 <div className="absolute bottom-4 right-4 w-16 h-16">
-                  <motion.div
-                    animate={{ y: [0, -8, 0] }}
-                    transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-                    className="w-full h-full flex items-center justify-center"
-                  >
+                  <div className="w-full h-full flex items-center justify-center animate-gentle-bounce">
                     <svg className="w-12 h-12 text-blue-500/40" fill="currentColor" viewBox="0 0 24 24">
                       <path d="M7 14l5-5 5 5z" />
                     </svg>
-                  </motion.div>
+                  </div>
                 </div>
               </motion.div>
 
@@ -528,20 +493,15 @@ const Hero = () => {
                   <div className="text-sm font-semibold text-white mb-1">{t.hero.alwaysOpen}</div>
                   <div className="text-xs text-yellow-400 font-mono font-bold">{t.hero.alwaysOnline}</div>
                 </div>
-                {/* Speed bars animation */}
+                {/* Speed bars animation — CSS only */}
                 <div className="absolute bottom-4 right-4 flex items-end gap-1 h-10">
                   {[45, 75, 60, 90, 65].map((height, i) => (
-                    <motion.div
+                    <div
                       key={i}
-                      className="w-1.5 bg-gradient-to-t from-yellow-500 to-yellow-300 rounded-full"
-                      initial={{ height: '30%' }}
-                      animate={{ height: `${height}%` }}
-                      transition={{
-                        duration: 0.8,
-                        delay: 0.9 + i * 0.1,
-                        repeat: Infinity,
-                        repeatType: 'reverse',
-                        repeatDelay: 0.5
+                      className="w-1.5 bg-gradient-to-t from-yellow-500 to-yellow-300 rounded-full animate-speed-bar"
+                      style={{
+                        height: `${height}%`,
+                        animationDelay: `${0.9 + i * 0.1}s`,
                       }}
                     />
                   ))}
@@ -561,15 +521,16 @@ const Hero = () => {
                   <div className="text-sm font-semibold text-white mb-1">{t.hero.heroVisuals.revenueScale}</div>
                   <div className="text-2xl font-bold text-orange-400">{t.hero.heroVisuals.scaleStatus}</div>
                 </div>
-                {/* Growth chart */}
+                {/* Growth chart — CSS animation */}
                 <div className="absolute bottom-0 left-0 right-0 h-10 flex items-end gap-0.5 px-3 pb-3">
                   {[30, 40, 35, 55, 50, 70, 95].map((height, i) => (
-                    <motion.div
+                    <div
                       key={i}
-                      className="flex-1 bg-orange-500/40 rounded-t"
-                      initial={{ height: 0 }}
-                      animate={isInView ? { height: `${height}%` } : { height: 0 }}
-                      transition={{ duration: 0.8, delay: 1.2 + i * 0.1 }}
+                      className={`flex-1 bg-orange-500/40 rounded-t transition-all duration-700 ease-out ${isInView ? '' : '!h-0'}`}
+                      style={{
+                        height: isInView ? `${height}%` : 0,
+                        transitionDelay: `${1.2 + i * 0.1}s`,
+                      }}
                     />
                   ))}
                 </div>
@@ -598,18 +559,15 @@ const Hero = () => {
 
                   <div className="flex items-baseline gap-2">
                     <div className="text-3xl font-bold text-green-400">4.9</div>
-                    <div className="flex gap-0.5">
+                    <div className={`flex gap-0.5 transition-all duration-500 ${isInView ? 'scale-100 rotate-0 opacity-100' : 'scale-0 -rotate-180 opacity-0'}`} style={{ transitionDelay: '1.3s' }}>
                       {[...Array(5)].map((_, i) => (
-                        <motion.svg
+                        <svg
                           key={i}
-                          initial={{ scale: 0, rotate: -180 }}
-                          animate={isInView ? { scale: 1, rotate: 0 } : { scale: 0, rotate: -180 }}
-                          transition={{ delay: 1.3 + i * 0.08, type: "spring", stiffness: 200 }}
                           className="w-4 h-4 text-yellow-400 fill-current"
                           viewBox="0 0 20 20"
                         >
                           <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z" />
-                        </motion.svg>
+                        </svg>
                       ))}
                     </div>
                   </div>
@@ -664,8 +622,8 @@ const Hero = () => {
 
             </div>
 
-            {/* Floating Glow */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-primary/10 rounded-full blur-[120px] pointer-events-none -z-10" />
+            {/* Floating Glow — GPU optimized */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-primary/10 rounded-full blur-[80px] pointer-events-none -z-10" style={{ willChange: 'filter' }} />
           </motion.div>
 
         </div>

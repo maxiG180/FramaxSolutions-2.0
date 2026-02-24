@@ -16,7 +16,10 @@ export function Header() {
     const { t } = useLanguage();
 
     useMotionValueEvent(scrollY, "change", (latest) => {
-        setIsScrolled(latest > 50);
+        const shouldBeScrolled = latest > 50;
+        if (shouldBeScrolled !== isScrolled) {
+            setIsScrolled(shouldBeScrolled);
+        }
     });
 
     return (
@@ -25,7 +28,7 @@ export function Header() {
                 "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
                 isScrolled
                     ? "bg-background/80 backdrop-blur-md border-b border-border/50 py-3"
-                    : "bg-transparent py-5"
+                    : "bg-transparent py-5",
             )}
         >
             <div className="container mx-auto px-4 flex items-center justify-between">

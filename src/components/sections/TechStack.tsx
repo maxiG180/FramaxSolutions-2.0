@@ -19,7 +19,7 @@ export function TechStack() {
     const { t } = useLanguage();
 
     return (
-        <section className="border-y border-border bg-background/50 py-10 backdrop-blur-sm">
+        <section className="border-y border-border bg-background/50 py-10">
             <div className="container mx-auto px-4">
                 <p
                     className="mb-8 text-center text-sm font-medium text-muted-foreground"
@@ -29,24 +29,30 @@ export function TechStack() {
                 </p>
                 {/* Desktop Version */}
                 <div className="relative hidden w-full overflow-hidden md:flex">
-                    <div className="animate-marquee flex min-w-full shrink-0 items-center justify-around gap-10">
+                    <div className="animate-marquee flex min-w-full shrink-0 items-center justify-around gap-10" style={{ willChange: 'transform' }}>
                         {technologies.map((tech, i) => (
                             <div key={i} className="flex items-center gap-2 transition-all duration-300 hover:scale-110">
                                 {/* Using img tag for external SVGs to avoid Next.js Image config issues for now */}
                                 <img
                                     src={tech.url}
                                     alt={tech.name}
+                                    loading="lazy"
+                                    width={32}
+                                    height={32}
                                     className="h-8 w-auto object-contain"
                                 />
                             </div>
                         ))}
                     </div>
-                    <div className="animate-marquee flex min-w-full shrink-0 items-center justify-around gap-10" aria-hidden="true">
+                    <div className="animate-marquee flex min-w-full shrink-0 items-center justify-around gap-10" aria-hidden="true" style={{ willChange: 'transform' }}>
                         {technologies.map((tech, i) => (
                             <div key={`duplicate-${i}`} className="flex items-center gap-2 transition-all duration-300 hover:scale-110">
                                 <img
                                     src={tech.url}
                                     alt={tech.name}
+                                    loading="lazy"
+                                    width={32}
+                                    height={32}
                                     className="h-8 w-auto object-contain"
                                 />
                             </div>
@@ -58,23 +64,29 @@ export function TechStack() {
 
                 {/* Mobile Version */}
                 <div className="relative flex w-full overflow-hidden md:hidden [mask-image:linear-gradient(to_right,transparent,black_10%,black_90%,transparent)]">
-                    <div className="animate-marquee flex min-w-full shrink-0 items-center justify-start gap-8 pr-8">
+                    <div className="animate-marquee flex min-w-full shrink-0 items-center justify-start gap-8 pr-8" style={{ willChange: 'transform' }}>
                         {technologies.map((tech, i) => (
                             <div key={i} className="flex shrink-0 items-center gap-2 transition-all duration-300 hover:scale-110">
                                 <img
                                     src={tech.url}
                                     alt={tech.name}
+                                    loading="lazy"
+                                    width={24}
+                                    height={24}
                                     className="h-6 w-auto object-contain"
                                 />
                             </div>
                         ))}
                     </div>
-                    <div className="animate-marquee flex min-w-full shrink-0 items-center justify-start gap-8 pr-8" aria-hidden="true">
+                    <div className="animate-marquee flex min-w-full shrink-0 items-center justify-start gap-8 pr-8" aria-hidden="true" style={{ willChange: 'transform' }}>
                         {technologies.map((tech, i) => (
                             <div key={`duplicate-${i}`} className="flex shrink-0 items-center gap-2 transition-all duration-300 hover:scale-110">
                                 <img
                                     src={tech.url}
                                     alt={tech.name}
+                                    loading="lazy"
+                                    width={24}
+                                    height={24}
                                     className="h-6 w-auto object-contain"
                                 />
                             </div>

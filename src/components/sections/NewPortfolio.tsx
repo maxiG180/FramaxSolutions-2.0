@@ -101,24 +101,15 @@ const PROJECTS: Project[] = [
     }
 ];
 
-// Duplicate projects for infinite loop
-const MARQUEE_PROJECTS = [...PROJECTS, ...PROJECTS, ...PROJECTS];
+// Duplicate projects for infinite loop (2x is sufficient for seamless looping)
+const MARQUEE_PROJECTS = [...PROJECTS, ...PROJECTS];
 
 const PortfolioItem = ({ project, onClick }: { project: Project; onClick: (link: string) => void }) => {
     const videoRef = useRef<HTMLVideoElement>(null);
 
     return (
-        <motion.div
+        <div
             className="relative group w-[300px] md:w-[450px] aspect-video rounded-2xl overflow-hidden bg-card border border-border/50 shrink-0"
-            whileHover={{ scale: 1.02 }}
-            transition={{ duration: 0.3 }}
-            onMouseEnter={() => videoRef.current?.play()}
-            onMouseLeave={() => {
-                if (videoRef.current) {
-                    videoRef.current.pause();
-                    videoRef.current.currentTime = 0;
-                }
-            }}
         >
             <div className="block w-full h-full cursor-grab active:cursor-grabbing">
                 {/* Image / Video */}
@@ -165,7 +156,7 @@ const PortfolioItem = ({ project, onClick }: { project: Project; onClick: (link:
                     </div>
                 </div>
             </div>
-        </motion.div>
+        </div>
     );
 };
 
@@ -186,26 +177,22 @@ export function NewPortfolio() {
     useEffect(() => {
         if (containerRef.current) {
             const totalWidth = containerRef.current.scrollWidth;
-            const singleSetWidth = totalWidth / 3;
+            const singleSetWidth = totalWidth / 2;
             setContentWidth(singleSetWidth);
             x.set(-singleSetWidth);
         }
     }, []);
 
     useAnimationFrame((t, delta) => {
-        if (isDragging || !contentWidth) return;
+        if (isDragging || !contentWidth || isHovered) return;
 
-        let moveBy = baseVelocity * (delta / 16); // Normalize for 60fps
-
-        if (isHovered) {
-            moveBy = 0;
-        }
+        const moveBy = baseVelocity * (delta / 16); // Normalize for 60fps
 
         let newX = x.get() + moveBy;
 
         if (newX <= -contentWidth * 2) {
             newX += contentWidth;
-        } else if (newX > -contentWidth) {
+        } else if (newX > 0) {
             newX -= contentWidth;
         }
 
@@ -270,8 +257,8 @@ export function NewPortfolio() {
             <div className="w-full relative pointer-events-none cursor-default py-10">
                 <motion.div
                     ref={containerRef}
-                    className="flex gap-8 w-max px-4 opacity-40 grayscale-[0.3] blur-[12px]"
-                    style={{ x }}
+                    className="flex gap-8 w-max px-4 opacity-40 grayscale-[0.3] blur-[8px]"
+                    style={{ x, willChange: 'transform' }}
                 >
                     {MARQUEE_PROJECTS.map((project, index) => (
                         <PortfolioItem
