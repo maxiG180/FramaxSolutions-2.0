@@ -1,6 +1,7 @@
 import { Metadata } from "next";
 import { Outfit } from "next/font/google";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 import RootClientWrapper from "./RootClientWrapper";
 
@@ -54,7 +55,6 @@ export default function RootLayout({
         {/* dns-prefetch for analytics — non-blocking */}
         <link rel="dns-prefetch" href="https://a.plerdy.com" />
         <link rel="dns-prefetch" href="https://vitals.vercel-insights.com" />
-        <link rel="dns-prefetch" href="https://cdn.simpleicons.org" />
       </head>
       <body
         suppressHydrationWarning
@@ -62,6 +62,7 @@ export default function RootLayout({
       >
         <RootClientWrapper>{children}</RootClientWrapper>
         <SpeedInsights />
+        <Analytics />
       </body>
     </html>
   );
