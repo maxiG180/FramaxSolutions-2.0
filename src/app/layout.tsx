@@ -50,6 +50,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="scroll-smooth">
+      <head>
+        {/* Pre-establish connections to critical third-party origins */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://cdn.simpleicons.org" />
+        <link rel="dns-prefetch" href="https://a.plerdy.com" />
+      </head>
       <body
         suppressHydrationWarning
         className={`${outfit.variable} antialiased font-sans bg-background text-foreground overflow-x-hidden`}

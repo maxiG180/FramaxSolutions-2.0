@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useMemo } from "react";
+import React, { useRef } from "react";
 import Link from "next/link";
 import { motion, useInView } from "framer-motion";
 import { ArrowRight, TrendingUp, Users, Zap, Bell, FileText, Calendar } from "lucide-react";
@@ -98,36 +98,22 @@ const Hero = () => {
           {/* Left Content */}
           <div className="space-y-12 text-center lg:text-left">
 
-            {/* Headline */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-            >
+            {/* Headline — rendered immediately (no opacity:0) for best LCP */}
+            <div>
               <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold tracking-tight leading-[1.05] text-foreground">
                 {t.hero.titlePre}
                 <br />
                 <Typewriter text={t.hero.dynamicKeywords || [t.hero.titleHighlight]} />
               </h1>
-            </motion.div>
+            </div>
 
-            {/* Description */}
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-              transition={{ duration: 0.6, delay: 0.4 }}
-              className="text-lg sm:text-xl lg:text-2xl text-muted-foreground leading-relaxed max-w-lg mx-auto lg:mx-0"
-            >
+            {/* Description — also rendered immediately for FCP */}
+            <p className="text-lg sm:text-xl lg:text-2xl text-muted-foreground leading-relaxed max-w-lg mx-auto lg:mx-0">
               {t.hero.subtitle}
-            </motion.p>
+            </p>
 
-            {/* CTA */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-              transition={{ duration: 0.6, delay: 0.6 }}
-              className="flex justify-center lg:justify-start"
-            >
+            {/* CTA — also rendered immediately */}
+            <div className="flex justify-center lg:justify-start">
               <Link
                 href="/#booking"
                 className="group inline-flex items-center gap-2 sm:gap-3 px-6 sm:px-8 py-4 sm:py-5 text-base sm:text-lg font-semibold text-white bg-primary rounded-full hover:scale-105 transition-transform duration-200"
@@ -135,7 +121,7 @@ const Hero = () => {
                 {t.hero.bookMeeting}
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </Link>
-            </motion.div>
+            </div>
 
           </div>
 

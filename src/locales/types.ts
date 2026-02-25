@@ -548,4 +548,58 @@ export interface Translation {
         updateService: string;
         createService: string;
     };
+    discountOffer: {
+        triggerLabel: string;
+        offerTitle: string;
+        offerDesc: string;
+        unlockNow: string;
+        formTitle: string;
+        companyLabel: string;
+        companyPlaceholder: string;
+        roleLabel: string;
+        rolePlaceholder: string;
+        teamSizeLabel: string;
+        teamSizePlaceholder: string;
+        teamSize1: string;
+        teamSize2: string;
+        teamSize3: string;
+        teamSize4: string;
+        challengeLabel: string;
+        challengePlaceholder: string;
+        continue: string;
+        emailTitle: string;
+        emailLabel: string;
+        emailPlaceholder: string;
+        sending: string;
+        unlockCode: string;
+        successTitle: string;
+        successDesc: string;
+        close: string;
+    };
+    chatbot: {
+        title: string;
+        online: string;
+        notificationBubble: string;
+        suggestedQuestions: string;
+        inputPlaceholder: string;
+        initialMessage: string;
+        presets: {
+            timeline: string;
+            pricing: string;
+            maintenance: string;
+            services: string;
+            contact: string;
+        };
+        answers: {
+            timeline: string;
+            pricing: string;
+            maintenance: string;
+            services: string;
+            contact: string;
+            portfolio: string;
+            team: string;
+            hiring: string;
+            default: string;
+        };
+    };
 }

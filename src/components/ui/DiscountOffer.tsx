@@ -2,9 +2,13 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Gift, X, Copy, Check, ArrowRight } from "lucide-react";
+import { Gift, X, Check, ArrowRight } from "lucide-react";
+import { useLanguage } from "@/context/LanguageContext";
 
 export function DiscountOffer() {
+    const { t } = useLanguage();
+    const d = t.discountOffer;
+
     const [isOpen, setIsOpen] = useState(false);
     const [step, setStep] = useState<"offer" | "form" | "email" | "success">("offer");
     const [formData, setFormData] = useState({
@@ -39,22 +43,18 @@ export function DiscountOffer() {
         try {
             const response = await fetch('/api/send-discount', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(formData),
             });
 
             const data = await response.json();
 
             if (data.success && data.code) {
-                // Save code to localStorage for auto-fill but DON'T show it
                 localStorage.setItem("framax_promo_code", data.code);
                 localStorage.setItem("framax_discount_seen", "true");
 
                 setStep("success");
 
-                // Trigger confetti
                 const duration = 3 * 1000;
                 const animationEnd = Date.now() + duration;
                 const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 100 };
@@ -92,7 +92,7 @@ export function DiscountOffer() {
                         className="fixed bottom-6 left-6 z-40 flex items-center gap-2 bg-primary text-primary-foreground px-4 py-3 rounded-full shadow-lg hover:shadow-primary/25 transition-shadow"
                     >
                         <Gift className="w-5 h-5" />
-                        <span className="font-medium">Poupar 100€</span>
+                        <span className="font-medium">{d.triggerLabel}</span>
                     </motion.button>
                 )}
             </AnimatePresence>
@@ -100,7 +100,7 @@ export function DiscountOffer() {
             {/* Modal Overlay */}
             <AnimatePresence>
                 {isOpen && (
-                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm" style={{ willChange: 'opacity' }}>
+                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
                         <motion.div
                             initial={{ opacity: 0, scale: 0.9, y: 20 }}
                             animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -115,84 +115,81 @@ export function DiscountOffer() {
                                 <X className="w-5 h-5" />
                             </button>
 
-                            {/* Content */}
                             <div className="p-8">
                                 {step === "offer" && (
                                     <div className="text-center">
                                         <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center text-primary mx-auto mb-6">
                                             <Gift className="w-8 h-8" />
                                         </div>
-                                        <h3 className="text-2xl font-bold mb-2">Desbloqueie 100€ de Desconto</h3>
-                                        <p className="text-muted-foreground mb-8">
-                                            Responda a algumas perguntas rápidas sobre o seu negócio para desbloquear um desconto exclusivo no seu primeiro projeto.
-                                        </p>
+                                        <h3 className="text-2xl font-bold mb-2">{d.offerTitle}</h3>
+                                        <p className="text-muted-foreground mb-8">{d.offerDesc}</p>
                                         <button
                                             onClick={() => setStep("form")}
                                             className="w-full bg-primary text-primary-foreground py-3 rounded-xl font-medium hover:bg-primary/90 transition-all flex items-center justify-center gap-2"
                                         >
-                                            Desbloquear Agora <ArrowRight className="w-4 h-4" />
+                                            {d.unlockNow} <ArrowRight className="w-4 h-4" />
                                         </button>
                                     </div>
                                 )}
 
                                 {step === "form" && (
                                     <div>
-                                        <h3 className="text-xl font-bold mb-6">Fale-nos sobre si</h3>
+                                        <h3 className="text-xl font-bold mb-6">{d.formTitle}</h3>
                                         <form onSubmit={handleFormSubmit} className="space-y-4">
                                             <div>
-                                                <label className="block text-sm font-medium mb-1">Nome da Empresa</label>
+                                                <label className="block text-sm font-medium mb-1">{d.companyLabel}</label>
                                                 <input
                                                     required
                                                     type="text"
                                                     value={formData.company}
                                                     onChange={e => setFormData({ ...formData, company: e.target.value })}
                                                     className="w-full px-4 py-2 rounded-lg border border-border bg-background focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"
-                                                    placeholder="Acme Lda."
+                                                    placeholder={d.companyPlaceholder}
                                                 />
                                             </div>
                                             <div className="grid grid-cols-2 gap-4">
                                                 <div>
-                                                    <label className="block text-sm font-medium mb-1">Função</label>
+                                                    <label className="block text-sm font-medium mb-1">{d.roleLabel}</label>
                                                     <input
                                                         required
                                                         type="text"
                                                         value={formData.role}
                                                         onChange={e => setFormData({ ...formData, role: e.target.value })}
                                                         className="w-full px-4 py-2 rounded-lg border border-border bg-background focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"
-                                                        placeholder="Fundador"
+                                                        placeholder={d.rolePlaceholder}
                                                     />
                                                 </div>
                                                 <div>
-                                                    <label className="block text-sm font-medium mb-1">Dimensão da Equipa</label>
+                                                    <label className="block text-sm font-medium mb-1">{d.teamSizeLabel}</label>
                                                     <select
                                                         required
                                                         value={formData.teamSize}
                                                         onChange={e => setFormData({ ...formData, teamSize: e.target.value })}
                                                         className="w-full px-4 py-2 rounded-lg border border-border bg-background focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"
                                                     >
-                                                        <option value="">Selecionar...</option>
-                                                        <option value="1-5">1-5</option>
-                                                        <option value="6-20">6-20</option>
-                                                        <option value="21-50">21-50</option>
-                                                        <option value="50+">50+</option>
+                                                        <option value="">{d.teamSizePlaceholder}</option>
+                                                        <option value="1-5">{d.teamSize1}</option>
+                                                        <option value="6-20">{d.teamSize2}</option>
+                                                        <option value="21-50">{d.teamSize3}</option>
+                                                        <option value="50+">{d.teamSize4}</option>
                                                     </select>
                                                 </div>
                                             </div>
                                             <div>
-                                                <label className="block text-sm font-medium mb-1">Principal Desafio</label>
+                                                <label className="block text-sm font-medium mb-1">{d.challengeLabel}</label>
                                                 <input
                                                     type="text"
                                                     value={formData.challenge}
                                                     onChange={e => setFormData({ ...formData, challenge: e.target.value })}
                                                     className="w-full px-4 py-2 rounded-lg border border-border bg-background focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"
-                                                    placeholder="ex. Taxa de conversão baixa"
+                                                    placeholder={d.challengePlaceholder}
                                                 />
                                             </div>
                                             <button
                                                 type="submit"
                                                 className="w-full bg-primary text-primary-foreground py-3 rounded-xl font-medium hover:bg-primary/90 transition-all mt-2 flex items-center justify-center gap-2"
                                             >
-                                                Continuar <ArrowRight className="w-4 h-4" />
+                                                {d.continue} <ArrowRight className="w-4 h-4" />
                                             </button>
                                         </form>
                                     </div>
@@ -204,18 +201,18 @@ export function DiscountOffer() {
                                             <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center text-primary mx-auto mb-4">
                                                 <Gift className="w-6 h-6" />
                                             </div>
-                                            <h3 className="text-xl font-bold">Para onde enviamos o seu código?</h3>
+                                            <h3 className="text-xl font-bold">{d.emailTitle}</h3>
                                         </div>
                                         <form onSubmit={handleFinalSubmit} className="space-y-4">
                                             <div>
-                                                <label className="block text-sm font-medium mb-1">Endereço de Email</label>
+                                                <label className="block text-sm font-medium mb-1">{d.emailLabel}</label>
                                                 <input
                                                     required
                                                     type="email"
                                                     value={formData.email}
                                                     onChange={e => setFormData({ ...formData, email: e.target.value })}
                                                     className="w-full px-4 py-2 rounded-lg border border-border bg-background focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"
-                                                    placeholder="voce@empresa.pt"
+                                                    placeholder={d.emailPlaceholder}
                                                 />
                                             </div>
                                             <button
@@ -223,7 +220,7 @@ export function DiscountOffer() {
                                                 disabled={isSubmitting}
                                                 className="w-full bg-primary text-primary-foreground py-3 rounded-xl font-medium hover:bg-primary/90 transition-all mt-2 disabled:opacity-50 disabled:cursor-not-allowed"
                                             >
-                                                {isSubmitting ? "A enviar..." : "Desbloquear o Meu Código de 100€"}
+                                                {isSubmitting ? d.sending : d.unlockCode}
                                             </button>
                                         </form>
                                     </div>
@@ -234,18 +231,16 @@ export function DiscountOffer() {
                                         <div className="w-16 h-16 bg-green-500/10 rounded-full flex items-center justify-center text-green-500 mx-auto mb-6">
                                             <Check className="w-8 h-8" />
                                         </div>
-                                        <h3 className="text-2xl font-bold mb-2">Código Enviado!</h3>
+                                        <h3 className="text-2xl font-bold mb-2">{d.successTitle}</h3>
                                         <p className="text-muted-foreground mb-8">
-                                            Enviamos o seu código exclusivo de desconto de 100€ para <strong>{formData.email}</strong>.
+                                            {d.successDesc} <strong>{formData.email}</strong>.
                                             <br /><br />
-                                            Por favor, verifique a sua caixa de entrada (e pasta de spam) para o recuperar antes de marcar a sua chamada.
                                         </p>
-
                                         <button
                                             onClick={() => setIsOpen(false)}
                                             className="w-full bg-muted text-foreground py-3 rounded-xl font-medium hover:bg-muted/80 transition-all"
                                         >
-                                            Fechar
+                                            {d.close}
                                         </button>
                                     </div>
                                 )}
