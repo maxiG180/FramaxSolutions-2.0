@@ -6,40 +6,28 @@ import { motion, useInView } from "framer-motion";
 import { ArrowRight, TrendingUp, Users, Zap, Bell, FileText, Calendar } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 
-/**
- * Pure CSS word-cycler — zero JS timers, zero re-renders after mount.
- * Each word fades in/out on a staggered CSS animation-delay so the
- * browser compositor does all the work on the GPU thread.
- */
 const Typewriter = ({ text }: { text: string[] }) => {
-  const count = text.length;
-  // Each word gets: fadeDuration in + hold + fadeOut. Total cycle = count * slotDuration
-  const slotDuration = 3; // seconds per word
-  const fadeDuration = 0.4;
-  const totalDuration = count * slotDuration;
+  const [index, setIndex] = React.useState(0);
+  // Start fully typed so the first word is visible immediately on mount
+  const [subIndex, setSubIndex] = React.useState(text[0]?.length ?? 0);
+  const [reverse, setReverse] = React.useState(false);
+
+  React.useEffect(() => {
+    if (index >= text.length) { setIndex(0); return; }
+    if (subIndex === text[index].length + 1 && !reverse) { setTimeout(() => setReverse(true), 2000); return; }
+    if (subIndex === 0 && reverse) { setReverse(false); setIndex((prev) => (prev + 1) % text.length); return; }
+
+    const timeout = setTimeout(() => {
+      setSubIndex((prev) => prev + (reverse ? -1 : 1));
+    }, Math.max(reverse ? 75 : subIndex === text[index].length ? 2000 : 150, Math.floor(Math.random() * 350)));
+
+    return () => clearTimeout(timeout);
+  }, [subIndex, index, reverse, text]);
 
   return (
-    <span className="relative inline-block text-blue-500" style={{ minWidth: '4ch' }}>
-      {/* Invisible spacer so the parent h1 doesn't collapse in height */}
-      <span className="invisible select-none" aria-hidden="true">
-        {text.reduce((a, b) => a.length > b.length ? a : b)}
-      </span>
-      {text.map((word, i) => (
-        <span
-          key={word}
-          className="absolute inset-0 flex items-center"
-          style={{
-            animation: `word-cycle ${totalDuration}s ${i * slotDuration}s ease-in-out infinite`,
-            opacity: 0,
-          }}
-          aria-hidden={i !== 0}
-        >
-          {word}
-        </span>
-      ))}
-      {/* Cursor blink — pure CSS */}
-      <span className="absolute top-0 -right-3 text-blue-500 animate-cursor-blink" aria-hidden="true">|</span>
-      {/* Static underline — no framer-motion path animation needed here */}
+    <span className="relative inline-block text-blue-500">
+      {text[index].substring(0, subIndex)}
+      <span className="absolute top-0 -right-2 text-blue-500 animate-cursor-blink">|</span>
       <svg
         className="absolute w-full h-3 sm:h-4 -bottom-1 sm:-bottom-2 left-0 text-blue-500"
         viewBox="0 0 100 10"
@@ -551,7 +539,7 @@ const Hero = () => {
                 </div>
 
                 {/* Reviews popping up */}
-                <div className="relative mt-4 h-20 overflow-hidden flex items-center">
+                <div className="relative mt-2 h-24 overflow-hidden flex items-center pt-2">
                   {[
                     { name: t.hero.review1Name, text: t.hero.review1Text, delay: 2.5 },
                     { name: t.hero.review2Name, text: t.hero.review2Text, delay: 7 },

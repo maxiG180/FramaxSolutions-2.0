@@ -1,6 +1,10 @@
 import type { NextConfig } from "next";
+import path from "path";
 
 const nextConfig: NextConfig = {
+  // Fix Vercel lockfile warning — point tracing to the actual project root
+  outputFileTracingRoot: path.join(__dirname),
+
   // Enable React strict mode for better development experience
   reactStrictMode: true,
 

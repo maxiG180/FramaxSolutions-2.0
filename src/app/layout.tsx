@@ -51,11 +51,10 @@ export default function RootLayout({
   return (
     <html lang="en" className="scroll-smooth">
       <head>
-        {/* Pre-establish connections to critical third-party origins */}
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link rel="dns-prefetch" href="https://cdn.simpleicons.org" />
+        {/* dns-prefetch for analytics — non-blocking */}
         <link rel="dns-prefetch" href="https://a.plerdy.com" />
+        <link rel="dns-prefetch" href="https://vitals.vercel-insights.com" />
+        <link rel="dns-prefetch" href="https://cdn.simpleicons.org" />
       </head>
       <body
         suppressHydrationWarning

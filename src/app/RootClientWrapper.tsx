@@ -23,25 +23,35 @@ export default function RootClientWrapper({
     const isLogin = pathname?.startsWith("/login");
     const isPortal = pathname?.startsWith("/portal");
     const showLayout = !isDashboard && !isLogin && !isPortal;
+    // Only load Google OAuth SDK on routes that actually use it — saves ~45KB on homepage
+    const needsOAuth = isDashboard || isLogin || isPortal;
 
-    return (
-        <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || ''}>
-            <LanguageProvider>
-                {showLayout && <Header />}
-                <main className={showLayout ? "min-h-screen pt-20" : ""}>
-                    {children}
-                </main>
-                {showLayout && (
-                    <>
-                        <DeveloperMode />
-                        <KonamiTrigger />
-                        <Chatbot />
-                        <Footer />
-                        <CookieConsent />
-                    </>
-                )}
-                {!showLayout && <CookieConsent />}
-            </LanguageProvider>
-        </GoogleOAuthProvider>
+    const content = (
+        <LanguageProvider>
+            {showLayout && <Header />}
+            <main className={showLayout ? "min-h-screen pt-20" : ""}>
+                {children}
+            </main>
+            {showLayout && (
+                <>
+                    <DeveloperMode />
+                    <KonamiTrigger />
+                    <Chatbot />
+                    <Footer />
+                    <CookieConsent />
+                </>
+            )}
+            {!showLayout && <CookieConsent />}
+        </LanguageProvider>
     );
+
+    if (needsOAuth) {
+        return (
+            <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || ''}>
+                {content}
+            </GoogleOAuthProvider>
+        );
+    }
+
+    return content;
 }
