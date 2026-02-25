@@ -11,6 +11,7 @@ import { GoogleOAuthProvider } from '@react-oauth/google';
 // Lazy-load interaction-only components — keeps initial bundle lean
 const DeveloperMode = dynamic(() => import('@/components/ui/DeveloperMode').then(m => ({ default: m.DeveloperMode })), { ssr: false });
 const KonamiTrigger = dynamic(() => import('@/components/ui/KonamiTrigger').then(m => ({ default: m.KonamiTrigger })), { ssr: false });
+const EasterEggs = dynamic(() => import('@/components/ui/EasterEggs').then(m => ({ default: m.EasterEggs })), { ssr: false });
 const Chatbot = dynamic(() => import('@/components/chatbot/Chatbot'), { ssr: false });
 
 export default function RootClientWrapper({
@@ -36,6 +37,7 @@ export default function RootClientWrapper({
                 <>
                     <DeveloperMode />
                     <KonamiTrigger />
+                    <EasterEggs />
                     <Chatbot />
                     <Footer />
                     <CookieConsent />
