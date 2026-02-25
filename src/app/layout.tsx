@@ -55,6 +55,8 @@ export default function RootLayout({
         {/* dns-prefetch for analytics — non-blocking */}
         <link rel="dns-prefetch" href="https://a.plerdy.com" />
         <link rel="dns-prefetch" href="https://vitals.vercel-insights.com" />
+        {/* preconnect for TechStack icon CDN — establishes TCP+TLS before images lazy-load */}
+        <link rel="preconnect" href="https://cdn.simpleicons.org" />
       </head>
       <body
         suppressHydrationWarning
