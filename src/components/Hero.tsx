@@ -547,12 +547,12 @@ const Hero = () => {
                   ].map((review, i) => (
                     <motion.div
                       key={i}
-                      className="absolute inset-x-0 top-0 bottom-0 my-auto h-fit bg-slate-800/90 backdrop-blur-sm rounded-lg p-2.5 border border-green-500/20 shadow-lg"
-                      initial={{ y: 90, opacity: 0 }}
+                      className="absolute inset-x-0 top-1 bg-slate-800/90 backdrop-blur-sm rounded-lg p-2.5 border border-green-500/20 shadow-lg"
+                      initial={{ y: 96, opacity: 0 }}
                       animate={isInView ? {
-                        y: [90, -22, -22, -90],
+                        y: [96, 0, 0, -96],
                         opacity: [0, 1, 1, 0]
-                      } : { y: 90, opacity: 0 }}
+                      } : { y: 96, opacity: 0 }}
                       transition={{
                         duration: 4.5,
                         delay: review.delay,
