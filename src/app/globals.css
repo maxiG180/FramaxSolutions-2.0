@@ -161,3 +161,41 @@ body {
     scrollbar-width: thin;
     scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
 }
+
+/* ============================================================
+   RENDERING PERFORMANCE — content-visibility: auto
+   Tells the browser to skip layout/paint for off-screen sections
+   until they're about to enter the viewport. Large LCP/TBT win.
+   ============================================================ */
+section {
+    content-visibility: auto;
+    contain-intrinsic-size: 0 500px;
+    /* estimated height prevents scroll jump */
+}
+
+/* Hero is always visible — opt it back out */
+section:first-of-type {
+    content-visibility: visible;
+    contain-intrinsic-size: none;
+}
+
+/* Marquee/TechStack — force GPU compositing for smooth marquee */
+.animate-marquee,
+.animate-marquee-reverse {
+    will-change: transform;
+    transform: translateZ(0);
+}
+
+/* Reduce motion: disable heavy animations for accessibility + perf */
+@media (prefers-reduced-motion: reduce) {
+
+    .animate-gentle-bounce,
+    .animate-speed-bar,
+    .animate-cta-pulse,
+    .animate-click-cursor,
+    .animate-marquee,
+    .animate-marquee-reverse {
+        animation: none !important;
+        will-change: auto;
+    }
+}

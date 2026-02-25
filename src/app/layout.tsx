@@ -1,23 +1,14 @@
 import { Metadata } from "next";
-import { Outfit, Inter, Playfair_Display } from "next/font/google";
-import Script from "next/script";
+import { Outfit } from "next/font/google";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
 import RootClientWrapper from "./RootClientWrapper";
 
 const outfit = Outfit({
   variable: "--font-sans",
   subsets: ["latin"],
-});
-
-const inter = Inter({
-  variable: "--font-mono",
-  subsets: ["latin"],
-});
-
-const playfair = Playfair_Display({
-  variable: "--font-display",
-  subsets: ["latin"],
-  weight: ["400", "700", "900"],
+  display: "swap",
+  preload: true,
 });
 
 export const metadata: Metadata = {
@@ -61,9 +52,10 @@ export default function RootLayout({
     <html lang="en" className="scroll-smooth">
       <body
         suppressHydrationWarning
-        className={`${outfit.variable} ${inter.variable} ${playfair.variable} antialiased font-sans bg-background text-foreground overflow-x-hidden`}
+        className={`${outfit.variable} antialiased font-sans bg-background text-foreground overflow-x-hidden`}
       >
         <RootClientWrapper>{children}</RootClientWrapper>
+        <SpeedInsights />
       </body>
     </html>
   );

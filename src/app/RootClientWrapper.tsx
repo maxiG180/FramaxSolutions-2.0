@@ -1,14 +1,17 @@
 "use client";
 
 import { usePathname } from "next/navigation";
+import dynamic from "next/dynamic";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
-import { DeveloperMode } from "@/components/ui/DeveloperMode";
-import { KonamiTrigger } from "@/components/ui/KonamiTrigger";
-import Chatbot from "@/components/chatbot/Chatbot";
 import { CookieConsent } from "@/components/ui/CookieConsent";
 import { LanguageProvider } from "@/context/LanguageContext";
 import { GoogleOAuthProvider } from '@react-oauth/google';
+
+// Lazy-load interaction-only components — keeps initial bundle lean
+const DeveloperMode = dynamic(() => import('@/components/ui/DeveloperMode').then(m => ({ default: m.DeveloperMode })), { ssr: false });
+const KonamiTrigger = dynamic(() => import('@/components/ui/KonamiTrigger').then(m => ({ default: m.KonamiTrigger })), { ssr: false });
+const Chatbot = dynamic(() => import('@/components/chatbot/Chatbot'), { ssr: false });
 
 export default function RootClientWrapper({
     children,
