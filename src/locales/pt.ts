@@ -54,7 +54,7 @@ export const pt: Translation = {
         bookMeeting: "Marcar reunião gratuita",
         couldBeYou: "Este Poderia Ser Você",
         moreClients: "Mais Clientes",
-        alwaysOpen: "Ultra-Rápido",
+        alwaysOpen: "Tempos de Carregamento",
         alwaysOnline: "< 1s Carregamento",
         growth: "Crescimento",
         reviews: "Avaliações",

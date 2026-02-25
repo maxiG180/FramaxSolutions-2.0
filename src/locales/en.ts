@@ -54,7 +54,7 @@ export const en: Translation = {
         bookMeeting: "Book free meeting",
         couldBeYou: "This Could Be You",
         moreClients: "More Clients",
-        alwaysOpen: "Lightning Fast",
+        alwaysOpen: "Load Times",
         alwaysOnline: "< 1s Load Time",
         growth: "Growth",
         reviews: "Reviews",
