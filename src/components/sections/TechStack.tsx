@@ -2,93 +2,72 @@
 
 import { useLanguage } from "@/context/LanguageContext";
 
+// Inline SVGs — zero network requests, zero layout shift, instant render
 const technologies = [
-    { name: "Next.js", url: "https://cdn.simpleicons.org/nextdotjs/000000/ffffff" },
-    { name: "React", url: "https://cdn.simpleicons.org/react/61DAFB" },
-    { name: "TypeScript", url: "https://cdn.simpleicons.org/typescript/3178C6" },
-    { name: "Tailwind CSS", url: "https://cdn.simpleicons.org/tailwindcss/06B6D4" },
-    { name: "Framer", url: "https://cdn.simpleicons.org/framer/0055FF" },
-    { name: "Stripe", url: "https://cdn.simpleicons.org/stripe/635BFF" },
-    { name: "Vercel", url: "https://cdn.simpleicons.org/vercel/000000/ffffff" },
-    { name: "PostgreSQL", url: "https://cdn.simpleicons.org/postgresql/4169E1" },
-    { name: "Node.js", url: "https://cdn.simpleicons.org/nodedotjs/339933" },
-    { name: "Supabase", url: "https://cdn.simpleicons.org/supabase/3ECF8E" }
+    {
+        name: "Next.js",
+        svg: <svg viewBox="0 0 128 128" className="h-8 w-8"><path d="M64 0C28.7 0 0 28.7 0 64s28.7 64 64 64c11.2 0 21.7-2.9 30.8-7.9L48.4 55.3v36.6h-6.8V41.8h6.8l50.5 75.8C116.4 106.2 128 86.5 128 64c0-35.3-28.7-64-64-64zm-3.7 24.8h7.4v47.3L60.3 24.8zm40.6 78.5L81.5 74.6 86 68l25.5 38.3c-3 1.9-6.2 3.6-9.6 5z" fill="currentColor" className="text-white" /></svg>
+    },
+    {
+        name: "React",
+        svg: <svg viewBox="0 0 128 128" className="h-8 w-8"><g fill="#61DAFB"><circle cx="64" cy="64" r="11.4" /><path d="M107.3 45.2c-2.2-.8-4.5-1.6-6.9-2.3.6-2.4 1.1-4.8 1.5-7.1 2.1-13.2-.2-22.5-6.6-26.1-1.9-1.1-4-1.6-6.4-1.6-7 0-15.9 5.2-24.9 13.9-9-8.7-17.9-13.9-24.9-13.9-2.4 0-4.5.5-6.4 1.6-6.4 3.7-8.7 13-6.6 26.1.4 2.3.9 4.7 1.5 7.1-2.4.7-4.7 1.4-6.9 2.3C8.2 50 1.4 56.6 1.4 64s6.8 14 19.3 18.8c2.2.8 4.5 1.6 6.9 2.3-.6 2.4-1.1 4.8-1.5 7.1-2.1 13.2.2 22.5 6.6 26.1 1.9 1.1 4 1.6 6.4 1.6 7.1 0 16-5.2 24.9-13.9 9 8.7 17.9 13.9 24.9 13.9 2.4 0 4.5-.5 6.4-1.6 6.4-3.7 8.7-13 6.6-26.1-.4-2.3-.9-4.7-1.5-7.1 2.4-.7 4.7-1.4 6.9-2.3 12.5-4.8 19.3-11.4 19.3-18.8s-6.8-14-19.3-18.8zM92.5 14.7c4.1 2.4 5.5 9.8 3.8 20.3-.3 2.1-.8 4.3-1.4 6.6-5.2-1.2-10.7-2-16.5-2.5-3.4-4.8-6.9-9.1-10.4-13 7.4-7.3 14.9-12.3 21-12.3 1.3 0 2.5.3 3.5.9zM81.3 74c-1.8 3.2-3.9 6.4-6.1 9.6-3.7.3-7.4.4-11.2.4-3.9 0-7.6-.1-11.2-.4-2.2-3.2-4.2-6.4-6-9.6-1.9-3.3-3.7-6.7-5.3-10 1.6-3.3 3.4-6.7 5.3-10 1.8-3.2 3.9-6.4 6.1-9.6 3.7-.3 7.4-.4 11.2-.4 3.9 0 7.6.1 11.2.4 2.2 3.2 4.2 6.4 6 9.6 1.9 3.3 3.7 6.7 5.3 10-1.7 3.3-3.4 6.6-5.3 10zm8.3-3.3c1.5 3.5 2.7 6.9 3.8 10.3-3.4.8-7 1.4-10.8 1.9 1.2-1.9 2.5-3.9 3.6-5.9 1.2-2 2.3-4.1 3.4-6.3zM64 97.8c-2.4-2.6-4.7-5.4-6.9-8.3 2.3.1 4.6.2 6.9.2 2.3 0 4.6-.1 6.9-.2-2.2 2.9-4.5 5.7-6.9 8.3zm-18.6-15c-3.8-.5-7.4-1.1-10.8-1.9 1.1-3.3 2.3-6.8 3.8-10.3 1.1 2.2 2.2 4.3 3.4 6.3 1.2 2.1 2.4 4 3.6 5.9zm-9-25.7c-1.5-3.5-2.7-6.9-3.8-10.3 3.4-.8 7-1.4 10.8-1.9-1.2 1.9-2.5 3.9-3.6 5.9-1.2 2-2.3 4-3.4 6.3zM64 30.2c2.4 2.6 4.7 5.4 6.9 8.3-2.3-.1-4.6-.2-6.9-.2-2.3 0-4.6.1-6.9.2 2.2-2.9 4.5-5.7 6.9-8.3zm22.2 21l-3.6-5.9c3.8.5 7.4 1.1 10.8 1.9-1.1 3.3-2.3 6.8-3.8 10.3-1.1-2.2-2.2-4.3-3.4-6.3zM31.7 35c-1.7-10.5-.3-17.9 3.8-20.3 1-.6 2.2-.9 3.5-.9 6 0 13.5 4.9 21 12.3-3.5 3.8-7 8.2-10.4 13-5.8.5-11.3 1.4-16.5 2.5-.6-2.3-1-4.5-1.4-6.6zM7 64c0-4.7 5.7-9.7 15.7-13.4 2-.8 4.2-1.5 6.4-2.1 1.6 5 3.6 10.3 6 15.6-2.4 5.3-4.5 10.5-6 15.5C15.3 75.6 7 69.6 7 64zm28.5 49.3c-4.1-2.4-5.5-9.8-3.8-20.3.3-2.1.8-4.3 1.4-6.6 5.2 1.2 10.7 2 16.5 2.5 3.4 4.8 6.9 9.1 10.4 13-7.4 7.3-14.9 12.3-21 12.3-1.3 0-2.5-.3-3.5-.9zM96.3 93c1.7 10.5.3 17.9-3.8 20.3-1 .6-2.2.9-3.5.9-6 0-13.5-4.9-21-12.3 3.5-3.8 7-8.2 10.4-13 5.8-.5 11.3-1.4 16.5-2.5.6 2.3 1 4.5 1.4 6.6zm9-15.6c-2 .8-4.2 1.5-6.4 2.1-1.6-5-3.6-10.3-6-15.6 2.4-5.3 4.5-10.5 6-15.5 13.8 4 22.1 10 22.1 15.6 0 4.7-5.8 9.7-15.7 13.4z" /></g></svg>
+    },
+    {
+        name: "TypeScript",
+        svg: <svg viewBox="0 0 128 128" className="h-8 w-8"><rect width="128" height="128" rx="6" fill="#3178C6" /><path fill="#fff" d="M22 63h22v8H38v36h-9V71H22v-8zm48 0h-9l-1 5c-2-3-6-6-11-6-9 0-15 7-15 18s6 18 15 18c5 0 9-3 11-6v5h9V63zm-9 18c0 6-3 10-8 10s-8-4-8-10 3-10 8-10 8 4 8 10zm42-18h-14v8h9v22c0 4-2 5-6 5-3 0-6-1-8-3l-3 7c3 2 7 4 12 4 9 0 14-4 14-13V63z" /></svg>
+    },
+    {
+        name: "Tailwind CSS",
+        svg: <svg viewBox="0 0 128 128" className="h-8 w-8"><path d="M64.004 25.602c-17.067 0-27.73 8.53-32 25.597 6.398-8.531 13.867-11.73 22.398-9.597 4.871 1.214 8.352 4.746 12.207 8.66C72.883 56.629 80.145 64 96.004 64c17.066 0 27.73-8.531 32-25.602-6.399 8.536-13.867 11.735-22.399 9.602-4.87-1.215-8.351-4.746-12.207-8.66-6.27-6.367-13.53-13.738-29.394-13.738zM32.004 64c-17.066 0-27.73 8.531-32 25.602C6.402 81.066 13.87 77.867 22.402 80c4.871 1.215 8.352 4.746 12.207 8.66 6.274 6.367 13.536 13.738 29.395 13.738 17.066 0 27.73-8.53 32-25.597-6.399 8.531-13.867 11.73-22.399 9.597-4.87-1.214-8.351-4.746-12.207-8.66C55.126 71.371 47.864 64 32.004 64z" fill="#06B6D4" /></svg>
+    },
+    {
+        name: "Node.js",
+        svg: <svg viewBox="0 0 128 128" className="h-8 w-8"><path fill="#83CD29" d="M112.771 30.334L68.674 4.729c-2.781-1.584-6.402-1.584-9.205 0L14.901 30.334C12.031 31.985 10 35.088 10 38.407v51.142c0 3.319 2.084 6.423 4.954 8.083l11.775 6.688c5.628 2.772 7.617 2.772 10.178 2.772 8.333 0 13.093-5.039 13.093-13.828v-50.49c0-.713-.371-1.774-1.071-1.774h-5.623C42.594 41 42 42.061 42 42.773v50.49c0 3.896-3.524 7.773-10.11 4.48L20.907 90.73c-.424-.23-.723-.693-.723-1.181V38.407c0-.482.555-.966.982-1.213l44.424-25.561c.415-.235 1.025-.235 1.439 0l43.882 25.555c.42.253.657.793.657 1.219v51.142c0 .482-.253.966-.683 1.213l-44.16 25.555c-.415.24-1.025.24-1.398 0l-11.316-6.695c-.36-.2-.767-.335-1.155-.159-3.346 1.858-3.944 2.094-7.49 3.239-.837.264-2.07.669.476 1.882l14.844 8.776c1.388.801 2.914 1.2 4.39 1.2 1.471 0 2.994-.399 4.32-1.2l44.159-25.555c2.87-1.659 4.906-4.763 4.906-8.083V38.407c0-3.319-2.036-6.423-4.906-8.073zM77.727 81.астся c-11.25 0-13.903-3.032-14.782-9.042-.1-.626-.629-1.085-1.265-1.085h-5.86c-.708 0-1.274.571-1.274 1.279 0 7.487 4.06 16.444 23.181 16.444 13.873 0 21.809-5.443 21.809-14.945 0-9.424-6.351-11.948-19.724-13.735-13.544-1.805-14.933-2.707-14.933-5.884 0-2.636 1.035-6.151 10.049-6.151 8.066 0 11.008 1.737 12.219 7.16.114.547.606.94 1.165.94h5.877c.356 0 .693-.146.94-.407.24-.274.356-.61.32-.95-0.786-9.414-7.071-13.8-20.521-13.8-11.73 0-18.721 4.95-18.721 13.246 0 9.145 7.082 11.678 18.507 12.803 13.709 1.257 16.158 3.132 16.158 6.851 0 3.576-3.142 5.076-10.345 5.076z" /></svg>
+    },
+    {
+        name: "Supabase",
+        svg: <svg viewBox="0 0 109 113" className="h-8 w-8"><defs><linearGradient id="sb1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#249361" /><stop offset="100%" stopColor="#3ECF8E" /></linearGradient><linearGradient id="sb2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#000" stopOpacity=".2" /><stop offset="100%" stopColor="#000" stopOpacity="0" /></linearGradient></defs><path d="M63.708 110.284c-2.86 3.601-8.658 1.628-8.727-2.97l-1.007-67.251h45.22c8.19 0 12.758 9.46 7.665 15.874l-43.151 54.347z" fill="url(#sb1)" /><path d="M63.708 110.284c-2.86 3.601-8.658 1.628-8.727-2.97l-1.007-67.251h45.22c8.19 0 12.758 9.46 7.665 15.874l-43.151 54.347z" fill="url(#sb2)" /><path d="M45.317 2.071C48.178-1.53 53.976.443 54.045 5.041l.943 67.251H9.768c-8.19 0-12.758-9.46-7.665-15.874L45.317 2.071z" fill="#3ECF8E" /></svg>
+    },
+    {
+        name: "PostgreSQL",
+        svg: <svg viewBox="0 0 128 128" className="h-8 w-8"><path fill="#336791" d="M119.068 81.36c-.578-3.516-3.273-5.47-5.916-6.963V74.39c3.605-1.44 6.406-3.877 7.297-8.58.985-5.239-1.147-9.318-4.812-12.197-2.813-2.17-6.31-3.299-9.766-3.891-3.08-.527-6.242-.527-9.39-.527H84.51c-1.22 0-2.438.196-3.604.586l-.586-2.489c-.578-2.497.586-5.004 2.942-6.444 1.563-.918 3.315-1.25 5.08-1.25h17.187c.39 0 .782 0 1.172-.007 2.817-.06 5.68-.657 8.177-2.145 2.48-1.48 4.428-4.038 4.23-7.012-.255-3.847-3.575-6.185-6.73-7.398a25.85 25.85 0 00-9.29-1.66H86.13c-.594 0-1.18.04-1.764.109-1.476-4.896-3.994-9.5-8.164-12.84C71.133 5.85 65.26 4.2 59.55 4.2c-10.89 0-20.21 6.25-25.2 15.64-1.17 2.2-2.08 4.52-2.68 6.93-6.9 1.67-13.43 5.75-16.7 12.13C11.41 45.84 12.29 54.6 17.03 61.33c.45.65.94 1.27 1.45 1.87-2.12 2.97-3.67 6.43-3.96 10.17-.35 4.49 1.36 9.04 4.82 11.87 2.95 2.42 6.77 3.43 10.53 3.43 1.52 0 3.05-.16 4.56-.46.7 2.64 1.92 5.14 3.54 7.32 3.2 4.28 7.92 7.24 13.16 8.34a30.09 30.09 0 006.31.67c7.88 0 15.36-3.34 20.37-9.25 1.69-1.98 3.08-4.22 4.06-6.64.7.06 1.43.09 2.16.09 4.92 0 9.8-1.48 13.5-4.84 2.4-2.18 3.99-5.07 4.47-8.13.76.94 1.67 1.78 2.78 2.43 3.27 1.9 7.16 1.84 10.6.8 4.35-1.32 8.26-4.82 8.14-9.78zm0 0" /></svg>
+    },
+    {
+        name: "Stripe",
+        svg: <svg viewBox="0 0 60 60" className="h-8 w-8"><rect width="60" height="60" rx="6" fill="#635BFF" /><path d="M22.8 21.5c0-1.5 1.2-2.1 3.1-2.1 2.8 0 6.3.9 9.1 2.4v-8.6c-3-1.2-6.1-1.7-9.1-1.7-7.4 0-12.4 3.9-12.4 10.4 0 10.1 13.9 8.5 13.9 12.9 0 1.8-1.5 2.3-3.6 2.3-3.1 0-7.1-1.3-10.2-3v8.7c3.5 1.5 7 2.1 10.2 2.1 7.6 0 12.9-3.8 12.9-10.4-.1-10.9-14-9-13.9-13z" fill="#fff" /></svg>
+    },
+    {
+        name: "Vercel",
+        svg: <svg viewBox="0 0 76 76" className="h-8 w-8"><path d="M37.5 5.25L70 68.75H5L37.5 5.25z" fill="currentColor" className="text-white" /></svg>
+    },
+    {
+        name: "Framer",
+        svg: <svg viewBox="0 0 1000 1000" className="h-8 w-8"><path d="M0 0h500v500H250L0 250V0z" fill="#0055FF" /><path d="M0 500h500l250 250H0V500z" fill="#0044CC" /><path d="M500 500l250-250h250v250H500z" fill="#0099FF" /></svg>
+    },
 ];
 
 export function TechStack() {
     const { t } = useLanguage();
+    // Duplicate for seamless infinite loop
+    const items = [...technologies, ...technologies];
 
     return (
         <section className="border-y border-border bg-background/50 py-10">
             <div className="container mx-auto px-4">
-                <p
-                    className="mb-8 text-center text-sm font-medium text-muted-foreground"
-                    suppressHydrationWarning
-                >
+                <p className="mb-8 text-center text-sm font-medium text-muted-foreground" suppressHydrationWarning>
                     {t.techStack.poweredBy}
                 </p>
-                {/* Desktop Version */}
-                <div className="relative hidden w-full overflow-hidden md:flex">
-                    <div className="animate-marquee flex min-w-full shrink-0 items-center justify-around gap-10" style={{ willChange: 'transform' }}>
-                        {technologies.map((tech, i) => (
-                            <div key={i} className="flex items-center gap-2 transition-all duration-300 hover:scale-110">
-                                {/* Using img tag for external SVGs to avoid Next.js Image config issues for now */}
-                                <img
-                                    src={tech.url}
-                                    alt={tech.name}
-                                    loading="lazy"
-                                    width={32}
-                                    height={32}
-                                    className="h-8 w-auto object-contain"
-                                />
-                            </div>
-                        ))}
-                    </div>
-                    <div className="animate-marquee flex min-w-full shrink-0 items-center justify-around gap-10" aria-hidden="true" style={{ willChange: 'transform' }}>
-                        {technologies.map((tech, i) => (
-                            <div key={`duplicate-${i}`} className="flex items-center gap-2 transition-all duration-300 hover:scale-110">
-                                <img
-                                    src={tech.url}
-                                    alt={tech.name}
-                                    loading="lazy"
-                                    width={32}
-                                    height={32}
-                                    className="h-8 w-auto object-contain"
-                                />
-                            </div>
-                        ))}
-                    </div>
-                    <div className="pointer-events-none absolute inset-y-0 left-0 w-1/3 bg-gradient-to-r from-background to-transparent" />
-                    <div className="pointer-events-none absolute inset-y-0 right-0 w-1/3 bg-gradient-to-l from-background to-transparent" />
-                </div>
 
-                {/* Mobile Version */}
-                <div className="relative flex w-full overflow-hidden md:hidden [mask-image:linear-gradient(to_right,transparent,black_10%,black_90%,transparent)]">
-                    <div className="animate-marquee flex min-w-full shrink-0 items-center justify-start gap-8 pr-8" style={{ willChange: 'transform' }}>
-                        {technologies.map((tech, i) => (
-                            <div key={i} className="flex shrink-0 items-center gap-2 transition-all duration-300 hover:scale-110">
-                                <img
-                                    src={tech.url}
-                                    alt={tech.name}
-                                    loading="lazy"
-                                    width={24}
-                                    height={24}
-                                    className="h-6 w-auto object-contain"
-                                />
-                            </div>
-                        ))}
-                    </div>
-                    <div className="animate-marquee flex min-w-full shrink-0 items-center justify-start gap-8 pr-8" aria-hidden="true" style={{ willChange: 'transform' }}>
-                        {technologies.map((tech, i) => (
-                            <div key={`duplicate-${i}`} className="flex shrink-0 items-center gap-2 transition-all duration-300 hover:scale-110">
-                                <img
-                                    src={tech.url}
-                                    alt={tech.name}
-                                    loading="lazy"
-                                    width={24}
-                                    height={24}
-                                    className="h-6 w-auto object-contain"
-                                />
+                {/* CSS-only marquee — no JS, no framer-motion, no external requests */}
+                <div className="relative w-full overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_10%,black_90%,transparent)]">
+                    <div className="animate-marquee flex items-center gap-10" style={{ willChange: 'transform' }}>
+                        {items.map((tech, i) => (
+                            <div
+                                key={i}
+                                className="flex shrink-0 items-center gap-2 opacity-70 hover:opacity-100 transition-opacity hover:scale-110 transition-transform duration-200"
+                                title={tech.name}
+                            >
+                                {tech.svg}
                             </div>
                         ))}
                     </div>

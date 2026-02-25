@@ -3,10 +3,16 @@
 import { Zap, Search, Globe, Star, Bot, FileText, Settings, CheckCircle, MousePointerClick, LayoutDashboard, Users, Mail, Calendar } from "lucide-react";
 
 import { useState, useEffect, useRef } from "react";
-import createGlobe from "cobe";
+import dynamic from "next/dynamic";
 import { motion, useInView, useAnimation, AnimatePresence } from "framer-motion";
 
 import { useLanguage } from "@/context/LanguageContext";
+
+// Dynamically import the globe — cobe (~80KB WebGL) is NOT bundled until Features scrolls into view
+const GlobeCanvas = dynamic(() => import("@/components/ui/GlobeCanvas").then(m => ({ default: m.GlobeCanvas })), {
+    ssr: false,
+    loading: () => <div className="w-full h-full" />,
+});
 
 export function Features() {
     const { t } = useLanguage();
@@ -20,19 +26,21 @@ export function Features() {
 
     const [visibleNotifications, setVisibleNotifications] = useState([0, 1]);
 
+    // Refs for in-view animations
+    const containerRef = useRef(null);
+    const isInView = useInView(containerRef, { once: true, margin: "-100px" });
+
+    // Notification cycling — paused when section is off-screen
     useEffect(() => {
+        if (!isInView) return;
         const interval = setInterval(() => {
             setVisibleNotifications(prev => {
                 const nextIndex = (prev[0] - 1 + NOTIFICATIONS.length) % NOTIFICATIONS.length;
                 return [nextIndex, ...prev.slice(0, 1)];
             });
-        }, 4000); // Slower animation (4s)
+        }, 4000);
         return () => clearInterval(interval);
-    }, []);
-
-    // Refs for in-view animations
-    const containerRef = useRef(null);
-    const isInView = useInView(containerRef, { once: true, margin: "-100px" });
+    }, [isInView]);
 
 
     // SEO Card Animation Logic
@@ -71,53 +79,7 @@ export function Features() {
         }
     };
 
-    // Globe Logic
-    const canvasRef = useRef<HTMLCanvasElement>(null);
-    const pointerInteracting = useRef(null);
-    const pointerInteractionMovement = useRef(0);
-    const globeRef = useRef<ReturnType<typeof createGlobe> | null>(null);
-    const globeInitialized = useRef(false);
 
-    useEffect(() => {
-        // Only create globe when in view (lazy init)
-        if (!isInView || globeInitialized.current || !canvasRef.current) return;
-        globeInitialized.current = true;
-
-        let phi = 0;
-        let width = 0;
-        const onResize = () => canvasRef.current && (width = canvasRef.current.offsetWidth);
-        window.addEventListener('resize', onResize);
-        onResize();
-        const globe = createGlobe(canvasRef.current!, {
-            devicePixelRatio: 1.5,
-            width: width * 2,
-            height: width * 2,
-            phi: 0,
-            theta: 0.3,
-            dark: 1,
-            diffuse: 1.2,
-            mapSamples: 10000,
-            mapBrightness: 3,
-            baseColor: [0.3, 0.3, 0.3],
-            markerColor: [0.8, 0.8, 0.8],
-            glowColor: [0.5, 0.5, 0.5],
-            markers: [],
-            onRender: (state) => {
-                if (!pointerInteracting.current) {
-                    phi += 0.005;
-                }
-                state.phi = phi;
-                state.width = width * 2;
-                state.height = width * 2;
-            }
-        });
-        globeRef.current = globe;
-        setTimeout(() => canvasRef.current!.style.opacity = '1');
-        return () => {
-            globe.destroy();
-            window.removeEventListener('resize', onResize);
-        }
-    }, [isInView]);
 
     return (
         <section id="features" className="py-24 bg-background relative overflow-hidden">
@@ -475,14 +437,12 @@ export function Features() {
                             </p>
                         </div>
 
-                        {/* Visual: Cobe Globe */}
-                        <div className="absolute right-[-100px] bottom-[-100px] w-[600px] h-[600px] opacity-100 md:opacity-100 pointer-events-none">
-                            <canvas
-                                ref={canvasRef}
-                                style={{ width: 600, height: 600, maxWidth: "100%", aspectRatio: 1 }}
-                                className="w-full h-full opacity-0 transition-opacity duration-1000"
-                            />
-                        </div>
+                        {/* Visual: Cobe Globe — dynamically loaded, cobe only downloads when in view */}
+                        {isInView && (
+                            <div className="absolute right-[-100px] bottom-[-100px] w-[600px] h-[600px] pointer-events-none">
+                                <GlobeCanvas />
+                            </div>
+                        )}
                     </motion.div>
                 </motion.div>
             </div >

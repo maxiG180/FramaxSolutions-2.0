@@ -539,7 +539,7 @@ const Hero = () => {
                 </div>
 
                 {/* Reviews popping up */}
-                <div className="relative mt-2 h-24 overflow-hidden flex items-center pt-2">
+                <div className="relative mt-1 h-24 overflow-hidden">
                   {[
                     { name: t.hero.review1Name, text: t.hero.review1Text, delay: 2.5 },
                     { name: t.hero.review2Name, text: t.hero.review2Text, delay: 7 },
@@ -547,12 +547,12 @@ const Hero = () => {
                   ].map((review, i) => (
                     <motion.div
                       key={i}
-                      className="absolute left-0 right-0 bg-slate-800/90 backdrop-blur-sm rounded-lg p-2.5 border border-green-500/20 shadow-lg"
-                      initial={{ y: 100, opacity: 0 }}
+                      className="absolute inset-x-0 top-0 bottom-0 my-auto h-fit bg-slate-800/90 backdrop-blur-sm rounded-lg p-2.5 border border-green-500/20 shadow-lg"
+                      initial={{ y: 80, opacity: 0 }}
                       animate={isInView ? {
-                        y: [100, -10, -10, -120],
+                        y: [80, -8, -8, -90],
                         opacity: [0, 1, 1, 0]
-                      } : { y: 100, opacity: 0 }}
+                      } : { y: 80, opacity: 0 }}
                       transition={{
                         duration: 4.5,
                         delay: review.delay,

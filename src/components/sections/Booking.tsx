@@ -291,6 +291,10 @@ export function Booking() {
         return days;
     }, [currentDate]);
 
+    // Memoized today boundaries — avoids creating new Date() inside the 35-cell calendar grid map
+    const todayStart = useMemo(() => new Date(new Date().setHours(0, 0, 0, 0)), []);
+    const todayDate = useMemo(() => new Date(), []);
+
     return (
         <section id="booking" className="py-24 md:py-32 bg-background relative overflow-hidden">
             {/* Background Gradients */}
@@ -393,18 +397,18 @@ export function Booking() {
                                                         {date ? (
                                                             <button
                                                                 onClick={() => handleDateSelect(date)}
-                                                                disabled={date < new Date(new Date().setHours(0, 0, 0, 0))}
+                                                                disabled={date < todayStart}
                                                                 className={cn(
                                                                     "w-full h-full rounded-xl flex items-center justify-center text-sm font-medium transition-all duration-200 relative group",
                                                                     selectedDate?.toDateString() === date.toDateString()
                                                                         ? "bg-primary text-primary-foreground shadow-lg scale-105"
-                                                                        : date < new Date(new Date().setHours(0, 0, 0, 0))
+                                                                        : date < todayStart
                                                                             ? "text-muted-foreground/20 cursor-not-allowed"
                                                                             : "hover:bg-primary/10 hover:text-primary hover:scale-110 bg-background border border-border/50"
                                                                 )}
                                                             >
                                                                 {date.getDate()}
-                                                                {date.getDate() === new Date().getDate() && date.getMonth() === new Date().getMonth() && (
+                                                                {date.getDate() === todayDate.getDate() && date.getMonth() === todayDate.getMonth() && (
                                                                     <span className="absolute bottom-1 w-1 h-1 bg-primary rounded-full" />
                                                                 )}
                                                             </button>
