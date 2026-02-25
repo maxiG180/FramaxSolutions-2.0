@@ -82,6 +82,45 @@ body {
     }
 }
 
+/**
+ * word-cycle: drives the pure-CSS Typewriter in Hero.
+ * Each word occupies 1 slot of the total cycle duration.
+ * The animation runs for the full cycle but is only visible for 1 slot:
+ *   0%-N%   fade in, hold
+ *   N%-M%   fade out
+ *   M%-100% hidden (waiting for next loop)
+ * Where N = (1/count)*100 expressed as a fraction of the keyframe.
+ * Since we parameterise via animation-duration + delay per word,
+ * we just define the fade in/hold/out relative to 1 slot = 100% of totalDuration:
+ */
+@keyframes word-cycle {
+    0% {
+        opacity: 0;
+        transform: translateY(6px);
+    }
+
+    8% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    /* hold visible for roughly 1 slot */
+    33% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    41% {
+        opacity: 0;
+        transform: translateY(-6px);
+    }
+
+    100% {
+        opacity: 0;
+        transform: translateY(-6px);
+    }
+}
+
 @keyframes cta-pulse {
 
     0%,
@@ -197,5 +236,12 @@ section:first-of-type {
     .animate-marquee-reverse {
         animation: none !important;
         will-change: auto;
+    }
+
+    /* Stop word cycling for motion-sensitive users — show first word statically */
+    [style*="word-cycle"] {
+        animation: none !important;
+        opacity: 1 !important;
+        transform: none !important;
     }
 }

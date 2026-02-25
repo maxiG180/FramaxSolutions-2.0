@@ -6,56 +6,47 @@ import { motion, useInView } from "framer-motion";
 import { ArrowRight, TrendingUp, Users, Zap, Bell, FileText, Calendar } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 
+/**
+ * Pure CSS word-cycler — zero JS timers, zero re-renders after mount.
+ * Each word fades in/out on a staggered CSS animation-delay so the
+ * browser compositor does all the work on the GPU thread.
+ */
 const Typewriter = ({ text }: { text: string[] }) => {
-  const [index, setIndex] = React.useState(0);
-  const [subIndex, setSubIndex] = React.useState(0);
-  const [reverse, setReverse] = React.useState(false);
-  const [blink, setBlink] = React.useState(true);
-
-  React.useEffect(() => {
-    if (index >= text.length) {
-      setIndex(0); // Loop back
-      return;
-    }
-
-    if (subIndex === text[index].length + 1 && !reverse) {
-      setTimeout(() => setReverse(true), 2000); // Wait before deleting
-      return;
-    }
-
-    if (subIndex === 0 && reverse) {
-      setReverse(false);
-      setIndex((prev) => (prev + 1) % text.length);
-      return;
-    }
-
-    const timeout = setTimeout(() => {
-      setSubIndex((prev) => prev + (reverse ? -1 : 1));
-    }, Math.max(reverse ? 75 : subIndex === text[index].length ? 2000 : 150, Math.floor(Math.random() * 350)));
-
-    return () => clearTimeout(timeout);
-  }, [subIndex, index, reverse, text]);
-
-  // Cursor blink — use CSS animation instead of state to avoid re-renders
+  const count = text.length;
+  // Each word gets: fadeDuration in + hold + fadeOut. Total cycle = count * slotDuration
+  const slotDuration = 3; // seconds per word
+  const fadeDuration = 0.4;
+  const totalDuration = count * slotDuration;
 
   return (
-    <span className="relative inline-block text-blue-500">
-      {`${text[index].substring(0, subIndex)}`}
-      <span className="absolute top-0 -right-2 text-blue-500 animate-cursor-blink">|</span>
+    <span className="relative inline-block text-blue-500" style={{ minWidth: '4ch' }}>
+      {/* Invisible spacer so the parent h1 doesn't collapse in height */}
+      <span className="invisible select-none" aria-hidden="true">
+        {text.reduce((a, b) => a.length > b.length ? a : b)}
+      </span>
+      {text.map((word, i) => (
+        <span
+          key={word}
+          className="absolute inset-0 flex items-center"
+          style={{
+            animation: `word-cycle ${totalDuration}s ${i * slotDuration}s ease-in-out infinite`,
+            opacity: 0,
+          }}
+          aria-hidden={i !== 0}
+        >
+          {word}
+        </span>
+      ))}
+      {/* Cursor blink — pure CSS */}
+      <span className="absolute top-0 -right-3 text-blue-500 animate-cursor-blink" aria-hidden="true">|</span>
+      {/* Static underline — no framer-motion path animation needed here */}
       <svg
         className="absolute w-full h-3 sm:h-4 -bottom-1 sm:-bottom-2 left-0 text-blue-500"
         viewBox="0 0 100 10"
         preserveAspectRatio="none"
+        aria-hidden="true"
       >
-        <motion.path
-          d="M0 5 L100 5"
-          fill="transparent"
-          strokeWidth="8"
-          stroke="currentColor"
-          initial={{ pathLength: 0 }}
-          animate={{ pathLength: 1 }}
-          transition={{ duration: 0.8, delay: 1, ease: "easeOut" }}
-        />
+        <line x1="0" y1="5" x2="100" y2="5" stroke="currentColor" strokeWidth="8" />
       </svg>
     </span>
   );

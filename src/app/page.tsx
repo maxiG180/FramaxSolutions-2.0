@@ -1,17 +1,13 @@
 import dynamic from 'next/dynamic';
 
 // Dynamically import ALL heavy client components to reduce initial bundle
-const Hero = dynamic(() => import('@/components/Hero'), {
-  loading: () => <div className="min-h-screen animate-pulse bg-background" />,
-});
-const Booking = dynamic(() => import('@/components/sections/Booking').then(mod => ({ default: mod.Booking })), {
-  loading: () => <div className="min-h-[400px] animate-pulse bg-white/5" />,
-});
-const DiscountOffer = dynamic(() => import('@/components/ui/DiscountOffer').then(mod => ({ default: mod.DiscountOffer })), {
-  loading: () => <div className="min-h-[400px] animate-pulse bg-white/5" />,
-});
+const Hero = dynamic(() => import('@/components/Hero'));
 
-// Dynamically import non-critical components to reduce initial bundle
+// Floating widget — no loading skeleton (it's position:fixed, a skeleton would cause CLS)
+const DiscountOffer = dynamic(() => import('@/components/ui/DiscountOffer').then(mod => ({ default: mod.DiscountOffer })));
+const Booking = dynamic(() => import('@/components/sections/Booking').then(mod => ({ default: mod.Booking })), {
+  loading: () => <div className="min-h-[400px]" />,
+});
 const Features = dynamic(() => import('@/components/sections/Features').then(mod => ({ default: mod.Features })), {
   loading: () => <div className="min-h-[400px] animate-pulse bg-white/5" />,
 });
