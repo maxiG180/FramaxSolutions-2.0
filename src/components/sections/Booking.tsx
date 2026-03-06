@@ -297,10 +297,10 @@ export function Booking() {
 
     return (
         <section id="booking" className="py-24 md:py-32 bg-background relative overflow-hidden">
-            {/* Background Gradients */}
+            {/* Background Gradients - optimized without blur */}
             <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
-                <div className="absolute top-[-10%] right-[-5%] w-[500px] h-[500px] bg-primary/5 rounded-full blur-[100px]" style={{ willChange: 'filter' }} />
-                <div className="absolute bottom-[-10%] left-[-5%] w-[500px] h-[500px] bg-blue-500/5 rounded-full blur-[100px]" style={{ willChange: 'filter' }} />
+                <div className="absolute top-[-10%] right-[-5%] w-[500px] h-[500px] bg-primary/3 rounded-full" />
+                <div className="absolute bottom-[-10%] left-[-5%] w-[500px] h-[500px] bg-blue-500/3 rounded-full" />
             </div>
 
             <div className="container mx-auto px-4 relative z-10">
@@ -309,12 +309,7 @@ export function Booking() {
 
                         {/* LEFT COLUMN: Value Proposition */}
                         <div className="lg:col-span-5 flex flex-col justify-center">
-                            <motion.div
-                                initial={{ opacity: 0, y: 20 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                viewport={{ once: true }}
-                                className="space-y-8"
-                            >
+                            <div className="space-y-8">
                                 {/* Main Headline */}
                                 <div>
                                     <h2 className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-[1.1] mb-6">
@@ -327,28 +322,17 @@ export function Booking() {
                                         {t.booking.subtitle}
                                     </p>
                                 </div>
-
-
-
-
-                            </motion.div>
+                            </div>
                         </div>
 
                         {/* RIGHT COLUMN: Booking Flow */}
                         <div className="lg:col-span-7">
-                            <motion.div
-                                initial={{ opacity: 0, scale: 0.95 }}
-                                whileInView={{ opacity: 1, scale: 1 }}
-                                viewport={{ once: true }}
-                                transition={{ delay: 0.2 }}
-                                className="bg-card/50 backdrop-blur-xl border border-border/50 rounded-3xl shadow-2xl overflow-hidden relative md:min-h-[600px] flex flex-col"
-                            >
+                            <div className="bg-card/70 border border-border/50 rounded-3xl shadow-2xl overflow-hidden relative md:min-h-[600px] flex flex-col">
                                 {/* Progress Bar */}
                                 <div className="h-1 bg-muted w-full">
-                                    <motion.div
-                                        className="h-full bg-primary"
-                                        initial={{ width: "25%" }}
-                                        animate={{
+                                    <div
+                                        className="h-full bg-primary transition-all duration-500 ease-out"
+                                        style={{
                                             width: step === "date" ? "25%" : step === "time" ? "50%" : step === "form" ? "75%" : "100%"
                                         }}
                                     />
@@ -452,20 +436,17 @@ export function Booking() {
                                                         <p>{t.booking.checkingAvailability}</p>
                                                     </div>
                                                 ) : (
-                                                    TIME_SLOTS.map((time, i) => {
+                                                    TIME_SLOTS.map((time) => {
                                                         const isBusy = isSlotBusy(time);
                                                         const isPast = isSlotInPast(time);
                                                         const isDisabled = isBusy || isPast;
                                                         return (
-                                                            <motion.button
+                                                            <button
                                                                 key={time}
-                                                                initial={{ opacity: 0, y: 10 }}
-                                                                animate={{ opacity: 1, y: 0 }}
-                                                                transition={{ delay: i * 0.05 }}
                                                                 onClick={() => handleTimeSelect(time)}
                                                                 disabled={isDisabled}
                                                                 className={cn(
-                                                                    "py-4 px-4 rounded-xl border border-border transition-all text-sm font-medium flex items-center justify-center gap-2 group bg-background relative overflow-hidden",
+                                                                    "py-4 px-4 rounded-xl border border-border transition-all text-sm font-medium flex items-center justify-center gap-2 group bg-background",
                                                                     isDisabled
                                                                         ? "opacity-40 cursor-not-allowed bg-muted/20 border-transparent"
                                                                         : "hover:border-primary hover:bg-primary/5"
@@ -473,7 +454,7 @@ export function Booking() {
                                                             >
                                                                 <Clock className={cn("w-4 h-4 transition-colors", isDisabled ? "text-muted-foreground/50" : "text-muted-foreground group-hover:text-primary")} />
                                                                 <span className={cn(isDisabled && "line-through decoration-muted-foreground/50")}>{time}</span>
-                                                            </motion.button>
+                                                            </button>
                                                         );
                                                     })
                                                 )}
@@ -556,14 +537,9 @@ export function Booking() {
                                                         placeholder="john@company.com"
                                                     />
                                                     {errors.email && (
-                                                        <motion.p
-                                                            initial={{ opacity: 0, x: -10 }}
-                                                            animate={{ opacity: 1, x: [-10, 10, -5, 5, 0] }}
-                                                            transition={{ duration: 0.4 }}
-                                                            className="text-xs text-red-500 font-medium ml-1"
-                                                        >
+                                                        <p className="text-xs text-red-500 font-medium ml-1 opacity-0 animate-[shake_0.4s_ease-in-out_forwards]">
                                                             {errors.email}
-                                                        </motion.p>
+                                                        </p>
                                                     )}
                                                 </div>
                                                 <div className="space-y-1.5">
@@ -601,18 +577,9 @@ export function Booking() {
                                             animate={{ opacity: 1, scale: 1 }}
                                             className="p-8 flex-1 flex flex-col items-center justify-center text-center"
                                         >
-                                            <motion.div
-                                                initial={{ scale: 0 }}
-                                                animate={{ scale: 1 }}
-                                                transition={{
-                                                    type: "spring",
-                                                    stiffness: 260,
-                                                    damping: 20
-                                                }}
-                                                className="w-24 h-24 bg-gradient-to-tr from-green-400 to-green-600 rounded-full flex items-center justify-center text-white mb-8 shadow-xl shadow-green-500/30"
-                                            >
+                                            <div className="w-24 h-24 bg-gradient-to-tr from-green-400 to-green-600 rounded-full flex items-center justify-center text-white mb-8 shadow-xl shadow-green-500/30 animate-scale-in">
                                                 <Check className="w-12 h-12" />
-                                            </motion.div>
+                                            </div>
                                             <h3 className="text-3xl font-bold mb-4">{t.booking.allSet}</h3>
                                             <p className="text-muted-foreground mb-8 max-w-sm mx-auto leading-relaxed">
                                                 {t.booking.confirmationSent} <span className="text-foreground font-medium">{formData.email}</span>.
@@ -633,7 +600,7 @@ export function Booking() {
                                         </motion.div>
                                     )}
                                 </AnimatePresence>
-                            </motion.div>
+                            </div>
                         </div>
                     </div>
                 </div>

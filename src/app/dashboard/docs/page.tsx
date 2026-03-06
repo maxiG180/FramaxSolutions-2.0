@@ -294,7 +294,7 @@ export default function DocsPage() {
             onDrop={handleDrop}
         >
             {isDragging && (
-                <div className="absolute inset-0 z-50 bg-blue-500/20 backdrop-blur-sm border-2 border-blue-500 border-dashed rounded-xl flex items-center justify-center pointer-events-none">
+                <div className="absolute inset-0 z-50 bg-blue-500/30 border-2 border-blue-500 border-dashed rounded-xl flex items-center justify-center pointer-events-none">
                     <div className="text-center">
                         <Upload className="w-16 h-16 text-blue-400 mx-auto mb-4 animate-bounce" />
                         <p className="text-xl font-bold text-blue-100">Drop files to upload</p>
@@ -359,7 +359,7 @@ export default function DocsPage() {
             )}
 
             {/* Toolbar */}
-            <div className="flex items-center justify-between gap-4 sticky top-0 bg-neutral-950/80 backdrop-blur-xl py-4 z-10">
+            <div className="flex items-center justify-between gap-4 sticky top-0 bg-neutral-950/95 py-4 z-10">
                 <div className="relative flex-1 max-w-md">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
                     <input
@@ -479,7 +479,7 @@ export default function DocsPage() {
                                         <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1 z-10">
                                             <button
                                                 onClick={(e) => handleDeleteFile(e, file)}
-                                                className="p-1.5 hover:bg-red-500/80 rounded-lg text-white backdrop-blur-sm transition-colors"
+                                                className="p-1.5 hover:bg-red-500/80 rounded-lg text-white bg-black/60 transition-colors"
                                                 title="Delete"
                                             >
                                                 <Trash2 className="w-3 h-3" />
@@ -585,7 +585,7 @@ export default function DocsPage() {
                                 animate={{ opacity: 1 }}
                                 exit={{ opacity: 0 }}
                                 onClick={() => setIsCreateFolderOpen(false)}
-                                className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+                                className="absolute inset-0 bg-black/90"
                             />
                             <motion.div
                                 initial={{ opacity: 0, scale: 0.95, y: 20 }}
@@ -669,7 +669,7 @@ export default function DocsPage() {
                                 animate={{ opacity: 1 }}
                                 exit={{ opacity: 0 }}
                                 onClick={() => setSelectedFile(null)}
-                                className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+                                className="absolute inset-0 bg-black/90"
                             />
                             <motion.div
                                 initial={{ opacity: 0, scale: 0.95, y: 20 }}

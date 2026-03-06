@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState, useEffect, useMemo } from "react";
 
 type Language = "en" | "pt";
 
@@ -62,12 +62,13 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
         }
     }, [language, isLoaded]);
 
-    const value = {
+    // CRITICAL: Memoize value to prevent unnecessary re-renders in 38+ components!
+    const value = useMemo(() => ({
         language,
         setLanguage,
         t: translations[language],
         isLoaded
-    };
+    }), [language, isLoaded]);
 
     return (
         <LanguageContext.Provider value={value}>

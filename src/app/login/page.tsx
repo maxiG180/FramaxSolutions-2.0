@@ -36,7 +36,7 @@ export default function LoginPage() {
                 transition={{ duration: 0.5 }}
                 className="w-full max-w-md relative z-10"
             >
-                <div className="bg-white/5 border border-white/10 backdrop-blur-xl rounded-3xl p-8 shadow-2xl">
+                <div className="bg-white/5 border border-white/10 rounded-3xl p-8 shadow-2xl">
                     <div className="text-center mb-8">
                         <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-400 mb-2">
                             <span className="text-[#2563eb]">Framax</span><span className="text-white">Solutions</span>

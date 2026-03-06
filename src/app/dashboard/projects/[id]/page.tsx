@@ -111,7 +111,7 @@ export default function ProjectDetailsPage() {
 
                 {/* Quick Stats */}
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-10">
-                    <div className="bg-black/40 backdrop-blur-md rounded-2xl p-4 border border-white/5">
+                    <div className="bg-black/70 rounded-2xl p-4 border border-white/5">
                         <div className="text-white/40 text-xs font-medium mb-1 uppercase tracking-wider">Progress</div>
                         <div className="flex items-end gap-2">
                             <span className="text-2xl font-bold text-white">{project.progress}%</span>
@@ -123,7 +123,7 @@ export default function ProjectDetailsPage() {
                             <div className="h-full bg-blue-500 rounded-full" style={{ width: `${project.progress}%` }} />
                         </div>
                     </div>
-                    <div className="bg-black/40 backdrop-blur-md rounded-2xl p-4 border border-white/5">
+                    <div className="bg-black/70 rounded-2xl p-4 border border-white/5">
                         <div className="text-white/40 text-xs font-medium mb-1 uppercase tracking-wider">Time Remaining</div>
                         <div className="flex items-end gap-2">
                             <span className="text-2xl font-bold text-white">{project.daysLeft}</span>
@@ -133,7 +133,7 @@ export default function ProjectDetailsPage() {
                             <div className="h-full bg-orange-500 rounded-full" style={{ width: '60%' }} />
                         </div>
                     </div>
-                    <div className="bg-black/40 backdrop-blur-md rounded-2xl p-4 border border-white/5">
+                    <div className="bg-black/70 rounded-2xl p-4 border border-white/5">
                         <div className="text-white/40 text-xs font-medium mb-1 uppercase tracking-wider">Team</div>
                         <div className="flex items-center -space-x-2 mt-1">
                             {project.team.map((member, i) => (
@@ -146,7 +146,7 @@ export default function ProjectDetailsPage() {
                             </div>
                         </div>
                     </div>
-                    <div className="bg-black/40 backdrop-blur-md rounded-2xl p-4 border border-white/5">
+                    <div className="bg-black/70 rounded-2xl p-4 border border-white/5">
                         <div className="text-white/40 text-xs font-medium mb-1 uppercase tracking-wider">Tasks</div>
                         <div className="flex items-end gap-2">
                             <span className="text-2xl font-bold text-white">12</span>

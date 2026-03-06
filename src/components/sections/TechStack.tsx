@@ -26,17 +26,16 @@ export function TechStack() {
                 </p>
 
                 {/* Desktop — two duplicate rows for seamless infinite loop */}
-                <div className="relative hidden w-full overflow-hidden md:flex">
-                    <div
-                        className="animate-marquee flex min-w-full shrink-0 items-center justify-around gap-10"
-                        style={{ willChange: "transform" }}
-                    >
+                <div className="hidden w-full overflow-hidden md:flex [mask-image:linear-gradient(to_right,transparent,black_20%,black_80%,transparent)]">
+                    <div className="animate-marquee flex min-w-full shrink-0 items-center justify-around gap-10">
                         {technologies.map((tech, i) => (
-                            <div key={i} className="flex items-center gap-2 transition-all duration-300 hover:scale-110">
+                            <div key={i} className="flex items-center gap-2 hover:scale-110" style={{ transition: 'transform 0.3s' }}>
                                 <img
                                     src={tech.url}
                                     alt={tech.name}
                                     loading="lazy"
+                                    decoding="async"
+                                    fetchPriority="low"
                                     width={32}
                                     height={32}
                                     className="h-8 w-auto object-contain"
@@ -45,17 +44,15 @@ export function TechStack() {
                         ))}
                     </div>
                     {/* Duplicate for seamless loop */}
-                    <div
-                        className="animate-marquee flex min-w-full shrink-0 items-center justify-around gap-10"
-                        aria-hidden="true"
-                        style={{ willChange: "transform" }}
-                    >
+                    <div className="animate-marquee flex min-w-full shrink-0 items-center justify-around gap-10" aria-hidden="true">
                         {technologies.map((tech, i) => (
-                            <div key={`d-${i}`} className="flex items-center gap-2 transition-all duration-300 hover:scale-110">
+                            <div key={`d-${i}`} className="flex items-center gap-2">
                                 <img
                                     src={tech.url}
                                     alt=""
                                     loading="lazy"
+                                    decoding="async"
+                                    fetchPriority="low"
                                     width={32}
                                     height={32}
                                     className="h-8 w-auto object-contain"
@@ -63,23 +60,19 @@ export function TechStack() {
                             </div>
                         ))}
                     </div>
-                    {/* Fade edges */}
-                    <div className="pointer-events-none absolute inset-y-0 left-0 w-1/3 bg-gradient-to-r from-background to-transparent" />
-                    <div className="pointer-events-none absolute inset-y-0 right-0 w-1/3 bg-gradient-to-l from-background to-transparent" />
                 </div>
 
                 {/* Mobile */}
-                <div className="relative flex w-full overflow-hidden md:hidden [mask-image:linear-gradient(to_right,transparent,black_10%,black_90%,transparent)]">
-                    <div
-                        className="animate-marquee flex min-w-full shrink-0 items-center justify-start gap-8 pr-8"
-                        style={{ willChange: "transform" }}
-                    >
+                <div className="flex w-full overflow-hidden md:hidden [mask-image:linear-gradient(to_right,transparent,black_10%,black_90%,transparent)]">
+                    <div className="animate-marquee flex min-w-full shrink-0 items-center justify-start gap-8 pr-8">
                         {technologies.map((tech, i) => (
                             <div key={i} className="flex shrink-0 items-center gap-2">
                                 <img
                                     src={tech.url}
                                     alt={tech.name}
                                     loading="lazy"
+                                    decoding="async"
+                                    fetchPriority="low"
                                     width={24}
                                     height={24}
                                     className="h-6 w-auto object-contain"
@@ -87,17 +80,15 @@ export function TechStack() {
                             </div>
                         ))}
                     </div>
-                    <div
-                        className="animate-marquee flex min-w-full shrink-0 items-center justify-start gap-8 pr-8"
-                        aria-hidden="true"
-                        style={{ willChange: "transform" }}
-                    >
+                    <div className="animate-marquee flex min-w-full shrink-0 items-center justify-start gap-8 pr-8" aria-hidden="true">
                         {technologies.map((tech, i) => (
                             <div key={`dm-${i}`} className="flex shrink-0 items-center gap-2">
                                 <img
                                     src={tech.url}
                                     alt=""
                                     loading="lazy"
+                                    decoding="async"
+                                    fetchPriority="low"
                                     width={24}
                                     height={24}
                                     className="h-6 w-auto object-contain"

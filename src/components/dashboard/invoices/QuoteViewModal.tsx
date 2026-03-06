@@ -99,7 +99,7 @@ export function QuoteViewModal({ isOpen, onClose, quoteId, documentType = 'quote
                     onClick={onClose}
                 >
                     {/* Top Toolbar */}
-                    <div className="absolute top-0 left-0 right-0 flex items-center justify-between px-6 py-4 bg-black/50 backdrop-blur-sm border-b border-white/10">
+                    <div className="absolute top-0 left-0 right-0 flex items-center justify-between px-6 py-4 bg-black/80 border-b border-white/10">
                         <h2 className="text-lg font-medium text-white">
                             {documentType === 'invoice'
                                 ? (document?.invoice_number || t.invoices?.typeInvoice || 'Invoice')

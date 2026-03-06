@@ -37,7 +37,8 @@ export default function RootClientWrapper({
                 <>
                     <DeveloperMode />
                     <KonamiTrigger />
-                    <EasterEggs />
+                    {/* Temporarily disabled for performance testing */}
+                    {/* <EasterEggs /> */}
                     <Chatbot />
                     <Footer />
                     <CookieConsent />

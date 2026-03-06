@@ -33,7 +33,7 @@ export function CookieConsent() {
     if (!isVisible) return null;
 
     return (
-        <div className="fixed bottom-0 left-0 right-0 z-50 p-4 bg-background border-t border-border shadow-lg animate-in slide-in-from-bottom-10 md:m-4 md:rounded-lg md:border md:max-w-xl md:bg-background/95 md:backdrop-blur">
+        <div className="fixed bottom-0 left-0 right-0 z-50 p-4 bg-background border-t border-border shadow-lg animate-in slide-in-from-bottom-10 md:m-4 md:rounded-lg md:border md:max-w-xl md:bg-background/98">
             <div className="flex flex-col gap-4">
                 <div className="flex items-start justify-between gap-4">
                     <div className="space-y-2">

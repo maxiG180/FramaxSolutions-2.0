@@ -123,7 +123,7 @@ export function Sidebar({ isCollapsed, onToggle, isMobileOpen = false, onMobileC
             {/* Mobile Overlay */}
             {isMobileOpen && (
                 <div
-                    className="fixed inset-0 bg-black/50 z-40 md:hidden backdrop-blur-sm"
+                    className="fixed inset-0 bg-black/75 z-40 md:hidden"
                     onClick={onMobileClose}
                 />
             )}

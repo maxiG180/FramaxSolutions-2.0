@@ -77,10 +77,10 @@ export function Portfolio() {
                             {/* Content Container */}
                             <div className="absolute inset-0 p-8 flex flex-col justify-between">
                                 <div className="flex justify-between items-start">
-                                    <span className="px-4 py-2 rounded-full bg-background/50 backdrop-blur-md border border-white/10 text-xs font-medium uppercase tracking-wider">
+                                    <span className="px-4 py-2 rounded-full bg-background/50 border border-white/10 text-xs font-medium uppercase tracking-wider">
                                         {project.category}
                                     </span>
-                                    <div className="w-12 h-12 rounded-full bg-background/50 backdrop-blur-md border border-white/10 flex items-center justify-center group-hover:bg-primary group-hover:text-primary-foreground transition-colors duration-300">
+                                    <div className="w-12 h-12 rounded-full bg-background/50 border border-white/10 flex items-center justify-center group-hover:bg-primary group-hover:text-primary-foreground transition-colors duration-300">
                                         <ArrowUpRight className="w-6 h-6" />
                                     </div>
                                 </div>
