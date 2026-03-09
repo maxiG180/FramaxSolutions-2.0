@@ -27,9 +27,9 @@ export function TechStack() {
 
                 {/* Desktop — two duplicate rows for seamless infinite loop */}
                 <div className="hidden w-full overflow-hidden md:flex [mask-image:linear-gradient(to_right,transparent,black_20%,black_80%,transparent)]">
-                    <div className="animate-marquee flex min-w-full shrink-0 items-center justify-around gap-10">
+                    <div className="animate-marquee flex shrink-0 items-center gap-16 pr-16">
                         {technologies.map((tech, i) => (
-                            <div key={i} className="flex items-center gap-2 hover:scale-110" style={{ transition: 'transform 0.3s' }}>
+                            <div key={i} className="flex shrink-0 items-center gap-2 hover:scale-110" style={{ transition: 'transform 0.3s' }}>
                                 <img
                                     src={tech.url}
                                     alt={tech.name}
@@ -44,9 +44,9 @@ export function TechStack() {
                         ))}
                     </div>
                     {/* Duplicate for seamless loop */}
-                    <div className="animate-marquee flex min-w-full shrink-0 items-center justify-around gap-10" aria-hidden="true">
+                    <div className="animate-marquee flex shrink-0 items-center gap-16 pr-16" aria-hidden="true">
                         {technologies.map((tech, i) => (
-                            <div key={`d-${i}`} className="flex items-center gap-2">
+                            <div key={`d-${i}`} className="flex shrink-0 items-center gap-2">
                                 <img
                                     src={tech.url}
                                     alt=""
