@@ -200,10 +200,10 @@ export default function ServicesPackages() {
           </h3>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {[
-              { name: 'Manutenção Mensal', price: '20€/mês' },
-              { name: 'Alojamento Premium', price: '29€/mês' },
-              { name: 'SEO Mensal', price: '299€/mês' },
-              { name: 'Marketing Digital', price: 'Orçamento' },
+              { name: 'Website Personalizado', price: 'A partir de 499€' },
+              { name: 'Otimização SEO', price: 'Desde 299€' },
+              { name: 'Hosting & Domínio', price: '15€/mês' },
+              { name: 'Manutenção Premium', price: '49€/mês' },
             ].map((addon, i) => (
               <div
                 key={i}

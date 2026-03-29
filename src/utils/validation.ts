@@ -228,7 +228,7 @@ export const serviceTitleSchema = z
     .string()
     .min(1, 'Title is required')
     .max(200, 'Title is too long')
-    .regex(/^[a-zA-Z0-9\s\-&,.()]+$/, 'Title contains invalid characters');
+    .regex(/^[a-zA-Z0-9\u00C0-\u00FF\s\-&,.()]+$/, 'Title contains invalid characters');
 
 export const basePriceSchema = z
     .number()

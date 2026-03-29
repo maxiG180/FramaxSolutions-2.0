@@ -155,7 +155,7 @@ export default function InvoicesPage() {
                 due_date: invoice.rawData.due_date,
                 items: invoice.rawData.items || [],
                 subtotal: invoice.rawData.subtotal || 0,
-                tax_rate: invoice.rawData.tax_rate || 0.23,
+                tax_rate: invoice.rawData.tax_rate ?? 0,
                 tax_amount: invoice.rawData.tax_amount || 0,
                 total: invoice.rawData.total || 0,
                 notes: invoice.rawData.notes,

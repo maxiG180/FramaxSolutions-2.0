@@ -14,6 +14,11 @@ export type PriceType = 'Fixed' | 'Starting From' | 'Custom Quote';
 export type RecurringInterval = 'Monthly' | 'Quarterly' | 'Yearly';
 
 /**
+ * Inclusion type - How a service is included in another service
+ */
+export type InclusionType = 'bundled' | 'optional';
+
+/**
  * Service interface matching the Supabase services table
  */
 export interface Service {
@@ -31,6 +36,17 @@ export interface Service {
   category?: string | null;
   icon?: string | null;
   included_services?: Service[] | null; // Services included in this package
+}
+
+/**
+ * Service inclusion junction table entry
+ */
+export interface ServiceInclusion {
+  id: string;
+  parent_service_id: string;
+  included_service_id: string;
+  inclusion_type: InclusionType;
+  created_at: string;
 }
 
 /**

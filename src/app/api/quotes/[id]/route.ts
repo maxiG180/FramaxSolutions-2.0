@@ -88,6 +88,7 @@ export async function PUT(
       );
     }
 
+    // TODO: Migrar para quote_items table (normalized items instead of jsonb)
     // Calculate totals
     const subtotal = items.reduce((sum: number, item: any) => {
       return sum + (item.quantity * item.price);
@@ -109,7 +110,7 @@ export async function PUT(
         client_language: clientLanguage || 'pt',
         quote_date: quoteDate,
         expiry_date: expiryDate || null,
-        items: items,
+        items: items, // TODO: Migrar para quote_items table
         subtotal: subtotal,
         tax_rate: taxRate,
         tax_amount: taxAmount,

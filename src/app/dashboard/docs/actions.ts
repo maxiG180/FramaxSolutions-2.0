@@ -159,9 +159,23 @@ export async function getFiles(folderId?: string): Promise<{ files: File[], erro
 
     // Get public URLs for files
     const filesWithUrls = await Promise.all(files?.map(async (file) => {
+        // Parse bucket and path from storage_path
+        // Format can be: "client-logos/file.png" or just "folder/file.png" (documents bucket)
+        let bucket = 'documents';
+        let filePath = file.storage_path;
+
+        // Check if path starts with a known bucket name
+        if (file.storage_path.startsWith('client-logos/')) {
+            bucket = 'client-logos';
+            filePath = file.storage_path.substring('client-logos/'.length);
+        } else if (file.storage_path.startsWith('client-files/')) {
+            bucket = 'client-files';
+            filePath = file.storage_path.substring('client-files/'.length);
+        }
+
         const { data: { publicUrl } } = supabase.storage
-            .from('documents')
-            .getPublicUrl(file.storage_path)
+            .from(bucket)
+            .getPublicUrl(filePath)
 
         return {
             id: file.id,
@@ -283,9 +297,21 @@ export async function deleteFile(id: string, storagePath: string): Promise<{ err
     }
 
     // Delete from storage
+    // Parse bucket from storage path (e.g., "client-logos/file.png")
+    let bucket = 'documents';
+    let filePath = storagePath;
+
+    if (storagePath.startsWith('client-logos/')) {
+        bucket = 'client-logos';
+        filePath = storagePath.substring('client-logos/'.length);
+    } else if (storagePath.startsWith('client-files/')) {
+        bucket = 'client-files';
+        filePath = storagePath.substring('client-files/'.length);
+    }
+
     const { error: storageError } = await supabase.storage
-        .from('documents')
-        .remove([storagePath])
+        .from(bucket)
+        .remove([filePath])
 
     if (storageError) {
         console.error('Error deleting file from storage:', storageError)

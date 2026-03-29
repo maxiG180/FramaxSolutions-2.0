@@ -236,7 +236,7 @@ export default function QuotesPage() {
                 expiry_date: doc.rawData.expiry_date,
                 items: doc.rawData.items || [],
                 subtotal: doc.rawData.subtotal || 0,
-                tax_rate: doc.rawData.tax_rate || 0.23,
+                tax_rate: doc.rawData.tax_rate ?? 0,
                 tax_amount: doc.rawData.tax_amount || 0,
                 total: doc.rawData.total || 0,
                 notes: doc.rawData.notes,

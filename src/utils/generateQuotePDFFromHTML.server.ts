@@ -24,7 +24,7 @@ const DEFAULT_TRANSLATIONS = {
     subtotal: 'Subtotal',
     tax: 'IVA',
     notesTerms: 'Notas / Termos',
-    legalNote: 'Este orçamento não constitui fatura. Após aceitação, será emitida fatura oficial através do Portal das Finanças.',
+    legalNote: 'Este orçamento não constitui fatura. Após aceitação, será emitido recibo de ato isolado através do Portal das Finanças.',
     invoiceLegalNote: 'Esta fatura foi processada por computador e é válida sem assinatura.',
     nif: 'NIF',
 };

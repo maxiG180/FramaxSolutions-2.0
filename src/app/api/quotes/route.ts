@@ -82,6 +82,7 @@ export async function POST(request: Request) {
 
     const body = await request.json();
     const {
+      quoteNumber: customQuoteNumber, // Optional custom quote number from client
       clientName,
       clientEmail,
       clientPhone,
@@ -104,6 +105,7 @@ export async function POST(request: Request) {
       );
     }
 
+    // TODO: Migrar para quote_items table (normalized items instead of jsonb)
     // Calculate totals
     const subtotal = items.reduce((sum: number, item: any) => {
       return sum + (item.quantity * item.price);
@@ -112,33 +114,53 @@ export async function POST(request: Request) {
     const taxAmount = subtotal * taxRate;
     const total = subtotal + taxAmount;
 
-    // Generate unique sequential quote number with retry logic
-    let quoteNumber: string | undefined;
-    let attempts = 0;
-    const maxAttempts = 10;
+    // Use custom quote number if provided, otherwise generate sequential one
+    let quoteNumber: string;
 
-    while (attempts < maxAttempts) {
-      quoteNumber = await generateQuoteNumber(supabase);
-
-      // Check if this number already exists (race condition protection)
+    if (customQuoteNumber && customQuoteNumber.trim()) {
+      // Validate that custom number doesn't already exist
       const { data: existing } = await supabase
         .from('quotes')
         .select('quote_number')
-        .eq('quote_number', quoteNumber)
+        .eq('quote_number', customQuoteNumber)
         .single();
 
-      if (!existing) break;
+      if (existing) {
+        return NextResponse.json(
+          { error: 'Quote number already exists. Please use a different number.' },
+          { status: 400 }
+        );
+      }
 
-      attempts++;
-      // Small delay to avoid tight loop in case of conflicts
-      await new Promise(resolve => setTimeout(resolve, 100));
-    }
+      quoteNumber = customQuoteNumber.trim();
+    } else {
+      // Generate unique sequential quote number with retry logic
+      let attempts = 0;
+      const maxAttempts = 10;
 
-    if (attempts === maxAttempts || !quoteNumber) {
-      return NextResponse.json(
-        { error: 'Failed to generate unique quote number' },
-        { status: 500 }
-      );
+      while (attempts < maxAttempts) {
+        quoteNumber = await generateQuoteNumber(supabase);
+
+        // Check if this number already exists (race condition protection)
+        const { data: existing } = await supabase
+          .from('quotes')
+          .select('quote_number')
+          .eq('quote_number', quoteNumber)
+          .single();
+
+        if (!existing) break;
+
+        attempts++;
+        // Small delay to avoid tight loop in case of conflicts
+        await new Promise(resolve => setTimeout(resolve, 100));
+      }
+
+      if (attempts === maxAttempts) {
+        return NextResponse.json(
+          { error: 'Failed to generate unique quote number' },
+          { status: 500 }
+        );
+      }
     }
 
     // Insert quote
@@ -156,7 +178,7 @@ export async function POST(request: Request) {
         client_language: clientLanguage || 'pt',
         quote_date: quoteDate,
         expiry_date: expiryDate || null,
-        items: items,
+        items: items, // TODO: Migrar para quote_items table
         subtotal: subtotal,
         tax_rate: taxRate,
         tax_amount: taxAmount,

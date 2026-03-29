@@ -1,4 +1,4 @@
-import { Metadata } from "next";
+import { Metadata, Viewport } from "next";
 import DashboardClientLayout from "./DashboardClientLayout";
 
 export const metadata: Metadata = {
@@ -12,12 +12,13 @@ export const metadata: Metadata = {
         statusBarStyle: "black-translucent",
         title: "Framax Admin",
     },
-    viewport: {
-        width: "device-width",
-        initialScale: 1,
-        maximumScale: 1,
-        userScalable: false,
-    },
+};
+
+export const viewport: Viewport = {
+    width: "device-width",
+    initialScale: 1,
+    maximumScale: 1,
+    userScalable: false,
 };
 
 export default function DashboardLayout({
