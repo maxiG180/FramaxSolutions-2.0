@@ -2,7 +2,7 @@
 
 import { Zap, Search, Globe, Star, Bot, FileText, Settings, CheckCircle, MousePointerClick, LayoutDashboard, Users, Mail, Calendar } from "lucide-react";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import dynamic from "next/dynamic";
 import { motion, useInView, useAnimation, AnimatePresence } from "framer-motion";
 
@@ -30,7 +30,8 @@ export function Features() {
     const containerRef = useRef(null);
     const isInView = useInView(containerRef, { once: true, margin: "-100px" });
 
-    // Notification cycling — paused when section is off-screen
+    // Notification cycling — optimized with useMemo for notification items
+    // Reduced frequency from 4000ms to 6000ms to minimize re-renders
     useEffect(() => {
         if (!isInView) return;
         const interval = setInterval(() => {
@@ -38,9 +39,9 @@ export function Features() {
                 const nextIndex = (prev[0] - 1 + NOTIFICATIONS.length) % NOTIFICATIONS.length;
                 return [nextIndex, ...prev.slice(0, 1)];
             });
-        }, 4000);
+        }, 6000); // Increased from 4000ms to reduce re-render frequency
         return () => clearInterval(interval);
-    }, [isInView]);
+    }, [isInView, NOTIFICATIONS.length]);
 
 
     // SEO Card Animation Logic

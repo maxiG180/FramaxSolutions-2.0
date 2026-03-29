@@ -111,7 +111,7 @@ export default function Chatbot() {
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: 20, scale: 0.95 }}
                         transition={{ duration: 0.2 }}
-                        className="fixed bottom-24 right-6 z-50 w-[90vw] md:w-[420px] h-[600px] md:h-[650px] max-h-[80vh] flex flex-col rounded-2xl border border-white/10 bg-[#050505]/80 backdrop-blur-xl shadow-2xl overflow-hidden"
+                        className="fixed bottom-24 right-6 z-50 w-[90vw] md:w-[420px] h-[600px] md:h-[650px] max-h-[80vh] flex flex-col rounded-2xl border border-white/10 bg-[#050505]/95 shadow-2xl overflow-hidden"
                         style={{ boxShadow: "0 0 50px -12px rgba(37, 99, 235, 0.25)" }}
                     >
                         {/* Header */}
@@ -262,7 +262,7 @@ export default function Chatbot() {
                     whileTap={{ scale: 0.95 }}
                     className={cn(
                         "pointer-events-auto w-14 h-14 rounded-full shadow-lg flex items-center justify-center transition-all bg-blue-600 hover:bg-blue-500 text-white relative",
-                        isOpen && "rotate-90 bg-white/10 hover:bg-white/20 backdrop-blur-md"
+                        isOpen && "rotate-90 bg-white/20 hover:bg-white/30"
                     )}
                     style={{ boxShadow: isOpen ? "none" : "0 0 20px rgba(37, 99, 235, 0.5)" }}
                     aria-label={isOpen ? "Close chat" : "Open chat"}

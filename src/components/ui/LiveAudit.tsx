@@ -47,7 +47,7 @@ export function LiveAudit() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 2 }}
-                className="fixed bottom-8 right-8 z-40 hidden md:flex items-center gap-3 bg-background/80 backdrop-blur-md border border-border px-4 py-2 rounded-full shadow-lg"
+                className="fixed bottom-8 right-8 z-40 hidden md:flex items-center gap-3 bg-background/95 border border-border px-4 py-2 rounded-full shadow-lg"
             >
                 <div className="flex items-center justify-center w-6 h-6 rounded bg-muted text-xs font-bold font-mono text-muted-foreground border border-border">
                     L
@@ -62,7 +62,7 @@ export function LiveAudit() {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
+                        className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-4"
                         onClick={() => setIsOpen(false)}
                     >
                         <motion.div

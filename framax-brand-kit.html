@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Framax Solutions — Brand Kit</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    /* ── Core Palette ── */
+    --bg:        #0d0d0d;
+    --surface:   #161616;
+    --surface2:  #1c1c1c;
+    --border:    #222222;
+    --border2:   #2e2e2e;
+
+    /* ── Brand Colors ── */
+    --accent:    #2563eb;
+    --accent-h:  #1d4ed8;  /* hover */
+    --accent-l:  #3b82f6;  /* light variant */
+    --accent-bg: rgba(37, 99, 235, 0.08);
+    --accent-bg2:rgba(37, 99, 235, 0.15);
+    --red:       #ff5c38;
+    --red-bg:    rgba(255, 92, 56, 0.08);
+
+    /* ── Text ── */
+    --text:      #e8e8e8;
+    --text2:     #a0a0a0;
+    --muted:     #555555;
+
+    /* ── Typography ── */
+    --font-display: 'Bebas Neue', sans-serif;
+    --font-body:    'DM Sans', sans-serif;
+    --font-mono:    'DM Mono', monospace;
+
+    /* ── Spacing Scale (8px base) ── */
+    --s1: 4px;
+    --s2: 8px;
+    --s3: 12px;
+    --s4: 16px;
+    --s5: 24px;
+    --s6: 32px;
+    --s7: 48px;
+    --s8: 64px;
+    --s9: 96px;
+
+    /* ── Radii ── */
+    --r-sm: 4px;
+    --r-md: 8px;
+    --r-lg: 12px;
+    --r-xl: 16px;
+    --r-full: 999px;
+
+    /* ── Shadows ── */
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.4);
+    --shadow-md: 0 4px 16px rgba(0,0,0,0.5);
+    --shadow-accent: 0 0 24px rgba(37,99,235,0.25);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  /* ─────────────── LAYOUT ─────────────── */
+  .page { max-width: 960px; margin: 0 auto; padding: 64px 24px 120px; }
+
+  .section { margin-bottom: 80px; }
+
+  .section-label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 10px;
+  }
+
+  .section-title {
+    font-family: var(--font-display);
+    font-size: 42px;
+    letter-spacing: 0.03em;
+    color: #fff;
+    line-height: 1;
+    margin-bottom: 32px;
+  }
+
+  .divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin-bottom: 32px;
+  }
+
+  /* ─────────────── HEADER ─────────────── */
+  header {
+    padding: 64px 0 56px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 80px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+
+  .logo-block {}
+
+  .logo-wordmark {
+    font-family: var(--font-display);
+    font-size: 64px;
+    line-height: 0.9;
+    color: #fff;
+    letter-spacing: 0.02em;
+  }
+  .logo-wordmark span { color: var(--accent); }
+
+  .logo-sub {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-top: 10px;
+  }
+
+  .header-meta {
+    text-align: right;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--muted);
+    line-height: 1.8;
+  }
+
+  /* ─────────────── COLORS ─────────────── */
+  .color-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 12px;
+  }
+
+  .swatch {
+    border-radius: var(--r-md);
+    overflow: hidden;
+    border: 1px solid var(--border);
+  }
+
+  .swatch-color {
+    height: 80px;
+  }
+
+  .swatch-info {
+    background: var(--surface);
+    padding: 12px;
+  }
+
+  .swatch-name {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text);
+    margin-bottom: 2px;
+  }
+
+  .swatch-hex {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  .swatch-var {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--border2);
+    margin-top: 4px;
+  }
+
+  /* ─────────────── TYPOGRAPHY ─────────────── */
+  .type-block {
+    border: 1px solid var(--border);
+    border-radius: var(--r-lg);
+    overflow: hidden;
+    margin-bottom: 12px;
+  }
+
+  .type-meta {
+    background: var(--surface);
+    padding: 10px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .type-meta-label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  .type-meta-spec {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--accent);
+  }
+
+  .type-sample {
+    padding: 20px 24px;
+    background: var(--bg);
+  }
+
+  .t-display-xl { font-family: var(--font-display); font-size: 72px; line-height: 0.9; letter-spacing: 0.02em; color: #fff; }
+  .t-display-lg { font-family: var(--font-display); font-size: 48px; line-height: 0.95; letter-spacing: 0.02em; color: #fff; }
+  .t-display-md { font-family: var(--font-display); font-size: 32px; line-height: 1; letter-spacing: 0.03em; color: #fff; }
+  .t-body-lg    { font-family: var(--font-body); font-size: 18px; font-weight: 400; line-height: 1.65; color: var(--text); }
+  .t-body-md    { font-family: var(--font-body); font-size: 15px; font-weight: 400; line-height: 1.6; color: var(--text); }
+  .t-body-sm    { font-family: var(--font-body); font-size: 13px; font-weight: 300; line-height: 1.6; color: var(--text2); }
+  .t-mono       { font-family: var(--font-mono); font-size: 12px; line-height: 1.6; color: var(--accent); letter-spacing: 0.06em; }
+
+  /* ─────────────── BUTTONS ─────────────── */
+  .btn-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+
+  .btn {
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 500;
+    padding: 10px 22px;
+    border-radius: var(--r-md);
+    border: none;
+    cursor: pointer;
+    transition: all 0.15s;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    letter-spacing: 0.01em;
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    color: #fff;
+    box-shadow: var(--shadow-accent);
+  }
+  .btn-primary:hover { background: var(--accent-h); }
+
+  .btn-secondary {
+    background: var(--accent-bg);
+    color: var(--accent-l);
+    border: 1px solid rgba(37,99,235,0.25);
+  }
+  .btn-secondary:hover { background: var(--accent-bg2); }
+
+  .btn-outline {
+    background: transparent;
+    color: var(--text);
+    border: 1px solid var(--border2);
+  }
+  .btn-outline:hover { border-color: #444; background: var(--surface2); }
+
+  .btn-ghost {
+    background: transparent;
+    color: var(--text2);
+    border: none;
+    padding-left: 0;
+  }
+  .btn-ghost:hover { color: var(--text); }
+
+  .btn-danger {
+    background: var(--red-bg);
+    color: var(--red);
+    border: 1px solid rgba(255,92,56,0.2);
+  }
+  .btn-danger:hover { background: rgba(255,92,56,0.15); }
+
+  .btn-sm { font-size: 12px; padding: 7px 14px; }
+  .btn-lg { font-size: 16px; padding: 14px 28px; }
+
+  /* ─────────────── BADGES ─────────────── */
+  .badge-row { display: flex; flex-wrap: wrap; gap: 8px; }
+
+  .badge {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border-radius: var(--r-full);
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .badge-blue   { background: var(--accent-bg); color: var(--accent-l); border: 1px solid rgba(37,99,235,0.2); }
+  .badge-green  { background: rgba(34,197,94,0.08); color: #4ade80; border: 1px solid rgba(34,197,94,0.2); }
+  .badge-red    { background: var(--red-bg); color: var(--red); border: 1px solid rgba(255,92,56,0.2); }
+  .badge-gray   { background: rgba(255,255,255,0.04); color: var(--muted); border: 1px solid var(--border); }
+  .badge-dot::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: currentColor; display: inline-block; }
+
+  /* ─────────────── CARDS ─────────────── */
+  .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r-lg);
+    padding: 24px;
+    transition: border-color 0.15s;
+  }
+  .card:hover { border-color: var(--border2); }
+
+  .card-accent {
+    background: var(--surface);
+    border: 1px solid rgba(37,99,235,0.3);
+    border-radius: var(--r-lg);
+    padding: 24px;
+    box-shadow: var(--shadow-accent);
+  }
+
+  .card-icon {
+    width: 40px;
+    height: 40px;
+    background: var(--accent-bg);
+    border-radius: var(--r-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    margin-bottom: 14px;
+  }
+
+  .card h3 {
+    font-family: var(--font-body);
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+
+  .card p {
+    font-size: 13px;
+    color: var(--text2);
+    font-weight: 300;
+    line-height: 1.6;
+  }
+
+  /* ─────────────── INPUTS ─────────────── */
+  .input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  @media (max-width: 600px) { .input-grid { grid-template-columns: 1fr; } }
+
+  .input-wrap { display: flex; flex-direction: column; gap: 6px; }
+
+  .input-label {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text2);
+  }
+
+  .input {
+    font-family: var(--font-body);
+    font-size: 14px;
+    background: var(--surface);
+    border: 1px solid var(--border2);
+    border-radius: var(--r-md);
+    color: var(--text);
+    padding: 10px 14px;
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+    width: 100%;
+  }
+  .input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(37,99,235,0.12); }
+  .input::placeholder { color: var(--muted); }
+
+  .input-error { border-color: var(--red) !important; }
+  .input-hint { font-size: 11px; color: var(--muted); }
+  .input-hint.error { color: var(--red); }
+
+  /* ─────────────── SPACING ─────────────── */
+  .spacing-row { display: flex; align-items: flex-end; gap: 16px; flex-wrap: wrap; }
+
+  .spacing-block { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+
+  .spacing-visual { background: var(--accent-bg); border: 1px solid rgba(37,99,235,0.2); border-radius: var(--r-sm); }
+
+  .spacing-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--muted);
+    text-align: center;
+  }
+
+  .spacing-value {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--accent);
+    text-align: center;
+  }
+
+  /* ─────────────── CODE SNIPPET ─────────────── */
+  .code-block {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r-lg);
+    overflow: hidden;
+  }
+
+  .code-header {
+    background: var(--surface2);
+    padding: 10px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .code-title {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--text2);
+  }
+
+  .code-copy {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--accent);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+  }
+  .code-copy:hover { color: var(--accent-l); }
+
+  pre {
+    padding: 20px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    line-height: 1.8;
+    color: var(--text2);
+    overflow-x: auto;
+  }
+
+  .kw  { color: var(--accent-l); }
+  .val { color: #f97316; }
+  .cmt { color: var(--muted); }
+  .fn  { color: #a78bfa; }
+
+  /* ─────────────── MISC ─────────────── */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 640px) { .two-col { grid-template-columns: 1fr; } }
+
+  .info-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+    gap: 16px;
+  }
+  .info-row:last-child { border-bottom: none; }
+  .info-key { font-size: 13px; color: var(--text2); font-weight: 400; }
+  .info-val { font-family: var(--font-mono); font-size: 12px; color: var(--text); }
+
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- HEADER -->
+  <header>
+    <div class="logo-block">
+      <div class="logo-wordmark">FRAMAX<span>.</span></div>
+      <div class="logo-sub">Solutions — Brand Kit v1.0</div>
+    </div>
+    <div class="header-meta">
+      <div>Internal Use Only</div>
+      <div>framax.solutions</div>
+    </div>
+  </header>
+
+  <!-- COLORS -->
+  <div class="section">
+    <div class="section-label">01 — Color System</div>
+    <div class="section-title">Palette</div>
+    <div class="color-grid">
+      <div class="swatch">
+        <div class="swatch-color" style="background:#2563eb;"></div>
+        <div class="swatch-info">
+          <div class="swatch-name">Accent Blue</div>
+          <div class="swatch-hex">#2563eb</div>
+          <div class="swatch-var">--accent</div>
+        </div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:#3b82f6;"></div>
+        <div class="swatch-info">
+          <div class="swatch-name">Accent Light</div>
+          <div class="swatch-hex">#3b82f6</div>
+          <div class="swatch-var">--accent-l</div>
+        </div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:#1d4ed8;"></div>
+        <div class="swatch-info">
+          <div class="swatch-name">Accent Hover</div>
+          <div class="swatch-hex">#1d4ed8</div>
+          <div class="swatch-var">--accent-h</div>
+        </div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:#ff5c38;"></div>
+        <div class="swatch-info">
+          <div class="swatch-name">Red / Alert</div>
+          <div class="swatch-hex">#ff5c38</div>
+          <div class="swatch-var">--red</div>
+        </div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:#0d0d0d; border-bottom: 1px solid #222;"></div>
+        <div class="swatch-info">
+          <div class="swatch-name">Background</div>
+          <div class="swatch-hex">#0d0d0d</div>
+          <div class="swatch-var">--bg</div>
+        </div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:#161616; border-bottom: 1px solid #222;"></div>
+        <div class="swatch-info">
+          <div class="swatch-name">Surface</div>
+          <div class="swatch-hex">#161616</div>
+          <div class="swatch-var">--surface</div>
+        </div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:#e8e8e8;"></div>
+        <div class="swatch-info">
+          <div class="swatch-name">Text Primary</div>
+          <div class="swatch-hex">#e8e8e8</div>
+          <div class="swatch-var">--text</div>
+        </div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:#555555;"></div>
+        <div class="swatch-info">
+          <div class="swatch-name">Text Muted</div>
+          <div class="swatch-hex">#555555</div>
+          <div class="swatch-var">--muted</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TYPOGRAPHY -->
+  <div class="section">
+    <div class="section-label">02 — Typography</div>
+    <div class="section-title">Type Scale</div>
+
+    <div class="type-block">
+      <div class="type-meta"><span class="type-meta-label">Display XL — Hero headlines</span><span class="type-meta-spec">Bebas Neue · 72px · tracking 0.02em</span></div>
+      <div class="type-sample"><div class="t-display-xl">Framax Solutions</div></div>
+    </div>
+    <div class="type-block">
+      <div class="type-meta"><span class="type-meta-label">Display LG — Section headings</span><span class="type-meta-spec">Bebas Neue · 48px</span></div>
+      <div class="type-sample"><div class="t-display-lg">Web Development</div></div>
+    </div>
+    <div class="type-block">
+      <div class="type-meta"><span class="type-meta-label">Display MD — Card/component titles</span><span class="type-meta-spec">Bebas Neue · 32px</span></div>
+      <div class="type-sample"><div class="t-display-md">Our Services</div></div>
+    </div>
+    <div class="type-block">
+      <div class="type-meta"><span class="type-meta-label">Body LG — Intro paragraphs</span><span class="type-meta-spec">DM Sans · 18px · weight 400 · line-height 1.65</span></div>
+      <div class="type-sample"><div class="t-body-lg">We build custom websites that generate real results for Portuguese businesses. No templates, no bloat — just clean, fast, conversion-focused web.</div></div>
+    </div>
+    <div class="type-block">
+      <div class="type-meta"><span class="type-meta-label">Body MD — Default text</span><span class="type-meta-spec">DM Sans · 15px · weight 400 · line-height 1.6</span></div>
+      <div class="type-sample"><div class="t-body-md">Our approach combines strategic thinking with technical precision to deliver websites that work as hard as your business does.</div></div>
+    </div>
+    <div class="type-block">
+      <div class="type-meta"><span class="type-meta-label">Body SM — Captions, secondary info</span><span class="type-meta-spec">DM Sans · 13px · weight 300</span></div>
+      <div class="type-sample"><div class="t-body-sm">Last updated March 2026 · Framax Solutions · Portugal</div></div>
+    </div>
+    <div class="type-block">
+      <div class="type-meta"><span class="type-meta-label">Mono — Labels, tags, code, metadata</span><span class="type-meta-spec">DM Mono · 12px · tracking 0.06em</span></div>
+      <div class="type-sample"><div class="t-mono">01 — Project · framax.solutions · #2563eb</div></div>
+    </div>
+  </div>
+
+  <!-- BUTTONS -->
+  <div class="section">
+    <div class="section-label">03 — Components</div>
+    <div class="section-title">Buttons</div>
+
+    <div class="btn-row">
+      <button class="btn btn-primary">Get Started</button>
+      <button class="btn btn-secondary">Learn More</button>
+      <button class="btn btn-outline">View Portfolio</button>
+      <button class="btn btn-ghost">Cancel</button>
+      <button class="btn btn-danger">Delete</button>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-primary btn-sm">Small Primary</button>
+      <button class="btn btn-outline btn-sm">Small Outline</button>
+      <button class="btn btn-primary btn-lg">Large Primary →</button>
+    </div>
+  </div>
+
+  <!-- BADGES -->
+  <div class="section">
+    <div class="section-label">03b — Components</div>
+    <div class="section-title">Badges & Tags</div>
+    <div class="badge-row">
+      <span class="badge badge-blue badge-dot">Active</span>
+      <span class="badge badge-green badge-dot">Delivered</span>
+      <span class="badge badge-red badge-dot">Overdue</span>
+      <span class="badge badge-gray">Draft</span>
+      <span class="badge badge-blue">SEO</span>
+      <span class="badge badge-blue">Must</span>
+      <span class="badge badge-gray">Nice to Have</span>
+      <span class="badge badge-red">Urgent</span>
+    </div>
+  </div>
+
+  <!-- CARDS -->
+  <div class="section">
+    <div class="section-label">03c — Components</div>
+    <div class="section-title">Cards</div>
+    <div class="card-grid">
+      <div class="card">
+        <div class="card-icon">🌐</div>
+        <h3>Website Development</h3>
+        <p>Custom-built, performance-optimised websites. No templates, no compromise.</p>
+      </div>
+      <div class="card-accent">
+        <div class="card-icon">📈</div>
+        <h3>SEO & Performance</h3>
+        <p>Rank higher, load faster. We build for search engines and real users.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">⚡</div>
+        <h3>Maintenance</h3>
+        <p>Ongoing support, updates, and monitoring so your site never goes dark.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- INPUTS -->
+  <div class="section">
+    <div class="section-label">03d — Components</div>
+    <div class="section-title">Form Inputs</div>
+    <div class="input-grid">
+      <div class="input-wrap">
+        <label class="input-label">Full Name</label>
+        <input class="input" type="text" placeholder="João Silva">
+        <span class="input-hint">Used for contract and invoicing.</span>
+      </div>
+      <div class="input-wrap">
+        <label class="input-label">Email</label>
+        <input class="input" type="email" placeholder="joao@empresa.pt">
+      </div>
+      <div class="input-wrap">
+        <label class="input-label">Phone</label>
+        <input class="input input-error" type="tel" placeholder="+351 9xx xxx xxx">
+        <span class="input-hint error">↑ Invalid phone number.</span>
+      </div>
+      <div class="input-wrap">
+        <label class="input-label">Budget Range</label>
+        <input class="input" type="text" placeholder="€500 – €1500">
+      </div>
+    </div>
+  </div>
+
+  <!-- SPACING -->
+  <div class="section">
+    <div class="section-label">04 — Spacing</div>
+    <div class="section-title">Spacing Scale</div>
+    <div class="spacing-row">
+      <div class="spacing-block"><div class="spacing-visual" style="width:4px; height:4px;"></div><div class="spacing-label">--s1</div><div class="spacing-value">4px</div></div>
+      <div class="spacing-block"><div class="spacing-visual" style="width:8px; height:8px;"></div><div class="spacing-label">--s2</div><div class="spacing-value">8px</div></div>
+      <div class="spacing-block"><div class="spacing-visual" style="width:12px; height:12px;"></div><div class="spacing-label">--s3</div><div class="spacing-value">12px</div></div>
+      <div class="spacing-block"><div class="spacing-visual" style="width:16px; height:16px;"></div><div class="spacing-label">--s4</div><div class="spacing-value">16px</div></div>
+      <div class="spacing-block"><div class="spacing-visual" style="width:24px; height:24px;"></div><div class="spacing-label">--s5</div><div class="spacing-value">24px</div></div>
+      <div class="spacing-block"><div class="spacing-visual" style="width:32px; height:32px;"></div><div class="spacing-label">--s6</div><div class="spacing-value">32px</div></div>
+      <div class="spacing-block"><div class="spacing-visual" style="width:48px; height:48px;"></div><div class="spacing-label">--s7</div><div class="spacing-value">48px</div></div>
+      <div class="spacing-block"><div class="spacing-visual" style="width:64px; height:64px;"></div><div class="spacing-label">--s8</div><div class="spacing-value">64px</div></div>
+      <div class="spacing-block"><div class="spacing-visual" style="width:96px; height:96px;"></div><div class="spacing-label">--s9</div><div class="spacing-value">96px</div></div>
+    </div>
+  </div>
+
+  <!-- CSS VARIABLES -->
+  <div class="section">
+    <div class="section-label">05 — Code</div>
+    <div class="section-title">CSS Variables</div>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-title">framax-tokens.css</span>
+        <button class="code-copy" onclick="copyCSS()">Copy</button>
+      </div>
+      <pre id="cssBlock"><span class="fn">:root</span> {
+  <span class="cmt">/* ── Palette ── */</span>
+  <span class="kw">--bg</span>:          <span class="val">#0d0d0d</span>;
+  <span class="kw">--surface</span>:     <span class="val">#161616</span>;
+  <span class="kw">--surface2</span>:    <span class="val">#1c1c1c</span>;
+  <span class="kw">--border</span>:      <span class="val">#222222</span>;
+  <span class="kw">--border2</span>:     <span class="val">#2e2e2e</span>;
+
+  <span class="cmt">/* ── Brand ── */</span>
+  <span class="kw">--accent</span>:      <span class="val">#2563eb</span>;
+  <span class="kw">--accent-h</span>:    <span class="val">#1d4ed8</span>;
+  <span class="kw">--accent-l</span>:    <span class="val">#3b82f6</span>;
+  <span class="kw">--accent-bg</span>:   <span class="val">rgba(37, 99, 235, 0.08)</span>;
+  <span class="kw">--red</span>:         <span class="val">#ff5c38</span>;
+
+  <span class="cmt">/* ── Text ── */</span>
+  <span class="kw">--text</span>:        <span class="val">#e8e8e8</span>;
+  <span class="kw">--text2</span>:       <span class="val">#a0a0a0</span>;
+  <span class="kw">--muted</span>:       <span class="val">#555555</span>;
+
+  <span class="cmt">/* ── Fonts ── */</span>
+  <span class="kw">--font-display</span>: <span class="val">'Bebas Neue'</span>, sans-serif;
+  <span class="kw">--font-body</span>:    <span class="val">'DM Sans'</span>, sans-serif;
+  <span class="kw">--font-mono</span>:    <span class="val">'DM Mono'</span>, monospace;
+
+  <span class="cmt">/* ── Spacing ── */</span>
+  <span class="kw">--s1</span>: <span class="val">4px</span>;  <span class="kw">--s2</span>: <span class="val">8px</span>;  <span class="kw">--s3</span>: <span class="val">12px</span>;
+  <span class="kw">--s4</span>: <span class="val">16px</span>; <span class="kw">--s5</span>: <span class="val">24px</span>; <span class="kw">--s6</span>: <span class="val">32px</span>;
+  <span class="kw">--s7</span>: <span class="val">48px</span>; <span class="kw">--s8</span>: <span class="val">64px</span>; <span class="kw">--s9</span>: <span class="val">96px</span>;
+
+  <span class="cmt">/* ── Radii ── */</span>
+  <span class="kw">--r-sm</span>: <span class="val">4px</span>; <span class="kw">--r-md</span>: <span class="val">8px</span>; <span class="kw">--r-lg</span>: <span class="val">12px</span>;
+  <span class="kw">--r-xl</span>: <span class="val">16px</span>; <span class="kw">--r-full</span>: <span class="val">999px</span>;
+
+  <span class="cmt">/* ── Shadows ── */</span>
+  <span class="kw">--shadow-sm</span>:     <span class="val">0 1px 3px rgba(0,0,0,0.4)</span>;
+  <span class="kw">--shadow-md</span>:     <span class="val">0 4px 16px rgba(0,0,0,0.5)</span>;
+  <span class="kw">--shadow-accent</span>: <span class="val">0 0 24px rgba(37,99,235,0.25)</span>;
+}</pre>
+    </div>
+  </div>
+
+  <!-- BRAND RULES -->
+  <div class="section">
+    <div class="section-label">06 — Brand Rules</div>
+    <div class="section-title">Do's & Don'ts</div>
+    <div class="two-col">
+      <div>
+        <div style="font-family:var(--font-mono);font-size:11px;color:#4ade80;letter-spacing:0.1em;margin-bottom:12px;">✓ DO</div>
+        <div class="info-row"><span class="info-key">Use Bebas Neue for all headlines</span></div>
+        <div class="info-row"><span class="info-key">Use #2563eb as the single brand color</span></div>
+        <div class="info-row"><span class="info-key">Keep backgrounds dark (#0d0d0d)</span></div>
+        <div class="info-row"><span class="info-key">Use DM Mono for tags, metadata, labels</span></div>
+        <div class="info-row"><span class="info-key">Maintain generous whitespace</span></div>
+        <div class="info-row"><span class="info-key">Use the 8px spacing scale consistently</span></div>
+      </div>
+      <div>
+        <div style="font-family:var(--font-mono);font-size:11px;color:var(--red);letter-spacing:0.1em;margin-bottom:12px;">✕ DON'T</div>
+        <div class="info-row"><span class="info-key">Use more than 3 colors in one layout</span></div>
+        <div class="info-row"><span class="info-key">Use Inter, Roboto, or Arial</span></div>
+        <div class="info-row"><span class="info-key">Use gradients — keep colors flat</span></div>
+        <div class="info-row"><span class="info-key">Use light backgrounds for internal tools</span></div>
+        <div class="info-row"><span class="info-key">Mix spacing values outside the scale</span></div>
+        <div class="info-row"><span class="info-key">Use more than one accent color per page</span></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  function copyCSS() {
+    const css = `:root {
+  /* ── Palette ── */
+  --bg:          #0d0d0d;
+  --surface:     #161616;
+  --surface2:    #1c1c1c;
+  --border:      #222222;
+  --border2:     #2e2e2e;
+
+  /* ── Brand ── */
+  --accent:      #2563eb;
+  --accent-h:    #1d4ed8;
+  --accent-l:    #3b82f6;
+  --accent-bg:   rgba(37, 99, 235, 0.08);
+  --red:         #ff5c38;
+
+  /* ── Text ── */
+  --text:        #e8e8e8;
+  --text2:       #a0a0a0;
+  --muted:       #555555;
+
+  /* ── Fonts ── */
+  --font-display: 'Bebas Neue', sans-serif;
+  --font-body:    'DM Sans', sans-serif;
+  --font-mono:    'DM Mono', monospace;
+
+  /* ── Spacing ── */
+  --s1: 4px;  --s2: 8px;  --s3: 12px;
+  --s4: 16px; --s5: 24px; --s6: 32px;
+  --s7: 48px; --s8: 64px; --s9: 96px;
+
+  /* ── Radii ── */
+  --r-sm: 4px; --r-md: 8px; --r-lg: 12px;
+  --r-xl: 16px; --r-full: 999px;
+
+  /* ── Shadows ── */
+  --shadow-sm:     0 1px 3px rgba(0,0,0,0.4);
+  --shadow-md:     0 4px 16px rgba(0,0,0,0.5);
+  --shadow-accent: 0 0 24px rgba(37,99,235,0.25);
+}`;
+    navigator.clipboard.writeText(css).then(() => {
+      const btn = document.querySelector('.code-copy');
+      btn.textContent = 'Copied!';
+      setTimeout(() => btn.textContent = 'Copy', 2000);
+    });
+  }
+</script>
+</body>
+</html>
