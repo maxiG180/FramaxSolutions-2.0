@@ -201,7 +201,7 @@ export default function CalendarPage() {
     return (
         <div className="h-full flex flex-col lg:flex-row gap-6">
             {/* Main Calendar Grid */}
-            <div className="flex-1 bg-white/5 border border-white/10 rounded-2xl overflow-hidden flex flex-col min-h-[600px]">
+            <div className="flex-1 bg-white/5 border border-white/10 rounded-2xl overflow-hidden backdrop-blur-xl flex flex-col min-h-[600px]">
                 {/* Header */}
                 <div className="p-4 md:p-6 border-b border-white/10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                     <div className="flex items-center gap-4">
@@ -291,7 +291,7 @@ export default function CalendarPage() {
             </div>
 
             {/* Sidebar / Day View */}
-            <div className="w-full lg:w-80 bg-white/5 border border-white/10 rounded-2xl overflow-hidden flex flex-col max-h-[600px] lg:max-h-none">
+            <div className="w-full lg:w-80 bg-white/5 border border-white/10 rounded-2xl overflow-hidden backdrop-blur-xl flex flex-col max-h-[600px] lg:max-h-none">
                 <div className="p-4 md:p-6 border-b border-white/10 flex items-center justify-between">
                     <div>
                         <h2 className="text-xl md:text-2xl font-bold">

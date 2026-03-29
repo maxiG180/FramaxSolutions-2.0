@@ -157,7 +157,7 @@ export default function SettingsPage() {
 
     return (
         <div className="space-y-8">
-            <div className="sticky top-0 z-20 bg-[#0A0A0A]/98 pb-6 pt-1">
+            <div className="sticky top-0 z-20 bg-[#0A0A0A]/95 backdrop-blur-xl pb-6 pt-1">
                 <h1 className="text-3xl font-bold mb-2">Settings</h1>
                 <p className="text-white/60">Manage your agency preferences.</p>
             </div>
@@ -547,7 +547,7 @@ export default function SettingsPage() {
 
                             {/* Discord Modal */}
                             {showDiscordModal && (
-                                <div className="fixed inset-0 bg-black/75 flex items-center justify-center z-50" onClick={() => setShowDiscordModal(false)}>
+                                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50" onClick={() => setShowDiscordModal(false)}>
                                     <div className="bg-[#1A1A1A] border border-white/10 rounded-2xl p-6 max-w-md w-full mx-4" onClick={(e) => e.stopPropagation()}>
                                         <h3 className="text-xl font-bold mb-4">Connect Discord Webhook</h3>
                                         <p className="text-sm text-white/60 mb-4">
@@ -673,7 +673,7 @@ export default function SettingsPage() {
 
                             {/* Invite Modal */}
                             {showInviteModal && (
-                                <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-50 px-4" onClick={() => setShowInviteModal(false)}>
+                                <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 px-4" onClick={() => setShowInviteModal(false)}>
                                     <div className="bg-[#1A1A1A] border border-white/10 rounded-2xl p-6 max-w-md w-full" onClick={(e) => e.stopPropagation()}>
                                         <h3 className="text-xl font-bold mb-4">Invite Team Member</h3>
                                         <p className="text-sm text-white/60 mb-4">

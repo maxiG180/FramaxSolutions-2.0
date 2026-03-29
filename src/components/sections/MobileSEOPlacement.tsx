@@ -60,7 +60,7 @@ export function MobileSEOPlacement() {
                             transition={{ delay: 0.3 }}
                             className="flex items-center gap-6 mb-10"
                         >
-                            <div className="relative inline-flex p-1 bg-muted/50 rounded-full border border-border/50 ">
+                            <div className="relative inline-flex p-1 bg-muted/50 rounded-full border border-border/50 backdrop-blur-sm">
                                 <button
                                     onClick={() => setIsAfter(false)}
                                     className={`relative z-10 px-6 py-2.5 text-sm font-semibold rounded-full transition-all duration-300 ${!isAfter ? "text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}
@@ -92,7 +92,7 @@ export function MobileSEOPlacement() {
                                 whileInView={{ opacity: 1, scale: 1 }}
                                 viewport={{ once: true }}
                                 transition={{ delay: 0.4 }}
-                                className="p-6 rounded-2xl bg-gradient-to-br from-card to-card/50 border border-border/50 shadow-sm "
+                                className="p-6 rounded-2xl bg-gradient-to-br from-card to-card/50 border border-border/50 shadow-sm backdrop-blur-sm"
                             >
                                 <h4 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/60 mb-2">{t.mobileSEO.ranking}</h4>
                                 <p className="text-sm font-medium text-muted-foreground">{t.mobileSEO.rankingLabel}</p>
@@ -102,7 +102,7 @@ export function MobileSEOPlacement() {
                                 whileInView={{ opacity: 1, scale: 1 }}
                                 viewport={{ once: true }}
                                 transition={{ delay: 0.5 }}
-                                className="p-6 rounded-2xl bg-gradient-to-br from-card to-card/50 border border-border/50 shadow-sm "
+                                className="p-6 rounded-2xl bg-gradient-to-br from-card to-card/50 border border-border/50 shadow-sm backdrop-blur-sm"
                             >
                                 <h4 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/60 mb-2">{t.mobileSEO.traffic}</h4>
                                 <p className="text-sm font-medium text-muted-foreground">{t.mobileSEO.trafficLabel}</p>
@@ -148,8 +148,8 @@ export function MobileSEOPlacement() {
                                         <AnimatePresence>
                                             {!isAfter ? (
                                                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0">
-                                                    <div className="absolute top-1/4 left-1/3 p-2 bg-red-400/90 rounded-full shadow-lg animate-bounce" style={{ animationDuration: '2s' }}><MapPin className="w-3 h-3 text-white" /></div>
-                                                    <div className="absolute bottom-1/3 right-1/4 p-2 bg-gray-400/90 rounded-full shadow-lg"><MapPin className="w-3 h-3 text-white" /></div>
+                                                    <div className="absolute top-1/4 left-1/3 p-2 bg-red-400/90 rounded-full shadow-lg backdrop-blur-md animate-bounce" style={{ animationDuration: '2s' }}><MapPin className="w-3 h-3 text-white" /></div>
+                                                    <div className="absolute bottom-1/3 right-1/4 p-2 bg-gray-400/90 rounded-full shadow-lg backdrop-blur-md"><MapPin className="w-3 h-3 text-white" /></div>
                                                 </motion.div>
                                             ) : (
                                                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0">

@@ -724,7 +724,7 @@ export default function DashboardPage() {
                 return {
                     title: undefined,
                     description: undefined,
-                    header: <div className="h-full w-full bg-white/5 border border-white/10 rounded-2xl p-4 flex flex-col group relative overflow-hidden transition-colors hover:bg-white/10">
+                    header: <div className="h-full w-full bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-4 flex flex-col group relative overflow-hidden transition-colors hover:bg-white/10">
                         <div className="flex justify-between items-center mb-3">
                             <div className="flex items-center gap-2 text-white">
                                 <Edit3 className="w-5 h-5 text-yellow-400" />
@@ -873,7 +873,7 @@ export default function DashboardPage() {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="fixed inset-0 bg-black/90 flex items-center justify-center z-50"
+                        className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50"
                         onClick={() => setShowAddWidget(false)}
                     >
                         <motion.div

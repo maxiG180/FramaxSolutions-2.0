@@ -444,7 +444,7 @@ export default function ClientsPage() {
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 1 }}
                                 exit={{ opacity: 0 }}
-                                className="absolute inset-0 bg-black/90"
+                                className="absolute inset-0 bg-black/80 backdrop-blur-sm"
                             />
                             <motion.div
                                 initial={{ opacity: 0, scale: 0.95, y: 20 }}

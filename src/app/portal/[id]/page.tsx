@@ -98,7 +98,7 @@ export default function ClientPortalPage() {
                         </div>
                     </div>
 
-                    <div className="bg-black/40 rounded-2xl p-6 border border-white/5">
+                    <div className="bg-black/20 rounded-2xl p-6 border border-white/5 backdrop-blur-sm">
                         <h3 className="font-bold mb-4 flex items-center gap-2">
                             <ShieldCheck className="w-5 h-5 text-green-400" />
                             Pending Approvals

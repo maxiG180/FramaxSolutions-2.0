@@ -86,7 +86,7 @@ export default function NotesPage() {
     return (
         <div className="h-[calc(100vh-4rem)] flex gap-6 overflow-hidden">
             {/* Sidebar List */}
-            <div className="w-80 flex flex-col bg-white/5 border border-white/10 rounded-2xl overflow-hidden">
+            <div className="w-80 flex flex-col bg-white/5 border border-white/10 rounded-2xl overflow-hidden backdrop-blur-xl">
                 {/* Header */}
                 <div className="p-4 border-b border-white/10 space-y-4">
                     <div className="flex items-center justify-between">
@@ -137,7 +137,7 @@ export default function NotesPage() {
             </div>
 
             {/* Editor Area */}
-            <div className="flex-1 bg-white/5 border border-white/10 rounded-2xl overflow-hidden flex flex-col relative">
+            <div className="flex-1 bg-white/5 border border-white/10 rounded-2xl overflow-hidden flex flex-col backdrop-blur-xl relative">
                 {selectedNote ? (
                     <>
                         <div className="p-6 border-b border-white/10 flex items-center justify-between">
