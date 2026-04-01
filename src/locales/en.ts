@@ -643,7 +643,7 @@ export const en: Translation = {
             description: "A digital strategist focused on conversion-driven design and market growth, Francisco ensures every project is built to scale and sell.",
         },
         codeturtle: {
-            name: "CodeTurtle 🐢",
+            name: "CodeTurtle 🇰🇷",
             role: "Technical Lead & Debugging Master",
             description: "Our resident technical lead and debugging master. With a passion for clean solutions and a proven track record in complex system architecture, CodeTurtle ensures our technical foundations are indestructible and perfectly optimized.",
         },

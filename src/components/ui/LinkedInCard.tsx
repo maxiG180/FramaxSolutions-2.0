@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Linkedin, ExternalLink, Terminal } from "lucide-react";
+import { Linkedin, Github, ExternalLink, Terminal } from "lucide-react";
 import Image from "next/image";
 
 interface LinkedInCardProps {
@@ -14,6 +14,8 @@ interface LinkedInCardProps {
 }
 
 export function LinkedInCard({ name, role, description, linkedinUrl, imageUrl, viewProfileLabel = "View Profile" }: LinkedInCardProps) {
+    const isGithub = linkedinUrl.includes("github.com");
+    
     return (
         <motion.div
             whileHover={{ y: -5 }}
@@ -49,9 +51,9 @@ export function LinkedInCard({ name, role, description, linkedinUrl, imageUrl, v
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="rounded-full bg-blue-600/20 p-2 text-blue-400 transition-colors hover:bg-blue-600 hover:text-white"
-                                aria-label={`LinkedIn of ${name}`}
+                                aria-label={`${isGithub ? 'GitHub' : 'LinkedIn'} of ${name}`}
                             >
-                                <Linkedin size={20} />
+                                {isGithub ? <Github size={20} /> : <Linkedin size={20} />}
                             </a>
                         </div>
                         <p className="mt-4 line-clamp-4 text-sm leading-relaxed text-white/70">

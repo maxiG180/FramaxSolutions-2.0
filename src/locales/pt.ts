@@ -643,7 +643,7 @@ export const pt: Translation = {
             description: "Estrategista digital focado em design orientado à conversão e crescimento de mercado, o Francisco garante que cada projeto é construído para escalar e vender.",
         },
         codeturtle: {
-            name: "CodeTurtle 🐢",
+            name: "CodeTurtle 🇰🇷",
             role: "Líder Técnico & Mestre do Debugging",
             description: "O nosso líder técnico e mestre do debugging. Apaixonado por soluções limpas e com um percurso sólido em arquitetura de sistemas complexos, o CodeTurtle garante que as nossas bases técnicas são indestrutíveis e perfeitamente otimizadas.",
         },
