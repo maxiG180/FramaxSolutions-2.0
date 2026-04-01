@@ -607,6 +607,31 @@ export interface Translation {
         title: string;
         subtitle: string;
         introduction: string;
+        missionTitle: string;
+        missionDesc: string;
+        visionTitle: string;
+        visionDesc: string;
+        stats: {
+            projects: string;
+            projectsLabel: string;
+            clients: string;
+            clientsLabel: string;
+            coffee: string;
+            coffeeLabel: string;
+            hours: string;
+            hoursLabel: string;
+        };
+        valuesTitle: string;
+        values: {
+            innovationTitle: string;
+            innovationDesc: string;
+            transparencyTitle: string;
+            transparencyDesc: string;
+            resultsTitle: string;
+            resultsDesc: string;
+            resilienceTitle: string;
+            resilienceDesc: string;
+        };
         maksym: {
             name: string;
             role: string;
@@ -617,6 +642,7 @@ export interface Translation {
             role: string;
             description: string;
         };
+        viewProfile: string;
         cta: string;
     };
 }

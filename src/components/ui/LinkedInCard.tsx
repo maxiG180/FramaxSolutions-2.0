@@ -10,9 +10,10 @@ interface LinkedInCardProps {
     description: string;
     linkedinUrl: string;
     imageUrl?: string;
+    viewProfileLabel?: string;
 }
 
-export function LinkedInCard({ name, role, description, linkedinUrl, imageUrl }: LinkedInCardProps) {
+export function LinkedInCard({ name, role, description, linkedinUrl, imageUrl, viewProfileLabel = "View Profile" }: LinkedInCardProps) {
     return (
         <motion.div
             whileHover={{ y: -5 }}
@@ -65,7 +66,7 @@ export function LinkedInCard({ name, role, description, linkedinUrl, imageUrl }:
                             rel="noopener noreferrer"
                             className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-blue-400 transition-colors hover:text-blue-300"
                         >
-                            Ver Perfil Completo
+                            {viewProfileLabel}
                             <ExternalLink size={14} />
                         </a>
                     </div>
