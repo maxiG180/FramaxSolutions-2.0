@@ -556,7 +556,7 @@ export const en: Translation = {
         priceLabel: "Price *",
         pricingOptions: {
             oneTime: "One-Time",
-            starting From: "Starting From",
+            startingFrom: "Starting From",
             monthly: "Monthly",
             yearly: "Yearly",
             customQuote: "Custom Quote",
@@ -604,7 +604,7 @@ export const en: Translation = {
         title: "Framax Assistant",
         online: "Online now",
         notificationBubble: "👋 Got questions? Ask me!",
-        suggested Questions: "Suggested questions",
+        suggestedQuestions: "Suggested questions",
         inputPlaceholder: "Ask a question...",
         initialMessage: "👋 Hello! How can I help you today?",
         presets: {

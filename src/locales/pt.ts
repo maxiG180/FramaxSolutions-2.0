@@ -501,7 +501,7 @@ export const pt: Translation = {
         serviceTypeMonthly: "Mensal",
         serviceTypeOneTime: "Único",
         amount: "Valor",
-        billing Frequency: "Frequência de Faturação",
+        billingFrequency: "Frequência de Faturação",
         paymentDetails: "Detalhes do Pagamento",
         startDate: "Data de Início",
         nextPaymentDate: "Próximo Pagamento",
@@ -603,7 +603,7 @@ export const pt: Translation = {
     chatbot: {
         title: "Assistente Framax",
         online: "Disponível agora",
-        notification Bubble: "👋 Tem dúvidas? Pergunte-me!",
+        notificationBubble: "👋 Tem dúvidas? Pergunte-me!",
         suggestedQuestions: "Perguntas sugeridas",
         inputPlaceholder: "Faça uma pergunta...",
         initialMessage: "👋 Olá! Como posso ajudá-lo hoje?",
