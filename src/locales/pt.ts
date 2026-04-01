@@ -196,7 +196,7 @@ export const pt: Translation = {
                 answer: "Normalmente exigimos um depósito de 50% para iniciar o projeto, com os restantes 50% devidos após a conclusão e lançamento. Para projetos maiores, podemos discutir pagamentos baseados em metas."
             },
             {
-                question: "Podem atualizar o meu website atual?",
+                question: "Can you update my existing website?",
                 answer: "Com certeza. Podemos auditar o seu site atual e propor um plano de redesign ou migração para tecnologias modernas como Next.js para melhor desempenho e SEO."
             },
             {
@@ -501,7 +501,7 @@ export const pt: Translation = {
         serviceTypeMonthly: "Mensal",
         serviceTypeOneTime: "Único",
         amount: "Valor",
-        billingFrequency: "Frequência de Faturação",
+        billing Frequency: "Frequência de Faturação",
         paymentDetails: "Detalhes do Pagamento",
         startDate: "Data de Início",
         nextPaymentDate: "Próximo Pagamento",
@@ -603,7 +603,7 @@ export const pt: Translation = {
     chatbot: {
         title: "Assistente Framax",
         online: "Disponível agora",
-        notificationBubble: "👋 Tem dúvidas? Pergunte-me!",
+        notification Bubble: "👋 Tem dúvidas? Pergunte-me!",
         suggestedQuestions: "Perguntas sugeridas",
         inputPlaceholder: "Faça uma pergunta...",
         initialMessage: "👋 Olá! Como posso ajudá-lo hoje?",
@@ -627,9 +627,9 @@ export const pt: Translation = {
         },
     },
     about: {
-        title: "O Futuro do Sucesso Digital",
-        subtitle: "Construído pela Framax",
-        introduction: "Somos os seus parceiros estratégicos na transformação digital, unindo engenharia de ponta a resultados de negócio. Sem setups genéricos, apenas soluções de alto desempenho.",
+        title: "A Startup Portuguesa com a Melhor Relação Qualidade-Preço",
+        subtitle: "Desenvolvido pela Framax",
+        introduction: "Somos mais do que apenas programadores; somos os seus parceiros estratégicos. Especializamo-nos em engenharia de sistemas digitais complexos que resolvem desafios reais de negócio, com disponibilidade total e contacto direto como as nossas prioridades. Software de alto desempenho, com a melhor relação qualidade-preço do mercado.",
         teamTitle: "A Equipa",
         teamSubtitle: "Apaixonados por código, crescimento e o seu sucesso.",
         maksym: {

@@ -556,7 +556,7 @@ export const en: Translation = {
         priceLabel: "Price *",
         pricingOptions: {
             oneTime: "One-Time",
-            startingFrom: "Starting From",
+            starting From: "Starting From",
             monthly: "Monthly",
             yearly: "Yearly",
             customQuote: "Custom Quote",
@@ -604,7 +604,7 @@ export const en: Translation = {
         title: "Framax Assistant",
         online: "Online now",
         notificationBubble: "👋 Got questions? Ask me!",
-        suggestedQuestions: "Suggested questions",
+        suggested Questions: "Suggested questions",
         inputPlaceholder: "Ask a question...",
         initialMessage: "👋 Hello! How can I help you today?",
         presets: {
@@ -615,7 +615,7 @@ export const en: Translation = {
             contact: "How can I contact you?",
         },
         answers: {
-            timeline: `⏱️ **Project Timelines:**\n- Standard Website: 2-4 weeks\n- Website Redesign: 3-4 weeks\n- Custom Web App: 4-8 weeks\n- Booking / CRM Add-ons: 1-2 weeks\n\nWe provide personalised timelines in our proposal.`,
+            timeline: `⏱️ **Project Timelines:**\n- Standard Website: 2-4 weeks\n- Website Redesign: 3-4 weeks\n- Custom Web App: 4-8 weeks\n- Add-ons de Reserva / CRM: 1-2 semanas\n\nWe provide personalised timelines in our proposal.`,
             pricing: `💳 **Pricing Structure:**\n\n**Core Services (Custom Quote):**\n- Website (Design & Development)\n- Website Redesign\n- Custom Web Applications\n\n**Add-Ons (From):**\n- Advanced SEO: €299\n- CRM / ERP Systems: €399+\n- Booking System: €499+\n\n**Maintenance & Support:**\n- Maintenance: €1/hr\n- Domain & Hosting: €29/mo\n\nBook a discovery call for an accurate quote!`,
             maintenance: `🔧 **Maintenance Plan:**\n\n**Price:** €1/hr\n**Setup:** Immediate\n**Includes:**\n- Regular updates\n- Security patches\n- Technical support\n\nWe also offer **Domain & Hosting** for €29/mo.`,
             services: `💼 **Our Services:**\n\n**Core:**\n- Full Websites (Domain + Hosting + Basic SEO)\n- Custom Web Applications\n- Website Redesigns\n\n**Add-Ons:**\n- Advanced SEO Strategies\n- Booking Systems\n- CRM / ERP Integration\n\n**Support:**\n- Maintenance (€1/hr)\n- Domain & Hosting (€29/mo)`,
@@ -627,9 +627,9 @@ export const en: Translation = {
         },
     },
     about: {
-        title: "The Future of Digital Success",
-        subtitle: "Built by Framax",
-        introduction: "We are your strategic partners in digital transformation, blending cutting-edge engineering with business-driven results. No generic setups, just high-performance solutions.",
+        title: "The Portuguese Startup with the Best Quality-Price Ratio",
+        subtitle: "Developed by Framax",
+        introduction: "We are more than developers; we are your strategic partners. We specialize in engineering complex digital systems that solve real business challenges, with availability and dedicated contact as our top priorities. High-performance software, the best value on the market.",
         teamTitle: "The Team",
         teamSubtitle: "Passionate about code, growth, and your success.",
         maksym: {
