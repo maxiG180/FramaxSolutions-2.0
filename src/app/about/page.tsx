@@ -131,7 +131,7 @@ export default function AboutPage() {
                                 role={t.about.codeturtle.role}
                                 description={t.about.codeturtle.description}
                                 linkedinUrl="https://github.com/turtle4105"
-                                imageUrl="/CodeTurtle.png"
+                                imageUrl="/turtle.png"
                                 viewProfileLabel={t.about.viewProfile}
                             />
                         </motion.div>
