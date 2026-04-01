@@ -9,6 +9,7 @@ export interface Translation {
         results: string;
         login: string;
         dashboard: string;
+        about: string;
     };
     footer: {
         tagline: string;
@@ -601,5 +602,21 @@ export interface Translation {
             hiring: string;
             default: string;
         };
+    };
+    about: {
+        title: string;
+        subtitle: string;
+        introduction: string;
+        maksym: {
+            name: string;
+            role: string;
+            description: string;
+        };
+        francisco: {
+            name: string;
+            role: string;
+            description: string;
+        };
+        cta: string;
     };
 }

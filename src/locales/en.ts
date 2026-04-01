@@ -11,6 +11,7 @@ export const en: Translation = {
         results: "Results",
         login: "Login",
         dashboard: "Dashboard",
+        about: "About Us",
     },
     footer: {
         tagline: "Building digital experiences that feel alive. Fast, responsive, and delightful.",
@@ -52,7 +53,7 @@ export const en: Translation = {
         title: "Websites that sell more",
         subtitle: "We create software solutions that understand your business and bring REAL results.",
         bookMeeting: "Book free meeting",
-        couldBeYou: "This Could Be You",
+        couldBeYou: "Your Company",
         moreClients: "More Clients",
         alwaysOpen: "Load Times",
         alwaysOnline: "< 1s Load Time",
@@ -170,7 +171,7 @@ export const en: Translation = {
         monthlyRevenue: "Monthly Revenue",
         newClients: "New Clients",
         // Other
-        thisCouldBeYou: "This could be you!",
+        thisCouldBeYou: "Your Company",
         searchYourBusiness: "Your Business",
     },
     legal: {
@@ -624,6 +625,22 @@ export const en: Translation = {
             hiring: `🚀 **Join the Team:**\n\nWe are primarily looking for **Marketing Specialists** and creative **Designers** to help our clients grow.\n\nWe are also open to talented Developers.\n\nSend your portfolio/CV to: careers@framaxsolutions.com`,
             default: `I can help you with questions about our **Services**, **Pricing**, **Timelines** or **Maintenance**. What would you like to know?`,
         },
+    },
+    about: {
+        title: "About Us",
+        subtitle: "The team behind Framax",
+        introduction: "We are a team passionate about technology and innovation, focused on delivering real results for your business.",
+        maksym: {
+            name: "Maksym Grebeniuk",
+            role: "Co-Founder & Software Engineer",
+            description: "Currently pursuing a Bachelor's degree in Software Engineering at Fontys University Eindhoven. Experienced in full-stack development with modern web technologies. Currently interning at DAMEN-IT as a Full-Stack .NET developer.",
+        },
+        francisco: {
+            name: "Francisco Farias",
+            role: "Co-Founder & Digital Strategy",
+            description: "Full Stack Developer with a focus on Digital Marketing & Strategy. Expert in creating solutions that not only work technically but drive business results.",
+        },
+        cta: "Let's work together",
     },
 };
 

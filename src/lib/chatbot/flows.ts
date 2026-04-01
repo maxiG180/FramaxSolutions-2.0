@@ -127,9 +127,13 @@ export const QUESTION_MATCHERS: QuestionMatcher[] = [
             /when.*finish/i,
             /delivery time/i,
             /turnaround/i,
-            /time.*take/i
+            /time.*take/i,
+            /quanto.*tempo/i,
+            /quando.*termina/i,
+            /prazo/i,
+            /duraç/i
         ],
-        keywords: ['timeline', 'schedule', 'deadline', 'date']
+        keywords: ['timeline', 'schedule', 'deadline', 'date', 'tempo', 'prazo', 'quando']
     },
     {
         id: 'pricing',
@@ -144,9 +148,15 @@ export const QUESTION_MATCHERS: QuestionMatcher[] = [
             /payment/i,
             /deposit/i,
             /expensive/i,
-            /cheap/i
+            /cheap/i,
+            /quanto/i,
+            /preço/i,
+            /valor/i,
+            /custo/i,
+            /orçamento/i,
+            /pagamento/i
         ],
-        keywords: ['money', 'expense', 'bill', 'invoice', 'euro', 'dollar']
+        keywords: ['money', 'expense', 'bill', 'invoice', 'euro', 'dollar', 'dinheiro', 'preço', 'valor', 'custo']
     },
     {
         id: 'maintenance',
@@ -158,9 +168,13 @@ export const QUESTION_MATCHERS: QuestionMatcher[] = [
             /fix/i,
             /errors/i,
             /bugs/i,
-            /help/i
+            /help/i,
+            /manutenç/i,
+            /suporte/i,
+            /atualiz/i,
+            /ajuda/i
         ],
-        keywords: ['care', 'monthly', 'plan', 'hosting']
+        keywords: ['care', 'monthly', 'plan', 'hosting', 'ajuda', 'suporte']
     },
     {
         id: 'services',
@@ -173,9 +187,13 @@ export const QUESTION_MATCHERS: QuestionMatcher[] = [
             /design/i,
             /development/i,
             /website/i,
-            /app/i
+            /app/i,
+            /serviço/i,
+            /fazem/i,
+            /oferecem/i,
+            /constroem/i
         ],
-        keywords: ['offerings', 'work', 'create', 'product']
+        keywords: ['offerings', 'work', 'create', 'product', 'serviços', 'trabalho']
     },
     {
         id: 'contact',
@@ -189,11 +207,15 @@ export const QUESTION_MATCHERS: QuestionMatcher[] = [
             /talk/i,
             /speak/i,
             /meeting/i,
-            /book/i
+            /book/i,
+            /contacto/i,
+            /falar/i,
+            /ligar/i,
+            /reunião/i,
+            /marcar/i
         ],
-        keywords: ['touch', 'message', 'number', 'address', 'location']
+        keywords: ['touch', 'message', 'number', 'address', 'location', 'contacto', 'telefone', 'reunião']
     },
-
     {
         id: 'portfolio',
         patterns: [
@@ -203,9 +225,13 @@ export const QUESTION_MATCHERS: QuestionMatcher[] = [
             /case/i,
             /client/i,
             /show/i,
-            /see/i
+            /see/i,
+            /exemplo/i,
+            /trabalho/i,
+            /projeto/i,
+            /ver/i
         ],
-        keywords: ['sample', 'project', 'previous', 'done']
+        keywords: ['sample', 'project', 'previous', 'done', 'exemplo', 'trabalho', 'portfólio']
     },
     {
         id: 'team',
@@ -215,9 +241,12 @@ export const QUESTION_MATCHERS: QuestionMatcher[] = [
             /people/i,
             /developer/i,
             /designer/i,
-            /company/i
+            /company/i,
+            /quem/i,
+            /equipa/i,
+            /pessoas/i
         ],
-        keywords: ['us', 'we', 'about', 'story']
+        keywords: ['us', 'we', 'about', 'story', 'equipa', 'nós']
     },
     {
         id: 'hiring',
@@ -227,9 +256,13 @@ export const QUESTION_MATCHERS: QuestionMatcher[] = [
             /hiring/i,
             /work for/i,
             /join/i,
-            /vacancy/i
+            /vacancy/i,
+            /vaga/i,
+            /emprego/i,
+            /carreira/i,
+            /trabalhar/i
         ],
-        keywords: ['apply', 'resume', 'cv']
+        keywords: ['apply', 'resume', 'cv', 'candidat', 'currículo']
     }
 ];
 

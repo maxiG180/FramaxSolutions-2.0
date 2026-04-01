@@ -54,6 +54,9 @@ export function Header() {
                     <Link href="/#features" className="text-sm font-medium hover:text-primary transition-colors">
                         {t.header.features}
                     </Link>
+                    <Link href="/about" className="text-sm font-medium hover:text-primary transition-colors">
+                        {t.header.about}
+                    </Link>
                     <Link href="/#portfolio" className="text-sm font-medium hover:text-primary transition-colors">
                         {t.header.portfolio}
                     </Link>
@@ -87,6 +90,13 @@ export function Header() {
                         onClick={closeMobileMenu}
                     >
                         {t.header.features}
+                    </Link>
+                    <Link
+                        href="/about"
+                        className="text-sm font-medium p-2 hover:bg-muted rounded-md"
+                        onClick={closeMobileMenu}
+                    >
+                        {t.header.about}
                     </Link>
                     <Link
                         href="/#portfolio"

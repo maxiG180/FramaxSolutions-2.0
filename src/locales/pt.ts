@@ -11,6 +11,7 @@ export const pt: Translation = {
         results: "Resultados",
         login: "Entrar",
         dashboard: "Painel",
+        about: "Sobre Nós",
     },
     footer: {
         tagline: "Criamos experiências digitais que ganham vida. Rápidas, responsivas e encantadoras.",
@@ -52,7 +53,7 @@ export const pt: Translation = {
         title: "Sites que vendem mais",
         subtitle: "Criamos soluções de software que entendem o seu negócio e trazem resultados REAIS.",
         bookMeeting: "Marcar reunião gratuita",
-        couldBeYou: "Este Poderia Ser Você",
+        couldBeYou: "A sua empresa",
         moreClients: "Mais Clientes",
         alwaysOpen: "Tempos de Carregamento",
         alwaysOnline: "< 1s Carregamento",
@@ -170,7 +171,7 @@ export const pt: Translation = {
         monthlyRevenue: "Receita Mensal",
         newClients: "Novos Clientes",
         // Other
-        thisCouldBeYou: "Este poderia ser você!",
+        thisCouldBeYou: "A sua empresa",
         searchYourBusiness: "O Seu Negócio",
     },
     legal: {
@@ -624,6 +625,22 @@ export const pt: Translation = {
             hiring: `🚀 **Junte-se à Equipa:**\n\nProcuramos principalmente **Especialistas de Marketing** e **Designers** criativos para ajudar os nossos clientes a crescer.\n\nEstamos também abertos a Programadores talentosos.\n\nEnvie o seu portfólio/CV para: careers@framaxsolutions.com`,
             default: `Posso ajudá-lo com perguntas sobre os nossos **Serviços**, **Preços**, **Prazos** ou **Manutenção**. O que gostaria de saber?`,
         },
+    },
+    about: {
+        title: "Sobre Nós",
+        subtitle: "A equipa por trás da Framax",
+        introduction: "Somos uma equipa apaixonada por tecnologia e inovação, focada em entregar resultados reais para o seu negócio.",
+        maksym: {
+            name: "Maksym Grebeniuk",
+            role: "Co-Fundador & Engenheiro de Software",
+            description: "Atualmente a frequentar a licenciatura em Engenharia de Software na Fontys University em Eindhoven. Experiência em desenvolvimento full-stack com tecnologias modernas. Atualmente estagiário na DAMEN-IT como programador Full-Stack .NET.",
+        },
+        francisco: {
+            name: "Francisco Farias",
+            role: "Co-Fundador & Estratégia Digital",
+            description: "Programador Full Stack com foco em Marketing Digital e Estratégia. Especialista em criar soluções que não só funcionam tecnicamente, mas que trazem resultados de negócio.",
+        },
+        cta: "Vamos trabalhar juntos",
     },
 };
 

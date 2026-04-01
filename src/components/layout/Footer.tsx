@@ -11,7 +11,7 @@ export function Footer() {
     return (
         <footer className="bg-muted/30 border-t border-border py-12">
             <div className="container mx-auto px-4">
-                <div className="grid grid-cols-1 md:grid-cols-5 gap-8 mb-12">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
                     <div className="col-span-1 md:col-span-2">
                         <Link href="/" className="mb-4 block">
                             <Image
@@ -29,27 +29,9 @@ export function Footer() {
                     </div>
 
                     <div>
-                        <h3 className="font-bold mb-4">{t.footer.product}</h3>
-                        <ul className="space-y-2">
-                            <li><Link href="#" className="text-sm text-muted-foreground hover:text-primary transition-colors">{t.footer.features}</Link></li>
-                            <li><Link href="#" className="text-sm text-muted-foreground hover:text-primary transition-colors">{t.footer.changelog}</Link></li>
-                        </ul>
-                    </div>
-
-                    <div>
-                        <h3 className="font-bold mb-4">{t.footer.studio}</h3>
-                        <ul className="space-y-2">
-                            <li><Link href="#" className="text-sm text-muted-foreground hover:text-primary transition-colors">{t.footer.about}</Link></li>
-                            <li><Link href="#" className="text-sm text-muted-foreground hover:text-primary transition-colors">{t.footer.blog}</Link></li>
-                            <li><Link href="#" className="text-sm text-muted-foreground hover:text-primary transition-colors">{t.footer.careers}</Link></li>
-                        </ul>
-                    </div>
-
-                    <div>
                         <h3 className="font-bold mb-4">{t.footer.legal}</h3>
                         <ul className="space-y-2">
                             <li><Link href="/legal/privacy" className="text-sm text-muted-foreground hover:text-primary transition-colors">{t.footer.privacy}</Link></li>
-                            {/* <li><Link href="/legal/terms" className="text-sm text-muted-foreground hover:text-primary transition-colors">{t.footer.terms}</Link></li> */}
                         </ul>
                     </div>
                 </div>
