@@ -21,7 +21,7 @@ export const pt: Translation = {
         studio: "Estúdio",
         about: "Sobre",
         blog: "Blog",
-        careers: "Carreiras",
+        careers: "Careiras",
         legal: "Legal",
         privacy: "Política de Privacidade",
         terms: "Termos de Serviço",
@@ -185,7 +185,7 @@ export const pt: Translation = {
         questions: [
             {
                 question: "Quanto tempo demora um projeto típico?",
-                answer: "Para uma landing page padrão, entregamos normalmente em 1 semana. Sites corporativos maiores demoram 2-3 semanas, enquanto aplicações web personalizadas podem demorar 4-8 semanas, dependendo da complexidade."
+                answer: "Para uma landing page padrão, entregamos normalmente em 1 semana. Sites corporativos maiores demoram 2-3 semanas, enquanto aplicações web personalizadas podem demorar 4-8 semanas, defendendo da complexidade."
             },
             {
                 question: "Oferecem alojamento e manutenção?",
@@ -644,8 +644,8 @@ export const pt: Translation = {
         },
         codeturtle: {
             name: "CodeTurtle 🐢",
-            role: "Arquiteto Fantasma & Developer Core",
-            description: "Uma força anónima por trás dos nossos algoritmos mais complexos. O CodeTurtle prospera nas sombras, garantindo que o núcleo técnico da Framax permanece inquebrável.",
+            role: "Líder Técnico & Mestre do Debugging",
+            description: "O nosso líder técnico e mestre do debugging. Apaixonado por soluções limpas e com um percurso sólido em arquitetura de sistemas complexos, o CodeTurtle garante que as nossas bases técnicas são indestrutíveis e perfeitamente otimizadas.",
         },
         viewProfile: "Ver Perfil",
         cta: "Escale o seu Negócio Hoje",

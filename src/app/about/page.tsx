@@ -130,8 +130,8 @@ export default function AboutPage() {
                                 name={t.about.codeturtle.name}
                                 role={t.about.codeturtle.role}
                                 description={t.about.codeturtle.description}
-                                linkedinUrl="#" // Anonymous
-                                imageUrl="" // No image
+                                linkedinUrl="https://github.com/turtle4105"
+                                imageUrl="/CodeTurtle.png"
                                 viewProfileLabel={t.about.viewProfile}
                             />
                         </motion.div>
