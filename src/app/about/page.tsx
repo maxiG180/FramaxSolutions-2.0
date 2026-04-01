@@ -5,52 +5,9 @@ import { LinkedInCard } from "@/components/ui/LinkedInCard";
 import { motion, useScroll, useTransform } from "framer-motion";
 import Link from "next/link";
 import { 
-    ArrowRight, 
-    Lightbulb, 
-    ShieldCheck, 
-    Rocket, 
-    Target, 
-    Eye, 
-    Coffee, 
-    CodeXml, 
-    CheckCircle2,
-    Trophy,
-    LucideIcon
+    ArrowRight
 } from "lucide-react";
 import { useRef } from "react";
-
-// --- Components ---
-
-const StatItem = ({ value, label, icon: Icon }: { value: string, label: string, icon: LucideIcon }) => (
-    <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        className="flex flex-col items-center p-6 bg-white/5 rounded-2xl border border-white/10 backdrop-blur-sm"
-    >
-        <div className="p-3 bg-blue-600/20 rounded-xl mb-4 text-blue-400">
-            <Icon size={24} />
-        </div>
-        <div className="text-3xl md:text-4xl font-bold text-white mb-1">{value}</div>
-        <div className="text-sm text-white/50 font-medium uppercase tracking-wider">{label}</div>
-    </motion.div>
-);
-
-const ValueCard = ({ title, description, icon: Icon, delay }: { title: string, description: string, icon: LucideIcon, delay: number }) => (
-    <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ delay }}
-        className="group p-8 bg-white/5 rounded-3xl border border-white/10 hover:bg-white/10 transition-all hover:border-blue-500/50 hover:shadow-2xl hover:shadow-blue-500/10"
-    >
-        <div className="w-12 h-12 bg-blue-600/20 rounded-2xl flex items-center justify-center text-blue-400 mb-6 group-hover:scale-110 transition-transform group-hover:bg-blue-600 group-hover:text-white">
-            <Icon size={24} />
-        </div>
-        <h3 className="text-xl font-bold text-white mb-4">{title}</h3>
-        <p className="text-white/60 leading-relaxed">{description}</p>
-    </motion.div>
-);
 
 // --- Page ---
 
@@ -87,7 +44,7 @@ export default function AboutPage() {
                             className="inline-flex items-center gap-2 px-4 py-1.5 mb-8 rounded-full bg-blue-600/10 border border-blue-500/20 text-blue-400 text-sm font-semibold tracking-wide uppercase"
                         >
                             <span className="w-2 h-2 rounded-full bg-blue-500 animate-ping" />
-                            The Framax Story
+                            Startup Spirit
                         </motion.div>
                         
                         <h1 className="text-6xl md:text-8xl font-black mb-10 tracking-tighter text-white leading-[0.9]">
@@ -122,96 +79,12 @@ export default function AboutPage() {
                 </div>
             </section>
 
-            {/* Stats Bar */}
-            <section className="relative z-10 py-12 border-y border-white/5 bg-white/[0.02] backdrop-blur-md">
-                <div className="container mx-auto px-4">
-                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
-                        <StatItem icon={Target} value={t.about.stats.projects} label={t.about.stats.projectsLabel} />
-                        <StatItem icon={CheckCircle2} value={t.about.stats.clients} label={t.about.stats.clientsLabel} />
-                        <StatItem icon={Coffee} value={t.about.stats.coffee} label={t.about.stats.coffeeLabel} />
-                        <StatItem icon={CodeXml} value={t.about.stats.hours} label={t.about.stats.hoursLabel} />
-                    </div>
-                </div>
-            </section>
-
-            {/* Mission & Vision */}
-            <section className="relative z-10 py-24 md:py-32">
-                <div className="container mx-auto px-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-10 max-w-6xl mx-auto">
-                        <motion.div
-                            initial={{ opacity: 0, x: -30 }}
-                            whileInView={{ opacity: 1, x: 0 }}
-                            viewport={{ once: true }}
-                            className="relative group p-10 bg-gradient-to-br from-blue-600/10 to-transparent rounded-[3rem] border border-blue-500/10 overflow-hidden"
-                        >
-                            <div className="absolute -right-20 -top-20 w-64 h-64 bg-blue-600/10 rounded-full blur-3xl group-hover:bg-blue-600/20 transition-colors" />
-                            <Target className="text-blue-500 mb-6" size={48} />
-                            <h2 className="text-4xl font-bold text-white mb-6">{t.about.missionTitle}</h2>
-                            <p className="text-xl text-white/70 leading-relaxed">
-                                {t.about.missionDesc}
-                            </p>
-                        </motion.div>
-
-                        <motion.div
-                            initial={{ opacity: 0, x: 30 }}
-                            whileInView={{ opacity: 1, x: 0 }}
-                            viewport={{ once: true }}
-                            className="relative group p-10 bg-gradient-to-br from-purple-600/10 to-transparent rounded-[3rem] border border-purple-500/10 overflow-hidden text-right md:text-left flex flex-col items-end md:items-start"
-                        >
-                            <div className="absolute -left-20 -bottom-20 w-64 h-64 bg-purple-600/10 rounded-full blur-3xl group-hover:bg-purple-600/20 transition-colors" />
-                            <Eye className="text-purple-500 mb-6" size={48} />
-                            <h2 className="text-4xl font-bold text-white mb-6">{t.about.visionTitle}</h2>
-                            <p className="text-xl text-white/70 leading-relaxed">
-                                {t.about.visionDesc}
-                            </p>
-                        </motion.div>
-                    </div>
-                </div>
-            </section>
-
-            {/* Core Values */}
-            <section className="relative z-10 py-24 md:py-32 bg-white/[0.01]">
-                <div className="container mx-auto px-4">
-                    <div className="max-w-4xl mx-auto text-center mb-16">
-                        <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">{t.about.valuesTitle}</h2>
-                        <div className="h-1 w-20 bg-blue-600 mx-auto rounded-full" />
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
-                        <ValueCard 
-                            icon={Lightbulb} 
-                            title={t.about.values.innovationTitle} 
-                            description={t.about.values.innovationDesc} 
-                            delay={0.1}
-                        />
-                        <ValueCard 
-                            icon={ShieldCheck} 
-                            title={t.about.values.transparencyTitle} 
-                            description={t.about.values.transparencyDesc} 
-                            delay={0.2}
-                        />
-                        <ValueCard 
-                            icon={Trophy} 
-                            title={t.about.values.resultsTitle} 
-                            description={t.about.values.resultsDesc} 
-                            delay={0.3}
-                        />
-                        <ValueCard 
-                            icon={Rocket} 
-                            title={t.about.values.resilienceTitle} 
-                            description={t.about.values.resilienceDesc} 
-                            delay={0.4}
-                        />
-                    </div>
-                </div>
-            </section>
-
             {/* Team Section */}
             <section className="relative z-10 py-24 md:py-32">
                 <div className="container mx-auto px-4">
                     <div className="max-w-4xl mx-auto text-center mb-20">
-                        <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">Meet the Founders</h2>
-                        <p className="text-white/50 text-xl font-light">The strategic minds powering your digital evolution.</p>
+                        <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">{t.about.teamTitle}</h2>
+                        <p className="text-white/50 text-xl font-light">{t.about.teamSubtitle}</p>
                     </div>
 
                     <div className="grid grid-cols-1 gap-12 max-w-5xl mx-auto">
