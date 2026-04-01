@@ -168,7 +168,7 @@ export const pt: Translation = {
         time15m: "há 15m",
         time2h: "há 2h",
         // Dashboard
-        monthly Revenue: "Receita Mensal",
+        monthlyRevenue: "Receita Mensal",
         newClients: "Novos Clientes",
         // Other
         thisCouldBeYou: "Sua Empresa",
@@ -318,7 +318,7 @@ export const pt: Translation = {
         editInvoice: "Editar Fatura",
         errorLoadingInvoice: "Erro ao carregar fatura",
         invoiceDetails: "Detalhes da Fatura",
-        failedToSave Invoice: "Falha ao gravar fatura",
+        failedToSaveInvoice: "Falha ao gravar fatura",
         selectPaymentMethod: "Selecione o método",
         paymentTransfer: "Transferência Bancária",
         paymentCash: "Dinheiro",
@@ -451,7 +451,7 @@ export const pt: Translation = {
         sending: "A enviar...",
         back: "Voltar",
         language: "Idioma do Email",
-        language Portuguese: "Português",
+        languagePortuguese: "Português",
         languageEnglish: "Inglês",
     },
     payments: {
@@ -629,7 +629,7 @@ export const pt: Translation = {
     about: {
         title: "A Startup Portuguesa com a Melhor Relação Qualidade-Preço",
         subtitle: "Desenvolvido pela Framax",
-        introduction: "Como uma startup dinâmica, unimos engenharia de elite a preços altamente acessíveis. Não construímos apenas sistemas; somos os seus parceiros dedicados. Da segurança impenetrável e performance ultra-rápida ao SEO de topo e comunicação contínua e aberta, tratamos de todos os detalhes—incluindo todos os ajustes que necessitar—para garantir que a sua visão escala com precisão absoluta.",
+        introduction: "Como uma startup dinâmica, unimos engenharia de elite a preços altamente acessíveis. Não construímos apenas sistemas; somos os seus parceiros dedicados. Da velocidade de entrega recorde, segurança impenetrável e performance de topo ao SEO avançado e comunicação contínua, tratamos de todos os detalhes—incluindo todos os ajustes que necessitar—para garantir que a sua visão escala com precisão absoluta.",
         teamTitle: "A Equipa",
         teamSubtitle: "Apaixonados por código, crescimento e o seu sucesso.",
         maksym: {

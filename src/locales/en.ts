@@ -459,7 +459,7 @@ export const en: Translation = {
         subtitle: "Manage recurring payments and subscriptions",
         createPayment: "Create Payment",
         recurringPayments: "Recurring Payments",
-        monthly Recurring Revenue: "Monthly Recurring Revenue",
+        monthlyRecurringRevenue: "Monthly Recurring Revenue",
         activeSubscriptions: "Active Subscriptions",
         overduePayments: "Overdue Payments",
         revenueThisMonth: "Revenue This Month",
@@ -620,7 +620,7 @@ export const en: Translation = {
             maintenance: `🔧 **Maintenance Plan:**\n\n**Price:** €1/hr\n**Setup:** Immediate\n**Includes:**\n- Regular updates\n- Security patches\n- Technical support\n\nWe also offer **Domain & Hosting** for €29/mo.`,
             services: `💼 **Our Services:**\n\n**Core:**\n- Full Websites (Domain + Hosting + Basic SEO)\n- Custom Web Applications\n- Website Redesigns\n\n**Add-Ons:**\n- Advanced SEO Strategies\n- Booking Systems\n- CRM / ERP Integration\n\n**Support:**\n- Maintenance (€1/hr)\n- Domain & Hosting (€29/mo)`,
             contact: `📞 **Let's connect:**\n- Email: contact@framaxsolutions.com\n- Book a discovery call on our site\n- Facebook: Framax Solutions\n\nHow else can I help?`,
-            portfolio: `🎨 **Our Work:**\n\nOur portfolio section is currently under maintenance as we curate our latest projects.\nHere are some of our most impactful solutions:\n\n- **Lumina Finance** (Fintech Dashboard)\n- **Velvet & Oak** (Luxury E-commerce)\n- **Nexus Health** (SaaS Platform)\n\nCheck back soon for the full visual showcase!`,
+            portfolio: `🎨 **Our Work:**\n\nOur portfolio section is currently under maintenance as we curate our latest projects.\nHere are some of our most impactful solutions:\n\n- **Lumina Finance** (Fintech Dashboard)\n- **Velvet & Oak** (Luxury E-commerce)\n- **Nexus Health** (SaaS Platform)\n- **Nexus Health** (SaaS Platform)\n\nCheck back soon for the full visual showcase!`,
             team: `👥 **About Us:**\n\nWe are a development team based in **Portugal**, also present in the **Netherlands**.\n\nWe build custom solutions based on your real needs:\n- Automation systems\n- Management dashboards\n- Booking platforms\n- Business tools\n\nReal people, real code, real results.`,
             hiring: `🚀 **Join the Team:**\n\nWe are primarily looking for **Marketing Specialists** and creative **Designers** to help our clients grow.\n\nWe are also open to talented Developers.\n\nSend your portfolio/CV to: careers@framaxsolutions.com`,
             default: `I can help you with questions about our **Services**, **Pricing**, **Timelines** or **Maintenance**. What would you like to know?`,
@@ -629,7 +629,7 @@ export const en: Translation = {
     about: {
         title: "The Portuguese Startup with the Best Quality-Price Ratio",
         subtitle: "Developed by Framax",
-        introduction: "As a dynamic startup, we bridge the gap between premium engineering and accessible pricing. We don't just build systems; we are your dedicated partners. From impenetrable security and blazing performance to top-tier SEO and open, continuous communication, we handle every detail—including all the adjustments you need—to ensure your vision scales with absolute precision.",
+        introduction: "As a dynamic startup, we bridge the gap between premium engineering and accessible pricing. We don't just build systems; we are your dedicated partners. From record-breaking delivery speeds, impenetrable security, and peak performance to top-tier SEO and continuous communication, we handle every detail—including all the adjustments you need—to ensure your vision scales with absolute precision.",
         teamTitle: "The Team",
         teamSubtitle: "Passionate about code, growth, and your success.",
         maksym: {
