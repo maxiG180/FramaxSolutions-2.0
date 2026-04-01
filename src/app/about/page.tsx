@@ -19,8 +19,8 @@ export default function AboutPage() {
         offset: ["start start", "end end"]
     });
 
-    const opacity = useTransform(scrollYProgress, [0, 0.2], [1, 0]);
-    const scale = useTransform(scrollYProgress, [0, 0.2], [1, 0.95]);
+    const opacity = useTransform(scrollYProgress, [0, 0.6], [1, 0]);
+    const scale = useTransform(scrollYProgress, [0, 0.6], [1, 0.95]);
 
     return (
         <div ref={containerRef} className="relative min-h-screen bg-background text-foreground selection:bg-blue-500/30">
@@ -32,7 +32,7 @@ export default function AboutPage() {
             </div>
 
             {/* Hero Section */}
-            <section className="relative z-10 pt-32 pb-20 md:pt-48 md:pb-32 overflow-hidden">
+            <section className="relative z-10 pt-12 pb-20 md:pt-24 md:pb-32 overflow-hidden">
                 <div className="container mx-auto px-4">
                     <motion.div
                         style={{ opacity, scale }}
@@ -116,6 +116,22 @@ export default function AboutPage() {
                                 description={t.about.francisco.description}
                                 linkedinUrl="https://www.linkedin.com/in/franciscoofarias/"
                                 imageUrl="/Francisco.png"
+                                viewProfileLabel={t.about.viewProfile}
+                            />
+                        </motion.div>
+
+                        <motion.div
+                            initial={{ opacity: 0, y: 40 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ duration: 0.8, delay: 0.4 }}
+                        >
+                            <LinkedInCard
+                                name={t.about.codeturtle.name}
+                                role={t.about.codeturtle.role}
+                                description={t.about.codeturtle.description}
+                                linkedinUrl="#" // Anonymous
+                                imageUrl="" // No image
                                 viewProfileLabel={t.about.viewProfile}
                             />
                         </motion.div>

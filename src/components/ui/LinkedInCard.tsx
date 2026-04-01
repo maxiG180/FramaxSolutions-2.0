@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Linkedin, ExternalLink } from "lucide-react";
+import { Linkedin, ExternalLink, Terminal } from "lucide-react";
 import Image from "next/image";
 
 interface LinkedInCardProps {
@@ -31,7 +31,7 @@ export function LinkedInCard({ name, role, description, linkedinUrl, imageUrl, v
                         />
                     ) : (
                         <div className="flex h-full w-full items-center justify-center bg-blue-600/20 text-blue-400">
-                             <div className="text-3xl font-bold">{name.charAt(0)}</div>
+                             <Terminal size={40} className="animate-pulse" />
                         </div>
                     )}
                 </div>

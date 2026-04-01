@@ -642,6 +642,11 @@ export const pt: Translation = {
             role: "Co-Fundador & Estrategista de Crescimento",
             description: "Estrategista digital focado em design orientado à conversão e crescimento de mercado, o Francisco garante que cada projeto é construído para escalar e vender.",
         },
+        codeturtle: {
+            name: "CodeTurtle 🐢",
+            role: "Arquiteto Fantasma & Developer Core",
+            description: "Uma força anónima por trás dos nossos algoritmos mais complexos. O CodeTurtle prospera nas sombras, garantindo que o núcleo técnico da Framax permanece inquebrável.",
+        },
         viewProfile: "Ver Perfil",
         cta: "Escale o seu Negócio Hoje",
     },

@@ -619,6 +619,11 @@ export interface Translation {
             role: string;
             description: string;
         };
+        codeturtle: {
+            name: string;
+            role: string;
+            description: string;
+        };
         viewProfile: string;
         cta: string;
     };
