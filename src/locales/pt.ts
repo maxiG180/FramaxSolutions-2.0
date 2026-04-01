@@ -168,7 +168,7 @@ export const pt: Translation = {
         time15m: "há 15m",
         time2h: "há 2h",
         // Dashboard
-        monthlyRevenue: "Receita Mensal",
+        monthly Revenue: "Receita Mensal",
         newClients: "Novos Clientes",
         // Other
         thisCouldBeYou: "Sua Empresa",
@@ -318,7 +318,7 @@ export const pt: Translation = {
         editInvoice: "Editar Fatura",
         errorLoadingInvoice: "Erro ao carregar fatura",
         invoiceDetails: "Detalhes da Fatura",
-        failedToSaveInvoice: "Falha ao gravar fatura",
+        failedToSave Invoice: "Falha ao gravar fatura",
         selectPaymentMethod: "Selecione o método",
         paymentTransfer: "Transferência Bancária",
         paymentCash: "Dinheiro",
@@ -451,7 +451,7 @@ export const pt: Translation = {
         sending: "A enviar...",
         back: "Voltar",
         language: "Idioma do Email",
-        languagePortuguese: "Português",
+        language Portuguese: "Português",
         languageEnglish: "Inglês",
     },
     payments: {
@@ -629,7 +629,7 @@ export const pt: Translation = {
     about: {
         title: "A Startup Portuguesa com a Melhor Relação Qualidade-Preço",
         subtitle: "Desenvolvido pela Framax",
-        introduction: "Somos mais do que apenas programadores; somos os seus parceiros estratégicos. Especializamo-nos em engenharia de sistemas digitais complexos que resolvem desafios reais de negócio, com disponibilidade total e contacto direto como as nossas prioridades. Software de alto desempenho, com a melhor relação qualidade-preço do mercado.",
+        introduction: "Como uma startup dinâmica, unimos engenharia de elite a preços altamente acessíveis. Não construímos apenas sistemas; somos os seus parceiros dedicados. Da segurança impenetrável e performance ultra-rápida ao SEO de topo e comunicação contínua e aberta, tratamos de todos os detalhes—incluindo todos os ajustes que necessitar—para garantir que a sua visão escala com precisão absoluta.",
         teamTitle: "A Equipa",
         teamSubtitle: "Apaixonados por código, crescimento e o seu sucesso.",
         maksym: {

@@ -459,7 +459,7 @@ export const en: Translation = {
         subtitle: "Manage recurring payments and subscriptions",
         createPayment: "Create Payment",
         recurringPayments: "Recurring Payments",
-        monthlyRecurringRevenue: "Monthly Recurring Revenue",
+        monthly Recurring Revenue: "Monthly Recurring Revenue",
         activeSubscriptions: "Active Subscriptions",
         overduePayments: "Overdue Payments",
         revenueThisMonth: "Revenue This Month",
@@ -629,7 +629,7 @@ export const en: Translation = {
     about: {
         title: "The Portuguese Startup with the Best Quality-Price Ratio",
         subtitle: "Developed by Framax",
-        introduction: "We are more than developers; we are your strategic partners. We specialize in engineering complex digital systems that solve real business challenges, with availability and dedicated contact as our top priorities. High-performance software, the best value on the market.",
+        introduction: "As a dynamic startup, we bridge the gap between premium engineering and accessible pricing. We don't just build systems; we are your dedicated partners. From impenetrable security and blazing performance to top-tier SEO and open, continuous communication, we handle every detail—including all the adjustments you need—to ensure your vision scales with absolute precision.",
         teamTitle: "The Team",
         teamSubtitle: "Passionate about code, growth, and your success.",
         maksym: {
