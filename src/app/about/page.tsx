@@ -60,6 +60,7 @@ export default function AboutPage() {
                             role={t.about.maksym.role}
                             description={t.about.maksym.description}
                             linkedinUrl="https://www.linkedin.com/in/maksym-grebeniuk-7a8b63174/"
+                            imageUrl="/Maksym.png"
                         />
                     </motion.div>
 
@@ -74,6 +75,7 @@ export default function AboutPage() {
                             role={t.about.francisco.role}
                             description={t.about.francisco.description}
                             linkedinUrl="https://www.linkedin.com/in/franciscoofarias/"
+                            imageUrl="/Francisco.png"
                         />
                     </motion.div>
                 </div>

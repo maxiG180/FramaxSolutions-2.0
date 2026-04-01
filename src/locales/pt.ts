@@ -633,12 +633,12 @@ export const pt: Translation = {
         maksym: {
             name: "Maksym Grebeniuk",
             role: "Co-Fundador & Engenheiro de Software",
-            description: "Atualmente a frequentar a licenciatura em Engenharia de Software na Fontys University em Eindhoven. Experiência em desenvolvimento full-stack com tecnologias modernas. Atualmente estagiário na DAMEN-IT como programador Full-Stack .NET.",
+            description: "Engenheiro de Software experiente em desenvolvimento full-stack com tecnologias modernas (.NET, React, Next.js). Atualmente focado em criar sistemas de automação de alto impacto na DAMEN-IT em Eindhoven e a liderar o desenvolvimento técnico da Framax Solutions. Especialista em transformar desafios complexos em soluções digitais escaláveis e eficientes.",
         },
         francisco: {
             name: "Francisco Farias",
             role: "Co-Fundador & Estratégia Digital",
-            description: "Programador Full Stack com foco em Marketing Digital e Estratégia. Especialista em criar soluções que não só funcionam tecnicamente, mas que trazem resultados de negócio.",
+            description: "Programador Full Stack com foco em Marketing Digital e Estratégia. Especialista em criar soluções que não só funcionam tecnicamente, mas que trazem resultados de negócio reais. Lidera a visão estratégica da Framax Solutions, garantindo que cada projeto maximize o retorno para o cliente.",
         },
         cta: "Vamos trabalhar juntos",
     },

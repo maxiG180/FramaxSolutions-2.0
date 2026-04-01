@@ -11,7 +11,7 @@ export function Footer() {
     return (
         <footer className="bg-muted/30 border-t border-border py-12">
             <div className="container mx-auto px-4">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+                <div className="grid grid-cols-1 md:grid-cols-5 gap-8 mb-12">
                     <div className="col-span-1 md:col-span-2">
                         <Link href="/" className="mb-4 block">
                             <Image
@@ -26,6 +26,22 @@ export function Footer() {
                         <p className="text-muted-foreground max-w-sm">
                             {t.footer.tagline}
                         </p>
+                    </div>
+
+                    <div>
+                        <h3 className="font-bold mb-4">{t.header.features}</h3>
+                        <ul className="space-y-2">
+                            <li><Link href="/#features" className="text-sm text-muted-foreground hover:text-primary transition-colors">{t.header.features}</Link></li>
+                            <li><Link href="/#portfolio" className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">{t.header.portfolio}</Link></li>
+                            <li><Link href="/#booking" className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">{t.header.getStarted}</Link></li>
+                        </ul>
+                    </div>
+
+                    <div>
+                        <h3 className="font-bold mb-4">{t.about.title}</h3>
+                        <ul className="space-y-2">
+                            <li><Link href="/about" className="text-sm text-muted-foreground hover:text-primary transition-colors">{t.about.title}</Link></li>
+                        </ul>
                     </div>
 
                     <div>
