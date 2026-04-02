@@ -53,7 +53,7 @@ export const pt: Translation = {
         title: "Websites que vendem mais",
         subtitle: "Criamos soluções de software que entendem o seu negócio e trazem resultados REAIS.",
         bookMeeting: "Agende reunião gratuita",
-        couldBeYou: "Sua Empresa",
+        couldBeYou: "A sua Empresa",
         moreClients: "Mais Clientes",
         alwaysOpen: "Carga",
         alwaysOnline: "< 1s Tempo Carga",
@@ -73,9 +73,9 @@ export const pt: Translation = {
         heroVisuals: {
             activeGrowth: "Aquisição de Clientes",
             recentActivity: "Atividade Recente",
-            revenueScale: "Sucesso do Cliente",
+            revenueScale: "Entrega Rápida ⚡",
             trendingUp: "Alta Conversão",
-            scaleStatus: "Resultados Excecionais"
+            scaleStatus: "Disponibilidade 24/7"
         }
     },
     portfolio: {
@@ -171,7 +171,7 @@ export const pt: Translation = {
         monthlyRevenue: "Receita Mensal",
         newClients: "Novos Clientes",
         // Other
-        thisCouldBeYou: "Sua Empresa",
+        thisCouldBeYou: "A sua Empresa",
         searchYourBusiness: "O Seu Negócio",
     },
     legal: {

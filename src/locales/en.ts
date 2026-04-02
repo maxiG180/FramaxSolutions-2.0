@@ -73,9 +73,9 @@ export const en: Translation = {
         heroVisuals: {
             activeGrowth: "Client Acquisition",
             recentActivity: "Recent Activity",
-            revenueScale: "Client Success",
+            revenueScale: "Fast Delivery ⚡",
             trendingUp: "High Conversion",
-            scaleStatus: "Exceptional Results"
+            scaleStatus: "24/7 Availability"
         }
     },
     portfolio: {
@@ -479,7 +479,7 @@ export const en: Translation = {
         statusCompleted: "Completed",
         frequencyMonthly: "Monthly",
         frequencyQuarterly: "Quarterly",
-        frequencyYearly: "Yearly",
+        frequencyYearly: "Anual",
         frequencyOneTime: "One Time",
         edit: "Edit",
         delete: "Delete",
@@ -502,7 +502,7 @@ export const en: Translation = {
         serviceTypeOneTime: "One Time",
         amount: "Amount",
         billingFrequency: "Billing Frequency",
-        paymentDetails: "Payment Details",
+        paymentDetails: "Start Date",
         startDate: "Start Date",
         nextPaymentDate: "Next Payment",
         paymentMethod: "Payment Method",

@@ -25,9 +25,9 @@ const Typewriter = ({ text }: { text: string[] }) => {
   }, [subIndex, index, reverse, text]);
 
   return (
-    <span className="relative inline-block text-blue-500">
+    <span className="relative inline text-blue-500">
       {text[index].substring(0, subIndex)}
-      <span className="absolute top-0 -right-2 text-blue-500 animate-cursor-blink">|</span>
+      <span className="inline-block w-[2px] h-[0.8em] bg-blue-500 ml-1.5 animate-cursor-blink align-middle" />
       <svg
         className="absolute w-full h-3 sm:h-4 -bottom-1 sm:-bottom-2 left-0 text-blue-500"
         viewBox="0 0 100 10"
