@@ -71,10 +71,10 @@ export const en: Translation = {
         review3Name: "Ricardo Costa",
         review3Text: "The new website is faster and converts much better. Highly recommend!",
         heroVisuals: {
-            activeGrowth: "Client Acquisition",
+            activeGrowth: "Delivery speed",
             recentActivity: "Recent Activity",
-            revenueScale: "Fast Delivery ⚡",
-            trendingUp: "High Conversion",
+            revenueScale: "On-time Delivery ⚡",
+            trendingUp: "Response Time",
             scaleStatus: "24/7 Availability"
         }
     },
@@ -621,7 +621,7 @@ export const en: Translation = {
             services: `💼 **Our Services:**\n\n**Core:**\n- Full Websites (Domain + Hosting + Basic SEO)\n- Custom Web Applications\n- Website Redesigns\n\n**Add-Ons:**\n- Advanced SEO Strategies\n- Booking Systems\n- CRM / ERP Integration\n\n**Support:**\n- Maintenance (€1/hr)\n- Domain & Hosting (€29/mo)`,
             contact: `📞 **Let's connect:**\n- Email: contact@framaxsolutions.com\n- Book a discovery call on our site\n- Facebook: Framax Solutions\n\nHow else can I help?`,
             portfolio: `🎨 **Our Work:**\n\nOur portfolio section is currently under maintenance as we curate our latest projects.\nHere are some of our most impactful solutions:\n\n- **Lumina Finance** (Fintech Dashboard)\n- **Velvet & Oak** (Luxury E-commerce)\n- **Nexus Health** (SaaS Platform)\n\nCheck back soon for the full visual showcase!`,
-            team: `👥 **About Us:**\n\nWe are a development team based in **Portugal**, also present in the **Netherlands**.\n\nWe build custom solutions based on your real needs:\n- Automation systems\n- Management dashboards\n- Booking platforms\n- Business tools\n\nReal people, real code, real results.`,
+            team: `👥 **About Us:**\n\nWe are a development team based in **Portugal**, also present in the **Netherlands**.\n\nWe build custom solutions based on your real needs:\n- Automation systems\n- Dashboards de gestão\n- Plataformas de reservas\n- Business tools\n\nReal people, real code, real results.`,
             hiring: `🚀 **Join the Team:**\n\nWe are primarily looking for **Marketing Specialists** and creative **Designers** to help our clients grow.\n\nWe are also open to talented Developers.\n\nSend your portfolio/CV to: careers@framaxsolutions.com`,
             default: `I can help you with questions about our **Services**, **Pricing**, **Timelines** or **Maintenance**. What would you like to know?`,
         },
