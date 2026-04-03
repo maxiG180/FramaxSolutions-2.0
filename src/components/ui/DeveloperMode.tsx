@@ -25,7 +25,7 @@ export function DeveloperMode() {
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.9 }}
-                className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90"
+                className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm"
             >
                 <div className="w-full max-w-2xl bg-black border border-green-500/50 rounded-lg shadow-[0_0_50px_rgba(34,197,94,0.2)] overflow-hidden font-mono text-green-500">
                     <div className="flex items-center justify-between px-4 py-2 border-b border-green-500/30 bg-green-500/10">

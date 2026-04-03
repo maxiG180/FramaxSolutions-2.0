@@ -6,15 +6,27 @@ import { motion, useInView } from "framer-motion";
 import { ArrowRight, TrendingUp, Users, Zap, Bell, FileText, Calendar } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 
-// CSS-only Typewriter — ZERO JavaScript re-renders!
-// Performance: No setTimeout, no state updates, pure CSS animation
 const Typewriter = ({ text }: { text: string[] }) => {
-  // Show the first word statically for immediate LCP
-  const displayText = text[0] || "";
+  const [index, setIndex] = React.useState(0);
+  // Start fully typed so the first word is visible immediately on mount
+  const [subIndex, setSubIndex] = React.useState(text[0]?.length ?? 0);
+  const [reverse, setReverse] = React.useState(false);
+
+  React.useEffect(() => {
+    if (index >= text.length) { setIndex(0); return; }
+    if (subIndex === text[index].length + 1 && !reverse) { setTimeout(() => setReverse(true), 2000); return; }
+    if (subIndex === 0 && reverse) { setReverse(false); setIndex((prev) => (prev + 1) % text.length); return; }
+
+    const timeout = setTimeout(() => {
+      setSubIndex((prev) => prev + (reverse ? -1 : 1));
+    }, Math.max(reverse ? 75 : subIndex === text[index].length ? 2000 : 150, Math.floor(Math.random() * 350)));
+
+    return () => clearTimeout(timeout);
+  }, [subIndex, index, reverse, text]);
 
   return (
     <span className="relative inline-block text-blue-500">
-      <span className="inline-block">{displayText}</span>
+      {text[index].substring(0, subIndex)}
       <span className="absolute top-0 -right-2 text-blue-500 animate-cursor-blink">|</span>
       <svg
         className="absolute w-full h-3 sm:h-4 -bottom-1 sm:-bottom-2 left-0 text-blue-500"
@@ -106,7 +118,7 @@ const Hero = () => {
               transition={{ duration: 0.6, delay: 1.2 }}
               className="flex flex-col items-center gap-1 mb-6"
             >
-              <span className="text-xs font-bold text-white bg-primary/95 px-3 py-1.5 rounded-full shadow-lg">
+              <span className="text-xs font-bold text-white bg-primary/90 backdrop-blur-sm px-3 py-1.5 rounded-full shadow-lg">
                 {t.hero.couldBeYou}
               </span>
               {/* Professional Horizontal Curly Bracket pointing up from cards */}
@@ -130,7 +142,7 @@ const Hero = () => {
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={isInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.8 }}
                 transition={{ delay: 0.6 }}
-                className="relative bg-gradient-to-br from-blue-500/10 to-blue-500/5 rounded-xl border border-blue-500/20 p-4 overflow-hidden"
+                className="relative bg-gradient-to-br from-blue-500/10 to-blue-500/5 backdrop-blur-xl rounded-xl border border-blue-500/20 p-4 overflow-hidden"
               >
                 <TrendingUp className="w-8 h-8 text-blue-500 mb-2" />
                 <div className="text-xl font-bold text-white mb-1">{t.hero.heroVisuals.activeGrowth}</div>
@@ -151,7 +163,7 @@ const Hero = () => {
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={isInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.8 }}
                 transition={{ delay: 0.7 }}
-                className="relative bg-gradient-to-br from-yellow-500/10 to-yellow-500/5 rounded-xl border border-yellow-500/20 p-4 overflow-hidden"
+                className="relative bg-gradient-to-br from-yellow-500/10 to-yellow-500/5 backdrop-blur-xl rounded-xl border border-yellow-500/20 p-4 overflow-hidden"
               >
                 <Zap className="w-8 h-8 text-yellow-500 mb-2" />
                 <div className="text-xs font-semibold text-white mb-1">{t.hero.alwaysOpen}</div>
@@ -177,7 +189,7 @@ const Hero = () => {
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={isInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.8 }}
                 transition={{ delay: 0.8 }}
-                className="row-span-2 relative bg-slate-900/90 rounded-xl border border-white/10 overflow-hidden"
+                className="row-span-2 relative bg-slate-900/90 backdrop-blur-xl rounded-xl border border-white/10 overflow-hidden"
               >
                 {/* Notification Hub Mobile */}
                 <div className="absolute inset-0 bg-gradient-to-br from-slate-950 to-slate-900 p-3 flex flex-col">
@@ -233,7 +245,7 @@ const Hero = () => {
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={isInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.8 }}
                 transition={{ delay: 0.9 }}
-                className="relative bg-gradient-to-br from-orange-500/10 to-orange-500/5 rounded-xl border border-orange-500/20 p-4 overflow-hidden"
+                className="relative bg-gradient-to-br from-orange-500/10 to-orange-500/5 backdrop-blur-xl rounded-xl border border-orange-500/20 p-4 overflow-hidden"
               >
                 <TrendingUp className="w-8 h-8 text-orange-500 mb-2" />
                 <div className="text-xs font-semibold text-white mb-1">{t.hero.heroVisuals.revenueScale}</div>
@@ -259,7 +271,7 @@ const Hero = () => {
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={isInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.8 }}
                 transition={{ delay: 1 }}
-                className="relative bg-gradient-to-br from-green-500/10 to-green-500/5 rounded-xl border border-green-500/20 p-4 overflow-hidden"
+                className="relative bg-gradient-to-br from-green-500/10 to-green-500/5 backdrop-blur-xl rounded-xl border border-green-500/20 p-4 overflow-hidden"
               >
                 {/* Header with Google branding */}
                 <div className="relative z-10 mb-2">
@@ -313,7 +325,7 @@ const Hero = () => {
               transition={{ duration: 0.6, delay: 1.2 }}
               className="absolute -top-20 left-0 right-0 flex flex-col items-center gap-1"
             >
-              <span className="text-sm font-bold text-white bg-primary/95 px-4 py-2 rounded-full shadow-lg">
+              <span className="text-sm font-bold text-white bg-primary/90 backdrop-blur-sm px-4 py-2 rounded-full shadow-lg">
                 {t.hero.couldBeYou}
               </span>
               {/* Professional Horizontal Curly Bracket pointing up from cards */}
@@ -336,7 +348,7 @@ const Hero = () => {
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={isInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.8 }}
                 transition={{ delay: 0.6 }}
-                className="relative bg-gradient-to-br from-blue-500/10 to-blue-500/5 rounded-2xl border border-blue-500/20 p-6 overflow-hidden group hover:border-blue-500/40 transition-all"
+                className="relative bg-gradient-to-br from-blue-500/10 to-blue-500/5 backdrop-blur-xl rounded-2xl border border-blue-500/20 p-6 overflow-hidden group hover:border-blue-500/40 transition-all"
               >
                 <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                 <TrendingUp className="w-10 h-10 text-blue-500 mb-2 relative z-10" />
@@ -360,7 +372,7 @@ const Hero = () => {
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={isInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.8 }}
                 transition={{ delay: 0.7 }}
-                className="row-span-2 relative bg-slate-900/90 rounded-2xl border border-white/10 overflow-hidden group"
+                className="row-span-2 relative bg-slate-900/90 backdrop-blur-xl rounded-2xl border border-white/10 overflow-hidden group"
               >
                 {/* Website Preview */}
                 {/* Notification Hub */}
@@ -438,7 +450,7 @@ const Hero = () => {
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={isInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.8 }}
                 transition={{ delay: 0.8 }}
-                className="relative bg-gradient-to-br from-yellow-500/10 to-yellow-500/5 rounded-2xl border border-yellow-500/20 p-6 overflow-hidden group hover:border-yellow-500/40 transition-all"
+                className="relative bg-gradient-to-br from-yellow-500/10 to-yellow-500/5 backdrop-blur-xl rounded-2xl border border-yellow-500/20 p-6 overflow-hidden group hover:border-yellow-500/40 transition-all"
               >
                 <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                 <Zap className="w-10 h-10 text-yellow-500 mb-2 relative z-10" />
@@ -466,7 +478,7 @@ const Hero = () => {
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={isInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.8 }}
                 transition={{ delay: 0.9 }}
-                className="relative bg-gradient-to-br from-orange-500/10 to-orange-500/5 rounded-2xl border border-orange-500/20 p-6 overflow-hidden group hover:border-orange-500/40 transition-all"
+                className="relative bg-gradient-to-br from-orange-500/10 to-orange-500/5 backdrop-blur-xl rounded-2xl border border-orange-500/20 p-6 overflow-hidden group hover:border-orange-500/40 transition-all"
               >
                 <div className="absolute inset-0 bg-gradient-to-br from-orange-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                 <TrendingUp className="w-10 h-10 text-orange-500 mb-2 relative z-10" />
@@ -494,7 +506,7 @@ const Hero = () => {
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={isInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.8 }}
                 transition={{ delay: 1 }}
-                className="relative bg-gradient-to-br from-green-500/10 to-green-500/5 rounded-2xl border border-green-500/20 p-6 overflow-hidden group hover:border-green-500/40 transition-all"
+                className="relative bg-gradient-to-br from-green-500/10 to-green-500/5 backdrop-blur-xl rounded-2xl border border-green-500/20 p-6 overflow-hidden group hover:border-green-500/40 transition-all"
               >
                 <div className="absolute inset-0 bg-gradient-to-br from-green-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
 
@@ -535,7 +547,7 @@ const Hero = () => {
                   ].map((review, i) => (
                     <motion.div
                       key={i}
-                      className="absolute inset-x-0 top-2 bg-slate-800/95 rounded-lg p-2.5 border border-green-500/20 shadow-lg"
+                      className="absolute inset-x-0 top-2 bg-slate-800/90 backdrop-blur-sm rounded-lg p-2.5 border border-green-500/20 shadow-lg"
                       initial={{ y: 96, opacity: 0 }}
                       animate={isInView ? {
                         y: [96, -6, -6, -96],

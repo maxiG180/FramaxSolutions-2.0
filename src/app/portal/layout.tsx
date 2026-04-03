@@ -15,7 +15,7 @@ export default function PortalLayout({
     return (
         <div className="min-h-screen bg-[#050505] text-white selection:bg-blue-500/30">
             {/* Simple Header */}
-            <header className="border-b border-white/5 bg-black/95 sticky top-0 z-50">
+            <header className="border-b border-white/5 bg-black/50 backdrop-blur-xl sticky top-0 z-50">
                 <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
                     <div className="flex items-center gap-3">
                         <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center font-bold text-white">

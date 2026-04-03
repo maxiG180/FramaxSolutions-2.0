@@ -69,7 +69,7 @@ export function SocialProof() {
                 </div>
 
                 {/* Logo Marquee */}
-                <div className="relative w-full overflow-hidden py-10 border-y border-border/50 bg-muted/30">
+                <div className="relative w-full overflow-hidden py-10 border-y border-border/50 bg-muted/20 backdrop-blur-sm">
                     <div className="flex w-full">
                         <motion.div
                             animate={{ x: ["0%", "-50%"] }}
