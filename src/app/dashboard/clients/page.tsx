@@ -167,8 +167,7 @@ export default function ClientsPage() {
                 .eq('id', editingId);
 
             if (error) {
-                console.error('Error updating client:', error);
-                console.error('Error details:', JSON.stringify(error, null, 2));
+                console.error('Error updating client:', error.message);
                 alert(`Error updating client: ${error.message || 'Unknown error'}`);
             } else {
                 setClients(clients.map(c => c.id === editingId ? { ...c, ...formData } as Client : c));
@@ -194,60 +193,35 @@ export default function ClientsPage() {
                 .single();
 
             if (error) {
-                console.error('Error adding client:', error);
-                console.error('Error details:', JSON.stringify(error, null, 2));
-                console.error('Error message:', error.message);
-                console.error('Error hint:', error.hint);
-                console.error('Error details object:', error.details);
-                alert(`Error adding client: ${error.message || 'Unknown error. Check console for details.'}`);
+                console.error('Error adding client:', error.message);
+                alert(`Error adding client: ${error.message || 'Unknown error.'}`);
             } else {
                 // Create folder in Docs page for the new client
-                console.log('🗂️ Starting folder creation in Docs for new client...');
-                console.log('Client data:', data);
-
                 try {
                     const clientFolderName = formData.name || `Client ${data.id}`;
-                    console.log('📁 Creating Docs folder:', clientFolderName);
-
-                    // Get current user
                     const { data: { user } } = await supabase.auth.getUser();
 
                     if (user) {
-                        // Create folder in the folders table (for Docs page)
                         const folderPayload: any = {
                             user_id: user.id,
                             name: clientFolderName,
                             color: 'text-blue-400',
-                            bg: 'bg-blue-400/10'
+                            bg: 'bg-blue-400/10',
+                            client_id: data.id,
                         };
 
-                        // Try to add client_id (will be ignored if column doesn't exist)
-                        try {
-                            folderPayload.client_id = data.id;
-                        } catch (e) {
-                            console.log('Note: client_id column not available yet');
-                        }
-
-                        const { data: folderData, error: folderError } = await supabase
+                        const { error: folderError } = await supabase
                             .from('folders')
                             .insert(folderPayload)
                             .select()
                             .single();
 
                         if (folderError) {
-                            console.error('❌ Could not create client folder in Docs:', folderError);
-                            console.error('Error details:', folderError);
-                            // Don't fail the client creation if folder creation fails
-                        } else {
-                            console.log('✅ Successfully created Docs folder for client:', clientFolderName);
-                            console.log('Folder data:', folderData);
+                            console.error('Could not create client folder in Docs:', folderError.message);
                         }
-                    } else {
-                        console.warn('⚠️ No authenticated user found, skipping folder creation');
                     }
                 } catch (folderError) {
-                    console.error('❌ Exception while creating client folder:', folderError);
-                    // Don't fail the client creation if folder creation fails
+                    console.error('Exception while creating client folder:', folderError);
                 }
 
                 setClients([data, ...clients]);

@@ -9,6 +9,7 @@ import {
     Minus,
     Send,
     Bot,
+    RotateCcw,
 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import { useState } from 'react';
@@ -130,6 +131,14 @@ export default function Chatbot() {
                             </div>
                             <div className="flex items-center gap-1">
                                 <button
+                                    onClick={() => resetChat(cb.initialMessage)}
+                                    className="p-2 hover:bg-white/10 rounded-full transition-colors text-white/70 hover:text-white"
+                                    aria-label="New conversation"
+                                    title="New conversation"
+                                >
+                                    <RotateCcw size={16} />
+                                </button>
+                                <button
                                     onClick={toggleOpen}
                                     className="p-2 hover:bg-white/10 rounded-full transition-colors text-white/70 hover:text-white"
                                     aria-label="Minimize"
@@ -193,18 +202,18 @@ export default function Chatbot() {
                             <div ref={messagesEndRef} />
                         </div>
 
-                        {/* Suggested Questions — hidden on mobile to save space */}
+                        {/* Suggested Questions */}
                         {!isTyping && messages[messages.length - 1]?.role === 'bot' && (
-                            <div className="px-4 pb-2 hidden md:block">
+                            <div className="px-4 pb-2">
                                 <p className="text-xs text-white/40 mb-2 font-medium uppercase tracking-wider">
                                     {cb.suggestedQuestions}
                                 </p>
-                                <div className="flex flex-wrap gap-2">
+                                <div className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:flex-wrap md:overflow-visible">
                                     {presets.slice(0, 4).map((text) => (
                                         <button
                                             key={text}
                                             onClick={() => handlePresetClick(text)}
-                                            className="bg-white/5 hover:bg-blue-600/20 border border-white/10 hover:border-blue-500/50 text-white/90 hover:text-white px-4 py-2 rounded-full text-xs transition-all hover:shadow-[0_0_15px_rgba(37,99,235,0.3)]"
+                                            className="flex-shrink-0 bg-white/5 hover:bg-blue-600/20 border border-white/10 hover:border-blue-500/50 text-white/90 hover:text-white px-4 py-2 rounded-full text-xs transition-all hover:shadow-[0_0_15px_rgba(37,99,235,0.3)]"
                                         >
                                             {text}
                                         </button>

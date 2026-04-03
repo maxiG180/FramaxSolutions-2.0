@@ -50,7 +50,7 @@ export function LinkedInCard({ name, role, description, linkedinUrl, imageUrl, v
                                 href={linkedinUrl}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="rounded-full bg-blue-600/20 p-2 text-blue-400 transition-colors hover:bg-blue-600 hover:text-white"
+                                className="inline-flex items-center justify-center rounded-full bg-blue-600/20 p-2 text-blue-400 transition-colors hover:bg-blue-600 hover:text-white"
                                 aria-label={`${isGithub ? 'GitHub' : 'LinkedIn'} of ${name}`}
                             >
                                 {isGithub ? <Github size={20} /> : <Linkedin size={20} />}
@@ -66,7 +66,7 @@ export function LinkedInCard({ name, role, description, linkedinUrl, imageUrl, v
                             href={linkedinUrl}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-blue-400 transition-colors hover:text-blue-300"
+                            className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-blue-400 transition-colors hover:text-blue-300"
                         >
                             {viewProfileLabel}
                             <ExternalLink size={14} />

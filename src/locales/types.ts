@@ -593,13 +593,20 @@ export interface Translation {
         };
         answers: {
             timeline: string;
+            timeline_more: string;
             pricing: string;
+            pricing_more: string;
             maintenance: string;
+            maintenance_more: string;
             services: string;
+            services_more: string;
             contact: string;
             portfolio: string;
             team: string;
             hiring: string;
+            greeting: string;
+            farewell: string;
+            thanks: string;
             default: string;
         };
     };

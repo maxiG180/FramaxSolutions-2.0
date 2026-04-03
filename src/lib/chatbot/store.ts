@@ -24,6 +24,7 @@ type ChatState = {
     hasSeenWelcome: boolean;
     messages: Message[];
     sessionId: string;
+    lastIntent: string | null;
 
     // Actions
     toggleOpen: () => void;
@@ -40,6 +41,7 @@ export const useChatStore = create<ChatState>()(
             isTyping: false,
             hasSeenWelcome: false,
             sessionId: uuidv4(),
+            lastIntent: null,
             messages: [
                 {
                     id: 'welcome',
@@ -72,7 +74,7 @@ export const useChatStore = create<ChatState>()(
             },
 
             handleUserMessage: async (content, answers) => {
-                const { addMessage, sessionId } = get();
+                const { addMessage, sessionId, lastIntent } = get();
                 const supabase = createClient();
 
                 // Add user message
@@ -84,12 +86,12 @@ export const useChatStore = create<ChatState>()(
                 // Simulate network delay / cognitive processing
                 await new Promise((resolve) => setTimeout(resolve, 1000));
 
-                // Find answer key and resolve text
-                const matchKey = findBestMatch(content);
+                // Find answer key — pass lastIntent for contextual follow-up detection
+                const matchKey = findBestMatch(content, lastIntent);
                 const answer = answers[matchKey] ?? answers['default'];
 
                 // Add bot message — store both the resolved text and the intent key
-                set({ isTyping: false });
+                set({ isTyping: false, lastIntent: matchKey });
                 addMessage('bot', answer, matchKey);
 
                 // Track interaction in Supabase
@@ -108,6 +110,7 @@ export const useChatStore = create<ChatState>()(
             resetChat: (initialMessage: string) => {
                 set({
                     sessionId: uuidv4(),
+                    lastIntent: null,
                     messages: [
                         {
                             id: uuidv4(),
