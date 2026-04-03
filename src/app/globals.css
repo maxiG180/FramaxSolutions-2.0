@@ -3,40 +3,44 @@
 @tailwind utilities;
 
 :root {
-    --background: #ffffff;
-    --foreground: #171717;
+    --background: #0a0a0a;
+    --foreground: #ededed;
 
-    --primary: #2563eb;
-    /* Blue 600 */
+    --primary: #3b82f6;
+    /* Blue 500 */
     --primary-foreground: #ffffff;
 
-    --secondary: #ec4899;
-    /* Pink 500 */
+    --secondary: #f472b6;
+    /* Pink 400 */
     --secondary-foreground: #ffffff;
 
-    --accent: #8b5cf6;
-    /* Violet 500 */
+    --accent: #a78bfa;
+    /* Violet 400 */
     --accent-foreground: #ffffff;
+
+    color-scheme: dark;
 }
 
-@media (prefers-color-scheme: dark) {
-    :root {
-        --background: #0a0a0a;
-        --foreground: #ededed;
-
-        --primary: #3b82f6;
-        /* Blue 500 */
-        --secondary: #f472b6;
-        /* Pink 400 */
-        --accent: #a78bfa;
-        /* Violet 400 */
-    }
+html {
+    overflow-x: hidden;
+    background-color: #0a0a0a !important;
 }
 
 body {
-    background: var(--background);
-    color: var(--foreground);
+    background: var(--background) !important;
+    color: var(--foreground) !important;
     font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+    -webkit-text-size-adjust: 100%;
+    /* Prevents iOS from auto-scaling text on orientation change */
+    padding-top: max(env(safe-area-inset-top), 0px);
+    padding-bottom: env(safe-area-inset-bottom);
+}
+
+@media (prefers-color-scheme: light) {
+    :root {
+        --background: #0a0a0a;
+        --foreground: #ededed;
+    }
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -206,16 +210,25 @@ body {
    Tells the browser to skip layout/paint for off-screen sections
    until they're about to enter the viewport. Large LCP/TBT win.
    ============================================================ */
+/* Improve layout stability for in-app browsers (LinkedIn/Instagram) */
 section {
     content-visibility: auto;
-    contain-intrinsic-size: 0 500px;
-    /* estimated height prevents scroll jump */
+    contain-intrinsic-size: auto 500px;
+    /* Modern browsers use 'auto' to better estimate height */
 }
 
 /* Hero is always visible — opt it back out */
 section:first-of-type {
     content-visibility: visible;
-    contain-intrinsic-size: none;
+    contain-intrinsic-size: initial;
+}
+
+@media (max-width: 1024px) {
+    /* Disable aggressive content-visibility on mobile/tablet where in-app webviews (LinkedIn, Instagram) may be unstable */
+    section {
+        content-visibility: visible;
+        contain-intrinsic-size: initial;
+    }
 }
 
 /* Marquee/TechStack — force GPU compositing for smooth marquee */

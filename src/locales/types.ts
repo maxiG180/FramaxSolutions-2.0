@@ -9,6 +9,7 @@ export interface Translation {
         results: string;
         login: string;
         dashboard: string;
+        about: string;
     };
     footer: {
         tagline: string;
@@ -592,14 +593,45 @@ export interface Translation {
         };
         answers: {
             timeline: string;
+            timeline_more: string;
             pricing: string;
+            pricing_more: string;
             maintenance: string;
+            maintenance_more: string;
             services: string;
+            services_more: string;
             contact: string;
             portfolio: string;
             team: string;
             hiring: string;
+            greeting: string;
+            farewell: string;
+            thanks: string;
             default: string;
         };
+    };
+    about: {
+        title: string;
+        subtitle: string;
+        introduction: string;
+        teamTitle: string;
+        teamSubtitle: string;
+        maksym: {
+            name: string;
+            role: string;
+            description: string;
+        };
+        francisco: {
+            name: string;
+            role: string;
+            description: string;
+        };
+        codeturtle: {
+            name: string;
+            role: string;
+            description: string;
+        };
+        viewProfile: string;
+        cta: string;
     };
 }

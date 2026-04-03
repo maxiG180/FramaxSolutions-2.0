@@ -29,19 +29,18 @@ export function Footer() {
                     </div>
 
                     <div>
-                        <h3 className="font-bold mb-4">{t.footer.product}</h3>
+                        <h3 className="font-bold mb-4">{t.header.features}</h3>
                         <ul className="space-y-2">
-                            <li><Link href="#" className="text-sm text-muted-foreground hover:text-primary transition-colors">{t.footer.features}</Link></li>
-                            <li><Link href="#" className="text-sm text-muted-foreground hover:text-primary transition-colors">{t.footer.changelog}</Link></li>
+                            <li><Link href="/#features" className="text-sm text-muted-foreground hover:text-primary transition-colors">{t.header.features}</Link></li>
+                            <li><Link href="/#portfolio" className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">{t.header.portfolio}</Link></li>
+                            <li><Link href="/#booking" className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">{t.header.getStarted}</Link></li>
                         </ul>
                     </div>
 
                     <div>
-                        <h3 className="font-bold mb-4">{t.footer.studio}</h3>
+                        <h3 className="font-bold mb-4">{t.about.title}</h3>
                         <ul className="space-y-2">
-                            <li><Link href="#" className="text-sm text-muted-foreground hover:text-primary transition-colors">{t.footer.about}</Link></li>
-                            <li><Link href="#" className="text-sm text-muted-foreground hover:text-primary transition-colors">{t.footer.blog}</Link></li>
-                            <li><Link href="#" className="text-sm text-muted-foreground hover:text-primary transition-colors">{t.footer.careers}</Link></li>
+                            <li><Link href="/about" className="text-sm text-muted-foreground hover:text-primary transition-colors">{t.about.title}</Link></li>
                         </ul>
                     </div>
 
@@ -49,7 +48,6 @@ export function Footer() {
                         <h3 className="font-bold mb-4">{t.footer.legal}</h3>
                         <ul className="space-y-2">
                             <li><Link href="/legal/privacy" className="text-sm text-muted-foreground hover:text-primary transition-colors">{t.footer.privacy}</Link></li>
-                            {/* <li><Link href="/legal/terms" className="text-sm text-muted-foreground hover:text-primary transition-colors">{t.footer.terms}</Link></li> */}
                         </ul>
                     </div>
                 </div>

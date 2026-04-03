@@ -1,117 +1,3 @@
-import { MessageCircle, Clock, CreditCard, Code, Wrench, Briefcase, Phone } from 'lucide-react';
-
-export type PresetQuestion = {
-    id: string;
-    text: string;
-    icon?: any; // Using any for icon component mainly for flexibility
-    keyword?: string;
-};
-
-export const PRESET_QUESTIONS: PresetQuestion[] = [
-    { id: 'timeline', text: 'Quanto tempo demora um projeto?', icon: Clock },
-    { id: 'pricing', text: 'Como funciona o preço?', icon: CreditCard },
-    { id: 'maintenance', text: 'Oferecem manutenção?', icon: Wrench },
-    { id: 'services', text: 'Que serviços oferecem?', icon: Briefcase },
-    { id: 'contact', text: 'Como posso contactar-vos?', icon: Phone },
-];
-
-export const ANSWERS: Record<string, string> = {
-    timeline: `⏱️ **Prazos dos projetos:**
-- Website (Standard): 2-4 semanas
-- Redesign de Website: 3-4 semanas
-- Aplicação Web Personalizada: 4-8 semanas
-- Sistemas de Reservas / Blog Add-ons: 1-2 semanas
-
-Fornecemos prazos personalizados na nossa proposta.`,
-
-    pricing: `💳 **Estrutura de Preços:**
-
-**Serviços Core (Orçamento Personalizado):**
-- Website (Design & Desenvolvimento)
-- Redesign de Website
-- Aplicações Web Personalizadas
-
-**Add-Ons (A partir de):**
-- SEO Avançado: 299€
-- Blog/CMS: 399€+
-- Sistema de Reservas: 499€+
-
-**Planos Mensais:**
-- Manutenção: 20€/mês
-- Domínio & Alojamento: 29€/mês
-
-Marque uma chamada de descoberta para um orçamento preciso!`,
-
-    maintenance: `🔧 **Plano de Manutenção:**
-
-**Preço:** 20€/mês
-**Configuração:** Imediata
-**Inclui:**
-- Atualizações regulares
-- Patches de segurança
-- Suporte técnico
-
-Oferecemos também **Domínio & Alojamento** por 29€/mês.`,
-
-    services: `💼 **Os Nossos Serviços:**
-
-**Core:**
-- Websites Completos (Domínio + Alojamento + SEO Básico)
-- Aplicações Web Personalizadas
-- Redesigns de Websites
-
-**Add-Ons:**
-- Estratégias de SEO Avançado
-- Sistemas de Reservas
-- Integração de Blog/CMS
-
-**Mensais:**
-- Manutenção (20€/mês)
-- Domínio & Alojamento (29€/mês)`,
-
-    contact: `📞 **Vamos ligar-nos:**
-- Email: contact@framaxsolutions.com
-- Marque uma chamada de descoberta no nosso site
-- Facebook: Framax Solutions
-
-Como posso ajudá-lo mais?`,
-
-
-
-    portfolio: `🎨 **O Nosso Trabalho:**
-
-A nossa sessão de portfólio está atualmente em manutenção enquanto selecionamos os nossos projetos mais recentes.
-No entanto, aqui estão algumas das nossas soluções mais impactantes:
-
-- **Lumina Finance** (Dashboard Fintech)
-- **Velvet & Oak** (E-commerce de Luxo)
-- **Nexus Health** (Plataforma SaaS)
-
-Volte em breve para a montra visual completa!`,
-
-    team: `👥 **Sobre Nós:**
-
-Somos uma equipa de programadores de **Portugal**, também com presença nos **Países Baixos**.
-
-Construímos soluções personalizadas com base nas suas necessidades reais:
-- Sistemas de automação
-- Dashboards de gestão
-- Plataformas de reservas
-- Ferramentas de negócio
-
-Pessoas reais, código real, resultados reais.`,
-
-    hiring: `🚀 **Junte-se à Equipa:**
-
-Procuramos principalmente **Especialistas de Marketing** e **Designers** criativos para ajudar os nossos clientes a crescer.
-
-Estamos também abertos a Programadores talentosos, embora o nosso foco atual seja em funções de crescimento e design.
-
-Envie o seu portfólio/CV para: careers@framaxsolutions.com`,
-
-    default: `Posso ajudá-lo com perguntas sobre os nossos **Serviços**, **Preços**, **Prazos** ou **Manutenção**. O que gostaria de saber?`
-};
-
 type QuestionMatcher = {
     id: string;
     patterns: RegExp[];
@@ -119,6 +5,39 @@ type QuestionMatcher = {
 };
 
 export const QUESTION_MATCHERS: QuestionMatcher[] = [
+    // Greetings — checked first to avoid false positives
+    {
+        id: 'greeting',
+        patterns: [
+            /^hi+$/i, /^hey+$/i, /^hello+$/i, /^yo$/i,
+            /^olá$/i, /^ola$/i, /^oi$/i,
+            /^good morning/i, /^good afternoon/i, /^good evening/i,
+            /^bom dia/i, /^boa tarde/i, /^boa noite/i,
+            /^what can you (do|help)/i,
+            /^how can you help/i,
+        ],
+        keywords: ['hello', 'hey', 'olá', 'ola', 'greetings']
+    },
+    {
+        id: 'farewell',
+        patterns: [
+            /^bye+$/i, /^goodbye$/i, /^see ya$/i, /^cya$/i, /^later$/i,
+            /^tchau$/i, /^adeus$/i, /^até logo/i, /^ate logo/i, /^até já/i,
+            /thanks.*bye/i, /thank you.*bye/i,
+        ],
+        keywords: ['bye', 'goodbye', 'farewell', 'tchau', 'adeus']
+    },
+    {
+        id: 'thanks',
+        patterns: [
+            /^thanks?$/i, /^thank you/i, /^thx$/i, /^ty$/i,
+            /^obrigad/i, /^muito obrigad/i,
+            /^cheers$/i, /^perfect$/i, /^great(,| |$)/i,
+            /^awesome$/i, /^got it$/i, /^makes sense$/i,
+            /^perfeito$/i, /^ótimo$/i, /^fixe$/i,
+        ],
+        keywords: ['thanks', 'thank', 'obrigado', 'obrigada', 'cheers']
+    },
     {
         id: 'timeline',
         patterns: [
@@ -127,9 +46,13 @@ export const QUESTION_MATCHERS: QuestionMatcher[] = [
             /when.*finish/i,
             /delivery time/i,
             /turnaround/i,
-            /time.*take/i
+            /time.*take/i,
+            /quanto.*tempo/i,
+            /quando.*termina/i,
+            /prazo/i,
+            /duraç/i
         ],
-        keywords: ['timeline', 'schedule', 'deadline', 'date']
+        keywords: ['timeline', 'schedule', 'deadline', 'date', 'tempo', 'prazo', 'quando']
     },
     {
         id: 'pricing',
@@ -144,23 +67,31 @@ export const QUESTION_MATCHERS: QuestionMatcher[] = [
             /payment/i,
             /deposit/i,
             /expensive/i,
-            /cheap/i
+            /cheap/i,
+            /quanto/i,
+            /preço/i,
+            /valor/i,
+            /custo/i,
+            /orçamento/i,
+            /pagamento/i
         ],
-        keywords: ['money', 'expense', 'bill', 'invoice', 'euro', 'dollar']
+        keywords: ['money', 'expense', 'bill', 'invoice', 'euro', 'dollar', 'dinheiro', 'preço', 'valor', 'custo']
     },
     {
         id: 'maintenance',
         patterns: [
             /maintenance/i,
-            /support/i,
-            /update/i,
+            /support plan/i,
+            /update.*site/i,
             /after.*project/i,
-            /fix/i,
-            /errors/i,
-            /bugs/i,
-            /help/i
+            /fix.*bug/i,
+            /bug.*fix/i,
+            /manutenç/i,
+            /suporte/i,
+            /atualiz/i,
+            /ajuda.*técni/i,
         ],
-        keywords: ['care', 'monthly', 'plan', 'hosting']
+        keywords: ['care', 'monthly', 'plan', 'hosting', 'manutenção', 'suporte']
     },
     {
         id: 'services',
@@ -173,9 +104,13 @@ export const QUESTION_MATCHERS: QuestionMatcher[] = [
             /design/i,
             /development/i,
             /website/i,
-            /app/i
+            /app/i,
+            /serviço/i,
+            /fazem/i,
+            /oferecem/i,
+            /constroem/i
         ],
-        keywords: ['offerings', 'work', 'create', 'product']
+        keywords: ['offerings', 'work', 'create', 'product', 'serviços', 'trabalho']
     },
     {
         id: 'contact',
@@ -189,11 +124,15 @@ export const QUESTION_MATCHERS: QuestionMatcher[] = [
             /talk/i,
             /speak/i,
             /meeting/i,
-            /book/i
+            /book/i,
+            /contacto/i,
+            /falar/i,
+            /ligar/i,
+            /reunião/i,
+            /marcar/i
         ],
-        keywords: ['touch', 'message', 'number', 'address', 'location']
+        keywords: ['touch', 'message', 'number', 'address', 'location', 'contacto', 'telefone', 'reunião']
     },
-
     {
         id: 'portfolio',
         patterns: [
@@ -203,9 +142,13 @@ export const QUESTION_MATCHERS: QuestionMatcher[] = [
             /case/i,
             /client/i,
             /show/i,
-            /see/i
+            /see/i,
+            /exemplo/i,
+            /trabalho/i,
+            /projeto/i,
+            /ver/i
         ],
-        keywords: ['sample', 'project', 'previous', 'done']
+        keywords: ['sample', 'project', 'previous', 'done', 'exemplo', 'trabalho', 'portfólio']
     },
     {
         id: 'team',
@@ -215,9 +158,12 @@ export const QUESTION_MATCHERS: QuestionMatcher[] = [
             /people/i,
             /developer/i,
             /designer/i,
-            /company/i
+            /company/i,
+            /quem/i,
+            /equipa/i,
+            /pessoas/i
         ],
-        keywords: ['us', 'we', 'about', 'story']
+        keywords: ['us', 'we', 'about', 'story', 'equipa', 'nós']
     },
     {
         id: 'hiring',
@@ -227,9 +173,13 @@ export const QUESTION_MATCHERS: QuestionMatcher[] = [
             /hiring/i,
             /work for/i,
             /join/i,
-            /vacancy/i
+            /vacancy/i,
+            /vaga/i,
+            /emprego/i,
+            /carreira/i,
+            /trabalhar/i
         ],
-        keywords: ['apply', 'resume', 'cv']
+        keywords: ['apply', 'resume', 'cv', 'candidat', 'currículo']
     }
 ];
 
@@ -265,8 +215,37 @@ function levenshteinDistance(a: string, b: string): number {
     return matrix[b.length][a.length];
 }
 
-export function findBestMatch(input: string): string {
+const FOLLOWUP_PATTERNS = [
+    /^more$/i,
+    /tell me more/i,
+    /more (details?|info|information)/i,
+    /what else/i,
+    /can you (expand|elaborate|explain more)/i,
+    /more about (that|this)/i,
+    /go on/i,
+    /^continue$/i,
+    /^and\??$/i,
+    /^ok(,| and| so)? (what|how|tell)/i,
+    /keep going/i,
+    /anything else/i,
+    /mais (detalhes?|informaç)/i,
+    /conta(r|-me) mais/i,
+    /^mais$/i,
+    /o que mais/i,
+];
+
+/** Context-aware intents that support _more follow-up variants */
+const EXPANDABLE_INTENTS = new Set(['timeline', 'pricing', 'maintenance', 'services']);
+
+export function findBestMatch(input: string, lastIntent?: string | null): string {
     const lowerInput = input.toLowerCase().trim();
+
+    // 0. Follow-up detection — expand on last topic if user asks for more
+    if (lastIntent && EXPANDABLE_INTENTS.has(lastIntent)) {
+        if (FOLLOWUP_PATTERNS.some(p => p.test(lowerInput))) {
+            return `${lastIntent}_more`;
+        }
+    }
 
     // 1. Check for exact regex matches (highest priority)
     for (const matcher of QUESTION_MATCHERS) {
@@ -313,5 +292,3 @@ export function findBestMatch(input: string): string {
 
     return 'default';
 }
-
-export const INITIAL_MESSAGE = `👋 Olá! Como posso ajudá-lo hoje?`;

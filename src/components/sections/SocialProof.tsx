@@ -16,9 +16,9 @@ const companies = [
 ];
 
 const stats = [
-    { label: "Clientes Satisfeitos", value: "50+", icon: Users },
-    { label: "Receita Gerada", value: "$10M+", icon: TrendingUp },
-    { label: "Sucesso nos Projetos", value: "100%", icon: CheckCircle2 },
+    { label: "Disponibilidade", value: "24/7", icon: Users },
+    { label: "Receita de Clientes", value: "+10M€", icon: TrendingUp },
+    { label: "Entregas On-time", value: "100%", icon: CheckCircle2 },
 ];
 
 export function SocialProof() {

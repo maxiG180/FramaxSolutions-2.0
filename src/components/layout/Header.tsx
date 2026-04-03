@@ -29,15 +29,16 @@ export function Header() {
     return (
         <header
             className={cn(
-                "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
+                "sticky left-0 right-0 z-[9999] transition-all duration-300",
                 isScrolled
-                    ? "bg-background/80 backdrop-blur-md border-b border-border/50 py-3"
+                    ? "bg-background/95 backdrop-blur-md border-b border-border/50 py-3"
                     : "bg-transparent py-5",
             )}
+            style={{ top: 'env(safe-area-inset-top)' }}
         >
-            <div className="container mx-auto px-4 flex items-center justify-between">
+            <div className="container mx-auto px-4 flex items-center justify-between gap-4">
                 {/* Left - Logo */}
-                <Link href="/#hero" className="flex items-center z-10">
+                <Link href="/#hero" className="flex items-center shrink-0 z-10 transition-all duration-300">
                     <Image
                         src="/logos/framax-logo-white.png"
                         alt="Framax Solutions"
@@ -45,35 +46,38 @@ export function Header() {
                         height={200}
                         priority
                         style={{ width: 'auto', height: 'auto' }}
-                        className="w-48"
+                        className="w-32 sm:w-40 md:w-48 transition-all"
                     />
                 </Link>
 
                 {/* Center - Navigation (Desktop) */}
-                <nav className="hidden md:flex items-center gap-8 absolute left-1/2 -translate-x-1/2">
-                    <Link href="/#features" className="text-sm font-medium hover:text-primary transition-colors">
+                <nav className="hidden lg:flex flex-1 items-center justify-center gap-6 lg:gap-10">
+                    <Link href="/#features" className="text-sm font-semibold hover:text-primary transition-all hover:scale-105 active:scale-95">
                         {t.header.features}
                     </Link>
-                    <Link href="/#portfolio" className="text-sm font-medium hover:text-primary transition-colors">
-                        {t.header.portfolio}
+                    <Link href="/about" className="text-sm font-semibold hover:text-primary transition-all hover:scale-105 active:scale-95">
+                        {t.header.about}
                     </Link>
-                    <Link href="/#booking" className="bg-primary text-primary-foreground px-5 py-2 rounded-full text-sm font-medium hover:bg-primary/90 transition-all hover:scale-105 active:scale-95">
-                        {t.header.getStarted}
+                    <Link href="/#portfolio" className="text-sm font-semibold hover:text-primary transition-all hover:scale-105 active:scale-95">
+                        {t.header.portfolio}
                     </Link>
                 </nav>
 
-                {/* Right - Language Switcher & Mobile Menu Button */}
-                <div className="flex items-center gap-4">
-                    <div className="hidden md:block">
+                {/* Right - Language Switcher & Actions */}
+                <div className="flex items-center gap-3 lg:gap-6 shrink-0">
+                    <div className="hidden md:flex items-center gap-4">
                         <LanguageSwitcher />
+                        <Link href="/#booking" className="hidden lg:block bg-primary text-primary-foreground px-6 py-2.5 rounded-full text-sm font-bold hover:bg-primary/90 transition-all hover:scale-105 active:scale-95 shadow-lg shadow-primary/20">
+                            {t.header.getStarted}
+                        </Link>
                     </div>
 
                     <button
-                        className="md:hidden p-2"
+                        className="lg:hidden p-2 text-white hover:bg-white/10 rounded-full transition-colors"
                         onClick={() => setIsMobileMenuOpen(prev => !prev)}
                         aria-label="Toggle menu"
                     >
-                        {isMobileMenuOpen ? <X /> : <Menu />}
+                        {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
                     </button>
                 </div>
             </div>
@@ -87,6 +91,13 @@ export function Header() {
                         onClick={closeMobileMenu}
                     >
                         {t.header.features}
+                    </Link>
+                    <Link
+                        href="/about"
+                        className="text-sm font-medium p-2 hover:bg-muted rounded-md"
+                        onClick={closeMobileMenu}
+                    >
+                        {t.header.about}
                     </Link>
                     <Link
                         href="/#portfolio"

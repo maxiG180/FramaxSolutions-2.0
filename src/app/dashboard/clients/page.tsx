@@ -186,8 +186,7 @@ export default function ClientsPage() {
                 .eq('id', editingId);
 
             if (error) {
-                console.error('Error updating client:', error);
-                console.error('Error details:', JSON.stringify(error, null, 2));
+                console.error('Error updating client:', error.message);
                 alert(`Error updating client: ${error.message || 'Unknown error'}`);
             } else {
                 setClients(clients.map(c => c.id === editingId ? { ...c, ...formData } as Client : c));
@@ -213,12 +212,8 @@ export default function ClientsPage() {
                 .single();
 
             if (error) {
-                console.error('Error adding client:', error);
-                console.error('Error details:', JSON.stringify(error, null, 2));
-                console.error('Error message:', error.message);
-                console.error('Error hint:', error.hint);
-                console.error('Error details object:', error.details);
-                alert(`Error adding client: ${error.message || 'Unknown error. Check console for details.'}`);
+                console.error('Error adding client:', error.message);
+                alert(`Error adding client: ${error.message || 'Unknown error.'}`);
             } else {
                 // Create folder in Docs page for the new client
                 console.log('🗂️ Starting folder creation in Docs for new client...');
@@ -227,9 +222,6 @@ export default function ClientsPage() {
                 // Create folder in Docs page automatically
                 try {
                     const clientFolderName = formData.name || `Client ${data.id}`;
-                    console.log('📁 Creating Docs folder:', clientFolderName);
-
-                    // Get current user
                     const { data: { user } } = await supabase.auth.getUser();
 
                     if (user) {
@@ -320,12 +312,9 @@ export default function ClientsPage() {
                                 if (!folderData) console.warn('  Missing: folderData');
                             }
                         }
-                    } else {
-                        console.warn('⚠️ No authenticated user found, skipping folder creation');
                     }
                 } catch (folderError) {
-                    console.error('❌ Exception while creating client folder:', folderError);
-                    // Don't fail the client creation if folder creation fails
+                    console.error('Exception while creating client folder:', folderError);
                 }
 
                 setClients([data, ...clients]);

@@ -28,7 +28,7 @@ export function Features() {
 
     // Refs for in-view animations
     const containerRef = useRef(null);
-    const isInView = useInView(containerRef, { once: true, margin: "-100px" });
+    const isInView = useInView(containerRef, { once: true, amount: 0.1 });
 
     // Notification cycling — paused when section is off-screen
     useEffect(() => {
@@ -195,7 +195,7 @@ export function Features() {
                                 <div
                                     className="absolute top-[130px] left-[55%] z-20 animate-click-cursor"
                                 >
-                                    <MousePointerClick className="w-8 h-8 text-white fill-black drop-shadow-xl" />
+                                    <MousePointerClick className="w-8 h-8 text-foreground fill-black drop-shadow-xl" />
                                 </div>
                             </div>
                         </div>
@@ -231,7 +231,7 @@ export function Features() {
                                         {/* Sidebar */}
                                         <div className="w-16 h-full border-r border-white/5 flex flex-col items-center py-4 gap-4 bg-[#0f172a]/50">
                                             <div className="w-8 h-8 rounded-lg bg-emerald-500 flex items-center justify-center shadow-lg shadow-emerald-500/20">
-                                                <LayoutDashboard className="w-4 h-4 text-white" />
+                                                <LayoutDashboard className="w-4 h-4 text-foreground" />
                                             </div>
                                             <div className="w-full h-px bg-white/5 my-1" />
                                             {[1, 2, 3].map(i => (
@@ -254,14 +254,14 @@ export function Features() {
                                             <div className="grid grid-cols-2 gap-3">
                                                 <div className="bg-[#1e293b]/50 rounded-xl p-3 border border-white/5">
                                                     <div className="text-[10px] text-slate-400 mb-1" suppressHydrationWarning>{t.features.monthlyRevenue}</div>
-                                                    <div className="text-lg font-bold text-white mb-1">€12.450</div>
+                                                    <div className="text-lg font-bold text-foreground mb-1">€12.450</div>
                                                     <div className="h-1 w-full bg-white/5 rounded-full overflow-hidden">
                                                         <div className="h-full w-[70%] bg-emerald-500 rounded-full" />
                                                     </div>
                                                 </div>
                                                 <div className="bg-[#1e293b]/50 rounded-xl p-3 border border-white/5">
                                                     <div className="text-[10px] text-slate-400 mb-1" suppressHydrationWarning>{t.features.newClients}</div>
-                                                    <div className="text-lg font-bold text-white mb-1">+124</div>
+                                                    <div className="text-lg font-bold text-foreground mb-1">+124</div>
                                                     <div className="h-1 w-full bg-white/5 rounded-full overflow-hidden">
                                                         <div className="h-full w-[45%] bg-blue-500 rounded-full" />
 
@@ -298,7 +298,7 @@ export function Features() {
                         onMouseEnter={handleSeoHover}
                     >
                         <div className="relative z-10 w-full md:w-3/5">
-                            <div className="mb-4 inline-flex rounded-lg bg-white/10 p-3 text-white">
+                            <div className="mb-4 inline-flex rounded-lg bg-white/10 p-3 text-foreground">
                                 <Search className="h-6 w-6" />
                             </div>
                             <h3 className="mb-2 text-2xl font-bold text-foreground relative z-10" suppressHydrationWarning>{t.features.seoTitle}</h3>
@@ -407,8 +407,8 @@ export function Features() {
                                                 <item.icon className={`w-4 h-4 ${item.color.replace('bg-', 'text-')}`} />
                                             </div>
                                             <div className="flex-1 min-w-0">
-                                                <p className="text-xs font-medium text-white/90 truncate" suppressHydrationWarning>{item.text}</p>
-                                                <p className="text-[10px] text-white/50" suppressHydrationWarning>{item.subtext}</p>
+                                                <p className="text-xs font-medium text-foreground/90 truncate" suppressHydrationWarning>{item.text}</p>
+                                                <p className="text-[10px] text-foreground/50" suppressHydrationWarning>{item.subtext}</p>
                                             </div>
                                             <div className="w-5 h-5 rounded-full bg-green-500/20 flex items-center justify-center">
                                                 <CheckCircle className="w-3 h-3 text-green-500" />
