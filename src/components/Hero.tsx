@@ -49,7 +49,7 @@ const Hero = () => {
   return (
     <section
       ref={containerRef}
-      className="relative min-h-screen flex items-center bg-background py-20 sm:py-24 lg:py-32 overflow-hidden"
+      className="relative min-h-screen min-h-[100dvh] flex items-center bg-background py-20 sm:py-24 lg:py-32 overflow-hidden"
     >
       {/* Background Elements */}
       <div className="absolute inset-0 pointer-events-none">
@@ -145,7 +145,7 @@ const Hero = () => {
                 className="relative bg-gradient-to-br from-blue-500/10 to-blue-500/5 backdrop-blur-xl rounded-xl border border-blue-500/20 p-4 overflow-hidden"
               >
                 <TrendingUp className="w-8 h-8 text-blue-500 mb-2" />
-                <div className="text-xl font-bold text-white mb-1">{t.hero.heroVisuals.activeGrowth}</div>
+                <div className="text-xl font-bold text-foreground mb-1">{t.hero.heroVisuals.activeGrowth}</div>
                 <div className="text-xs text-blue-400 font-medium">{t.hero.heroVisuals.trendingUp}</div>
 
                 {/* Simple arrow going up — CSS animation */}
@@ -166,7 +166,7 @@ const Hero = () => {
                 className="relative bg-gradient-to-br from-yellow-500/10 to-yellow-500/5 backdrop-blur-xl rounded-xl border border-yellow-500/20 p-4 overflow-hidden"
               >
                 <Zap className="w-8 h-8 text-yellow-500 mb-2" />
-                <div className="text-xs font-semibold text-white mb-1">{t.hero.alwaysOpen}</div>
+                <div className="text-xs font-semibold text-foreground mb-1">{t.hero.alwaysOpen}</div>
                 <div className="text-[10px] text-yellow-400 font-mono font-bold">{t.hero.alwaysOnline}</div>
 
                 {/* Speed bars animation — CSS only */}
@@ -199,7 +199,7 @@ const Hero = () => {
                       <div className="p-1 bg-primary/20 rounded">
                         <Bell className="w-3 h-3 text-primary" />
                       </div>
-                      <span className="text-[10px] font-semibold text-white">{t.hero.heroVisuals.recentActivity}</span>
+                      <span className="text-[10px] font-semibold text-foreground">{t.hero.heroVisuals.recentActivity}</span>
                     </div>
                   </div>
 
@@ -248,7 +248,7 @@ const Hero = () => {
                 className="relative bg-gradient-to-br from-orange-500/10 to-orange-500/5 backdrop-blur-xl rounded-xl border border-orange-500/20 p-4 overflow-hidden"
               >
                 <TrendingUp className="w-8 h-8 text-orange-500 mb-2" />
-                <div className="text-xs font-semibold text-white mb-1">{t.hero.heroVisuals.revenueScale}</div>
+                <div className="text-xs font-semibold text-foreground mb-1">{t.hero.heroVisuals.revenueScale}</div>
                 <div className="text-xl font-bold text-orange-400">{t.hero.heroVisuals.scaleStatus}</div>
 
                 {/* Growth chart — CSS animation */}
@@ -282,7 +282,7 @@ const Hero = () => {
                       <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
                       <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
                     </svg>
-                    <span className="text-xs font-semibold text-white">{t.hero.reviews}</span>
+                    <span className="text-xs font-semibold text-foreground">{t.hero.reviews}</span>
                   </div>
 
                   <div className="flex items-baseline gap-1.5">
@@ -353,7 +353,7 @@ const Hero = () => {
                 <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                 <TrendingUp className="w-10 h-10 text-blue-500 mb-2 relative z-10" />
                 <div className="relative z-10">
-                  <div className="text-lg font-bold text-white mb-1">{t.hero.heroVisuals.activeGrowth}</div>
+                  <div className="text-lg font-bold text-foreground mb-1">{t.hero.heroVisuals.activeGrowth}</div>
                   <div className="text-sm font-medium text-blue-400">{t.hero.heroVisuals.trendingUp}</div>
                 </div>
 
@@ -383,7 +383,7 @@ const Hero = () => {
                       <div className="p-1.5 bg-primary/20 rounded-lg">
                         <Bell className="w-4 h-4 text-primary" />
                       </div>
-                      <span className="text-sm font-semibold text-white">{t.hero.heroVisuals.recentActivity}</span>
+                      <span className="text-sm font-semibold text-foreground">{t.hero.heroVisuals.recentActivity}</span>
                     </div>
                     <div className="flex gap-1">
                       <div className="w-2 h-2 rounded-full bg-red-500/60" />
@@ -455,7 +455,7 @@ const Hero = () => {
                 <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                 <Zap className="w-10 h-10 text-yellow-500 mb-2 relative z-10" />
                 <div className="relative z-10">
-                  <div className="text-sm font-semibold text-white mb-1">{t.hero.alwaysOpen}</div>
+                  <div className="text-sm font-semibold text-foreground mb-1">{t.hero.alwaysOpen}</div>
                   <div className="text-xs text-yellow-400 font-mono font-bold">{t.hero.alwaysOnline}</div>
                 </div>
                 {/* Speed bars animation — CSS only */}
@@ -483,7 +483,7 @@ const Hero = () => {
                 <div className="absolute inset-0 bg-gradient-to-br from-orange-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                 <TrendingUp className="w-10 h-10 text-orange-500 mb-2 relative z-10" />
                 <div className="relative z-10">
-                  <div className="text-sm font-semibold text-white mb-1">{t.hero.heroVisuals.revenueScale}</div>
+                  <div className="text-sm font-semibold text-foreground mb-1">{t.hero.heroVisuals.revenueScale}</div>
                   <div className="text-2xl font-bold text-orange-400">{t.hero.heroVisuals.scaleStatus}</div>
                 </div>
                 {/* Growth chart — CSS animation */}
@@ -519,7 +519,7 @@ const Hero = () => {
                       <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
                       <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
                     </svg>
-                    <span className="text-sm font-semibold text-white">{t.hero.reviews}</span>
+                    <span className="text-sm font-semibold text-foreground">{t.hero.reviews}</span>
                   </div>
 
                   <div className="flex items-baseline gap-2">

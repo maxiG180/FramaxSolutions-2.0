@@ -19,7 +19,7 @@ export function LinkedInCard({ name, role, description, linkedinUrl, imageUrl, v
     return (
         <motion.div
             whileHover={{ y: -5 }}
-            className="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm transition-all hover:bg-white/10 hover:shadow-2xl hover:shadow-blue-500/10"
+            className="group relative overflow-hidden rounded-2xl border border-border bg-muted/30 p-6 backdrop-blur-sm transition-all hover:bg-muted/50 hover:shadow-2xl hover:shadow-blue-500/10"
         >
             <div className="flex flex-col md:flex-row gap-6">
                 {/* Image Section */}
@@ -43,8 +43,8 @@ export function LinkedInCard({ name, role, description, linkedinUrl, imageUrl, v
                     <div>
                         <div className="flex items-start justify-between">
                             <div>
-                                <h3 className="text-xl font-bold text-white md:text-2xl">{name}</h3>
-                                <p className="text-sm font-medium text-blue-400">{role}</p>
+                                <h3 className="text-xl font-bold text-foreground md:text-2xl">{name}</h3>
+                                <p className="text-sm font-medium text-primary">{role}</p>
                             </div>
                             <a
                                 href={linkedinUrl}
@@ -56,7 +56,7 @@ export function LinkedInCard({ name, role, description, linkedinUrl, imageUrl, v
                                 {isGithub ? <Github size={20} /> : <Linkedin size={20} />}
                             </a>
                         </div>
-                        <p className="mt-4 line-clamp-4 text-sm leading-relaxed text-white/70">
+                        <p className="mt-4 line-clamp-4 text-sm leading-relaxed text-muted-foreground">
                             {description}
                         </p>
                     </div>
