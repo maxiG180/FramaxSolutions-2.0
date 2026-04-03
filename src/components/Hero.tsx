@@ -49,7 +49,7 @@ const Hero = () => {
   return (
     <section
       ref={containerRef}
-      className="relative min-h-screen min-h-[100dvh] flex items-center bg-background py-20 sm:py-24 lg:py-32 overflow-hidden"
+      className="relative min-h-[100dvh] flex items-center bg-background py-20 sm:py-24 lg:py-32 overflow-hidden"
     >
       {/* Background Elements */}
       <div className="absolute inset-0 pointer-events-none">

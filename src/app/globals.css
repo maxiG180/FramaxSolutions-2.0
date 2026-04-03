@@ -18,25 +18,12 @@
     /* Violet 400 */
     --accent-foreground: #ffffff;
 
-    color-scheme: dark light;
-}
-
-@media (prefers-color-scheme: light) {
-    :root {
-        --background: #ffffff;
-        --foreground: #171717;
-
-        --primary: #2563eb;
-        /* Blue 600 */
-        --secondary: #ec4899;
-        /* Pink 500 */
-        --accent: #8b5cf6;
-        /* Violet 500 */
-    }
+    color-scheme: dark;
 }
 
 html {
     overflow-x: hidden;
+    background-color: #0a0a0a;
 }
 
 body {
@@ -45,7 +32,15 @@ body {
     font-family: var(--font-sans), Arial, Helvetica, sans-serif;
     -webkit-text-size-adjust: 100%;
     /* Prevents iOS from auto-scaling text on orientation change */
+    padding-top: env(safe-area-inset-top);
     padding-bottom: env(safe-area-inset-bottom);
+}
+
+@media (prefers-color-scheme: light) {
+    :root {
+        --background: #0a0a0a;
+        --foreground: #ededed;
+    }
 }
 
 @media (prefers-reduced-motion: no-preference) {

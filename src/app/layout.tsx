@@ -44,12 +44,13 @@ export const metadata: Metadata = {
   },
   other: {
     "format-detection": "telephone=no, date=no, email=no, address=no",
+    "supported-color-schemes": "dark",
   },
 };
 
 export const viewport = {
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: light)", color: "#0a0a0a" },
     { media: "(prefers-color-scheme: dark)", color: "#0a0a0a" },
   ],
   width: "device-width",
@@ -63,8 +64,21 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="scroll-smooth">
+    <html lang="en" className="scroll-smooth dark" suppressHydrationWarning>
       <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                var ua = navigator.userAgent;
+                var isLinkedIn = ua.indexOf('LinkedInApp') > -1 || ua.indexOf('LinkedIn') > -1;
+                if (isLinkedIn && /Android/i.test(ua)) {
+                  window.location.href = 'intent://' + window.location.host + window.location.pathname + window.location.search + '#Intent;scheme=https;package=com.android.chrome;end';
+                }
+              })();
+            `,
+          }}
+        />
         {/* dns-prefetch for analytics — non-blocking */}
         <link rel="dns-prefetch" href="https://a.plerdy.com" />
         <link rel="dns-prefetch" href="https://vitals.vercel-insights.com" />
