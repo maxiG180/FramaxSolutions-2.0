@@ -73,7 +73,7 @@ export function QuoteViewModal({ isOpen, onClose, quoteId, documentType = 'quote
         expiry_date: document.expiry_date,
         items: document.items || [],
         subtotal: document.subtotal || 0,
-        tax_rate: document.tax_rate || 0.23,
+        tax_rate: document.tax_rate ?? 0,
         tax_amount: document.tax_amount || 0,
         total: document.total || 0,
         notes: document.notes,

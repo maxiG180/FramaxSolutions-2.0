@@ -138,7 +138,7 @@ export async function POST(request: NextRequest) {
                 expiry_date: document.expiry_date,
                 items: document.items || [],
                 subtotal: document.subtotal || 0,
-                tax_rate: document.tax_rate || 0.23,
+                tax_rate: document.tax_rate ?? 0,
                 tax_amount: document.tax_amount || 0,
                 total: document.total || 0,
                 notes: document.notes,
@@ -181,7 +181,7 @@ export async function POST(request: NextRequest) {
                 subtotal: 'Subtotal',
                 tax: 'IVA',
                 notesTerms: 'Notas / Termos',
-                legalNote: 'Este orçamento não constitui fatura. Após aceitação, será emitida fatura oficial através do Portal das Finanças.',
+                legalNote: 'Este orçamento não constitui fatura. Após aceitação, será emitido recibo de ato isolado através do Portal das Finanças.',
                 invoiceLegalNote: 'Esta fatura foi processada por computador e é válida sem assinatura.',
                 nif: 'NIF',
             };

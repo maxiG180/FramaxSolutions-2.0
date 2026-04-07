@@ -186,6 +186,7 @@ export async function POST(request: NextRequest) {
 
         const data = validation.data;
 
+        // TODO: Migrar para invoice_items table (normalized items instead of jsonb)
         // 4. Calculate totals
         const subtotal = data.items.reduce((sum, item) => sum + (item.quantity * item.price), 0);
         const taxRate = data.taxRate || 0.23;
@@ -236,7 +237,7 @@ export async function POST(request: NextRequest) {
                 client_language: data.clientLanguage || 'pt',
                 invoice_date: data.invoiceDate,
                 due_date: data.dueDate || null,
-                items: data.items,
+                items: data.items, // TODO: Migrar para invoice_items table
                 subtotal: subtotal,
                 tax_rate: taxRate,
                 tax_amount: taxAmount,

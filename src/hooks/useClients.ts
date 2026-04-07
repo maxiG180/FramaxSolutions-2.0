@@ -12,6 +12,7 @@ export interface Client {
     contact_person?: string;
     country?: string;
     address?: string;
+    nif?: string;
     preferred_language?: 'pt' | 'en';
 }
 

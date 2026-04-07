@@ -26,6 +26,16 @@ interface Client {
     preferred_language?: 'pt' | 'en';
 }
 
+// Helper function to determine file type category from file name
+function getFileType(fileName: string): string {
+    const ext = fileName.split('.').pop()?.toLowerCase();
+    if (['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'].includes(ext || '')) return 'image';
+    if (['mp4', 'webm', 'ogg', 'mov'].includes(ext || '')) return 'video';
+    if (['js', 'ts', 'tsx', 'jsx', 'py', 'java', 'cpp', 'c', 'html', 'css'].includes(ext || '')) return 'code';
+    if (ext === 'pdf') return 'pdf';
+    return 'document';
+}
+
 export default function ClientsPage() {
     const supabase = createClient();
     const [clients, setClients] = useState<Client[]>([]);
@@ -42,6 +52,14 @@ export default function ClientsPage() {
     const [isTransitioning, setIsTransitioning] = useState(false);
     const [justAdvanced, setJustAdvanced] = useState(false);
     const totalSteps = 3;
+
+    // Logo upload metadata
+    const [logoMetadata, setLogoMetadata] = useState<{
+        storage_path: string;
+        file_name: string;
+        file_size: number;
+        file_type: string;
+    } | null>(null);
 
     // Form State
     const [formData, setFormData] = useState<Partial<Client>>({
@@ -86,6 +104,7 @@ export default function ClientsPage() {
 
     const resetForm = () => {
         setFormData({ name: "", email: "", phone: "", website: "", logo: "", contact_person: "", country: "", address: "", preferred_language: "pt" });
+        setLogoMetadata(null);
         setEditingId(null);
         setCurrentStep(1);
         setIsModalOpen(false);
@@ -197,27 +216,101 @@ export default function ClientsPage() {
                 alert(`Error adding client: ${error.message || 'Unknown error.'}`);
             } else {
                 // Create folder in Docs page for the new client
+                console.log('🗂️ Starting folder creation in Docs for new client...');
+                console.log('Client data:', data);
+
+                // Create folder in Docs page automatically
                 try {
                     const clientFolderName = formData.name || `Client ${data.id}`;
                     const { data: { user } } = await supabase.auth.getUser();
 
                     if (user) {
-                        const folderPayload: any = {
-                            user_id: user.id,
-                            name: clientFolderName,
-                            color: 'text-blue-400',
-                            bg: 'bg-blue-400/10',
-                            client_id: data.id,
-                        };
-
-                        const { error: folderError } = await supabase
+                        const { data: folderData, error: folderError } = await supabase
                             .from('folders')
-                            .insert(folderPayload)
+                            .insert({
+                                user_id: user.id,
+                                name: clientFolderName,
+                                color: 'text-blue-400',
+                                bg: 'bg-blue-400/10',
+                                client_id: data.id  // Link folder to client (ON DELETE CASCADE)
+                            })
                             .select()
                             .single();
 
                         if (folderError) {
-                            console.error('Could not create client folder in Docs:', folderError.message);
+                            console.error('❌ Could not create client folder in Docs:', folderError);
+                            console.error('Error message:', folderError.message);
+                            console.error('Error details:', folderError.details);
+                            console.error('Error hint:', folderError.hint);
+                            console.error('Payload sent:', {
+                                user_id: user.id,
+                                name: clientFolderName,
+                                color: 'text-blue-400',
+                                bg: 'bg-blue-400/10',
+                                client_id: data.id
+                            });
+                            // Don't fail the client creation if folder creation fails
+                        } else {
+                            console.log('✅ Successfully created Docs folder for client:', clientFolderName);
+                            console.log('📁 Folder will be auto-deleted when client is deleted (CASCADE)');
+                            console.log('🔄 Now checking if logo needs to be added to folder...');
+
+                            // If client has a logo, create a file entry in the folder
+                            console.log('🔍 Checking logo metadata:', {
+                                hasLogoMetadata: !!logoMetadata,
+                                logoMetadataDetails: logoMetadata,
+                                hasFolderData: !!folderData,
+                                folderDataId: folderData?.id
+                            });
+
+                            if (logoMetadata && folderData) {
+                                console.log('🖼️ Adding logo to folder...');
+
+                                // Convert file name to file type category (image/video/pdf/code/document)
+                                const fileTypeCategory = getFileType(logoMetadata.file_name);
+                                console.log('📋 File type category:', fileTypeCategory, '(from MIME type:', logoMetadata.file_type + ')');
+
+                                console.log('Inserting file with data:', {
+                                    user_id: user.id,
+                                    folder_id: folderData.id,
+                                    name: logoMetadata.file_name,
+                                    type: fileTypeCategory,  // Use category, not MIME type
+                                    size: logoMetadata.file_size,
+                                    storage_path: `client-logos/${logoMetadata.storage_path}`
+                                });
+
+                                const { data: fileData, error: fileError } = await supabase
+                                    .from('files')
+                                    .insert({
+                                        user_id: user.id,
+                                        folder_id: folderData.id,
+                                        name: logoMetadata.file_name,
+                                        type: fileTypeCategory,  // Use category 'image', not MIME type 'image/png'
+                                        size: logoMetadata.file_size,
+                                        storage_path: `client-logos/${logoMetadata.storage_path}`
+                                    })
+                                    .select()
+                                    .single();
+
+                                if (fileError) {
+                                    console.error('❌ Could not add logo to folder:', fileError);
+                                    console.error('Error details:', fileError.message, fileError.details, fileError.hint);
+                                } else {
+                                    console.log('✅ Logo added to folder successfully!');
+                                    console.log('📄 File record created:', {
+                                        id: fileData.id,
+                                        name: fileData.name,
+                                        type: fileData.type,
+                                        storage_path: fileData.storage_path,
+                                        folder_id: fileData.folder_id
+                                    });
+                                    console.log('🔍 To verify: Go to Docs → Open client folder → Logo should appear in the list');
+                                }
+                            } else {
+                                console.warn('⚠️ Logo not added to folder - logoMetadata or folderData missing');
+                                if (!logoMetadata) console.warn('  Missing: logoMetadata');
+                                if (!folderData) console.warn('  Missing: folderData');
+                            }
                         }
                     }
                 } catch (folderError) {
@@ -231,7 +324,9 @@ export default function ClientsPage() {
     };
 
     const handleDeleteClient = async (id: number) => {
-        if (confirm("Are you sure you want to delete this client?")) {
+        const clientName = clients.find(c => c.id === id)?.name || 'this client';
+
+        if (confirm(`Tem a certeza que pretende apagar "${clientName}"?\n\n⚠️ Isto irá também apagar:\n• Pasta associada no Docs\n• Todos os ficheiros da pasta\n• Projectos associados\n\nEsta acção não pode ser revertida.`)) {
             const { error } = await supabase
                 .from('clients')
                 .delete()
@@ -239,8 +334,10 @@ export default function ClientsPage() {
 
             if (error) {
                 console.error('Error deleting client:', error);
-                alert('Error deleting client');
+                alert('Erro ao apagar cliente. Verifique a consola para detalhes.');
             } else {
+                console.log(`✅ Cliente "${clientName}" apagado com sucesso`);
+                console.log('📁 Pastas associadas foram automaticamente apagadas (CASCADE)');
                 setClients(clients.filter(c => c.id !== id));
             }
         }
@@ -253,12 +350,14 @@ export default function ClientsPage() {
                     <h1 className="text-3xl font-bold mb-2">Clients</h1>
                     <p className="text-white/60">Manage your client relationships.</p>
                 </div>
-                <button
-                    onClick={handleOpenAdd}
-                    className="bg-blue-600 text-white px-4 py-2 rounded-lg font-bold flex items-center gap-2 hover:bg-blue-500 transition-colors shadow-lg shadow-blue-500/20"
-                >
-                    <Plus className="w-4 h-4" /> Add Client
-                </button>
+                <div className="flex items-center gap-3">
+                    <button
+                        onClick={handleOpenAdd}
+                        className="bg-blue-600 text-white px-4 py-2 rounded-lg font-bold flex items-center gap-2 hover:bg-blue-500 transition-colors shadow-lg shadow-blue-500/20"
+                    >
+                        <Plus className="w-4 h-4" /> Add Client
+                    </button>
+                </div>
             </div>
 
             {/* Search and Filter */}
@@ -485,7 +584,23 @@ export default function ClientsPage() {
                                                     <div className="relative group">
                                                         <div className="w-32 h-32 rounded-full bg-black/40 border-2 border-dashed border-white/20 flex items-center justify-center overflow-hidden relative">
                                                             {formData.logo ? (
-                                                                <img src={formData.logo} alt="Preview" className="w-full h-full object-cover" />
+                                                                <>
+                                                                    <img
+                                                                        src={formData.logo}
+                                                                        alt="Preview"
+                                                                        className="w-full h-full object-cover"
+                                                                        onLoad={() => console.log('✅ Preview image loaded successfully')}
+                                                                        onError={(e) => {
+                                                                            console.error('❌ Preview image failed to load:', formData.logo);
+                                                                            console.error('Image error event:', e);
+                                                                        }}
+                                                                    />
+                                                                    <div className="absolute bottom-1 right-1 bg-green-500 rounded-full p-1">
+                                                                        <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                                                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                                                        </svg>
+                                                                    </div>
+                                                                </>
                                                             ) : (
                                                                 <div className="flex flex-col items-center gap-2 text-white/20">
                                                                     <ImageIcon className="w-8 h-8" />
@@ -507,47 +622,73 @@ export default function ClientsPage() {
                                                                         className="hidden"
                                                                         onChange={async (e) => {
                                                                             const file = e.target.files?.[0];
-                                                                            if (!file) return;
+                                                                            if (!file) {
+                                                                                console.log('⚠️ No file selected');
+                                                                                return;
+                                                                            }
+
+                                                                            console.log('📤 Starting logo upload:', {
+                                                                                name: file.name,
+                                                                                size: file.size,
+                                                                                type: file.type
+                                                                            });
 
                                                                             const fileExt = file.name.split('.').pop();
                                                                             const fileName = `${Math.random()}.${fileExt}`;
                                                                             const filePath = `${fileName}`;
 
+                                                                            console.log('📁 Upload path:', filePath);
                                                                             setLoading(true);
-                                                                            const { error: uploadError } = await supabase.storage
-                                                                                .from('client-logos')
-                                                                                .upload(filePath, file);
 
-                                                                            if (uploadError) {
-                                                                                console.error('Error uploading image:', uploadError);
-                                                                                alert('Error uploading image. Make sure "client-logos" bucket exists.');
+                                                                            try {
+                                                                                const { error: uploadError } = await supabase.storage
+                                                                                    .from('client-logos')
+                                                                                    .upload(filePath, file);
+
+                                                                                if (uploadError) {
+                                                                                    console.error('❌ Error uploading image:', uploadError);
+                                                                                    alert('Error uploading image. Make sure "client-logos" bucket exists.');
+                                                                                    setLoading(false);
+                                                                                    return;
+                                                                                }
+
+                                                                                console.log('✅ Upload successful, getting public URL...');
+
+                                                                                const { data: { publicUrl } } = supabase.storage
+                                                                                    .from('client-logos')
+                                                                                    .getPublicUrl(filePath);
+
+                                                                                console.log('🔗 Public URL:', publicUrl);
+
+                                                                                // Save logo metadata for later file creation
+                                                                                const metadata = {
+                                                                                    storage_path: filePath,
+                                                                                    file_name: file.name,
+                                                                                    file_size: file.size,
+                                                                                    file_type: file.type
+                                                                                };
+                                                                                console.log('📸 Logo uploaded, saving metadata:', metadata);
+                                                                                setLogoMetadata(metadata);
+
+                                                                                // Use functional update to avoid stale closure
+                                                                                setFormData(prev => {
+                                                                                    console.log('🖼️ Setting preview URL in formData');
+                                                                                    return { ...prev, logo: publicUrl };
+                                                                                });
+
+                                                                                console.log('✅ Logo upload complete - preview should now be visible');
                                                                                 setLoading(false);
-                                                                                return;
+                                                                            } catch (error) {
+                                                                                console.error('❌ Exception during logo upload:', error);
+                                                                                alert(`Error uploading logo: ${error instanceof Error ? error.message : 'Unknown error'}`);
+                                                                                setLoading(false);
                                                                             }
-
-                                                                            const { data: { publicUrl } } = supabase.storage
-                                                                                .from('client-logos')
-                                                                                .getPublicUrl(filePath);
-
-                                                                            setFormData({ ...formData, logo: publicUrl });
-                                                                            setLoading(false);
                                                                         }}
                                                                     />
                                                                 </label>
                                                             )}
                                                         </div>
                                                     </div>
-                                                </div>
-
-                                                <div className="space-y-2">
-                                                    <label className="text-xs font-medium text-white/60 uppercase tracking-wider">Logo URL (Optional)</label>
-                                                    <input
-                                                        type="url"
-                                                        placeholder="https://example.com/logo.png"
-                                                        value={formData.logo || ""}
-                                                        onChange={e => setFormData({ ...formData, logo: e.target.value })}
-                                                        className="w-full bg-black border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-blue-500/50"
-                                                    />
                                                 </div>
 
                                                 <div className="space-y-2">

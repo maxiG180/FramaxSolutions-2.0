@@ -2,29 +2,32 @@
 
 import { useState, useEffect } from "react";
 import { Loader } from "@/components/ui/loader";
-import { Plus, MoreHorizontal, Phone, Mail, Trash2, X } from "lucide-react";
+import { Plus, MoreHorizontal, Phone, Mail, Trash2, X, RefreshCw } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-
-// Mock Data
-const INITIAL_LEADS = [
-    { id: 1, name: "TechStart Inc", contact: "Sarah Miller", value: "$15,000", status: "New", tag: "Redesign" },
-    { id: 2, name: "Coffee House", contact: "Mike Ross", value: "$5,000", status: "Contacted", tag: "SEO" },
-    { id: 3, name: "Legal Eagles", contact: "Jessica P.", value: "$25,000", status: "Proposal", tag: "App" },
-    { id: 4, name: "Fitness Pro", contact: "Tom Hardy", value: "$8,000", status: "Proposal", tag: "Web" },
-    { id: 5, name: "Bakery 101", contact: "Chef Gordon", value: "$3,000", status: "New", tag: "Social" },
-];
 
 const COLUMNS = ["New", "Contacted", "Proposal", "Won"];
 
-type Lead = typeof INITIAL_LEADS[0];
+interface Lead {
+    id: string | number;
+    name: string;
+    contact: string;
+    value: string;
+    status: string;
+    tag: string;
+    qualification?: string;
+    email?: string;
+    phone?: string;
+}
 
 export default function LeadsPage() {
-    const [leads, setLeads] = useState(INITIAL_LEADS);
+    const [leads, setLeads] = useState<Lead[]>([]);
     const [showAddModal, setShowAddModal] = useState(false);
     const [mounted, setMounted] = useState(false);
     const [loading, setLoading] = useState(true);
+    const [syncing, setSyncing] = useState(false);
     const [newLead, setNewLead] = useState({ name: "", contact: "", value: "", tag: "" });
-    const [draggedLead, setDraggedLead] = useState<number | null>(null);
+    const [draggedLead, setDraggedLead] = useState<string | number | null>(null);
+    const [error, setError] = useState<string | null>(null);
 
     const getColumnColor = (status: string) => {
         switch (status) {
@@ -36,13 +39,34 @@ export default function LeadsPage() {
         }
     };
 
-    const moveLead = (leadId: number, newStatus: string) => {
+    const moveLead = async (leadId: string | number, newStatus: string) => {
+        // Atualizar localmente primeiro para feedback imediato
         setLeads(leads.map(lead =>
             lead.id === leadId ? { ...lead, status: newStatus } : lead
         ));
+
+        // Sincronizar com Google Sheets
+        try {
+            const response = await fetch('/api/leads', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ leadId, newStatus })
+            });
+
+            const data = await response.json();
+
+            if (!data.success) {
+                console.error('Failed to update lead in Google Sheets:', data);
+                // Opcional: reverter a mudança local se falhar
+                setError(data.message || 'Falha ao atualizar no Google Sheets');
+            }
+        } catch (err) {
+            console.error('Error updating lead:', err);
+            setError('Erro ao sincronizar com Google Sheets');
+        }
     };
 
-    const deleteLead = (leadId: number) => {
+    const deleteLead = (leadId: string | number) => {
         setLeads(leads.filter(lead => lead.id !== leadId));
     };
 
@@ -63,18 +87,84 @@ export default function LeadsPage() {
         setShowAddModal(false);
     };
 
-    const handleDragStart = (leadId: number) => {
+    const handleDragStart = (e: React.DragEvent, leadId: string | number) => {
         setDraggedLead(leadId);
+
+        // Define a imagem de arrasto personalizada
+        const target = e.currentTarget as HTMLElement;
+        const clone = target.cloneNode(true) as HTMLElement;
+
+        // Estiliza o clone
+        clone.style.position = 'absolute';
+        clone.style.top = '-9999px';
+        clone.style.width = target.offsetWidth + 'px';
+        clone.style.opacity = '0.9';
+        clone.style.transform = 'rotate(3deg)';
+        clone.style.pointerEvents = 'none';
+
+        document.body.appendChild(clone);
+
+        // Define o clone como imagem de arrasto
+        e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.setDragImage(clone, e.nativeEvent.offsetX, e.nativeEvent.offsetY);
+
+        // Remove o clone após um frame
+        requestAnimationFrame(() => {
+            document.body.removeChild(clone);
+        });
     };
 
     const handleDragEnd = () => {
         setDraggedLead(null);
     };
 
+    const loadLeadsFromSheet = async () => {
+        try {
+            setLoading(true);
+            setError(null);
+
+            const response = await fetch('/api/leads');
+            const data = await response.json();
+
+            if (data.success) {
+                setLeads(data.data);
+            } else {
+                setError(data.message || 'Failed to load leads');
+                console.error('Error loading leads:', data.error);
+            }
+        } catch (err) {
+            setError('Failed to connect to Google Sheets');
+            console.error('Error fetching leads:', err);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const syncLeads = async () => {
+        try {
+            setSyncing(true);
+            setError(null);
+
+            const response = await fetch('/api/leads', { method: 'POST' });
+            const data = await response.json();
+
+            if (data.success) {
+                setLeads(data.data);
+            } else {
+                setError(data.message || 'Failed to sync leads');
+                console.error('Error syncing leads:', data.error);
+            }
+        } catch (err) {
+            setError('Failed to sync with Google Sheets');
+            console.error('Error syncing leads:', err);
+        } finally {
+            setSyncing(false);
+        }
+    };
+
     useEffect(() => {
         setMounted(true);
-        const timer = setTimeout(() => setLoading(false), 1000);
-        return () => clearTimeout(timer);
+        loadLeadsFromSheet();
     }, []);
 
     if (loading) return <Loader />;
@@ -91,14 +181,30 @@ export default function LeadsPage() {
             <div className="flex items-center justify-between mb-8">
                 <div>
                     <h1 className="text-3xl font-bold mb-2">Leads Pipeline</h1>
-                    <p className="text-white/60">Track your sales opportunities. Drag cards to move between stages.</p>
+                    <p className="text-white/60">
+                        {error ? (
+                            <span className="text-red-400">{error}</span>
+                        ) : (
+                            "Track your sales opportunities. Drag cards to move between stages."
+                        )}
+                    </p>
                 </div>
-                <button
-                    onClick={() => setShowAddModal(true)}
-                    className="bg-white text-black px-4 py-2 rounded-lg font-bold flex items-center gap-2 hover:bg-gray-200 transition-colors"
-                >
-                    <Plus className="w-4 h-4" /> Add Lead
-                </button>
+                <div className="flex gap-3">
+                    <button
+                        onClick={syncLeads}
+                        disabled={syncing}
+                        className="bg-white/10 text-white px-4 py-2 rounded-lg font-bold flex items-center gap-2 hover:bg-white/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                        <RefreshCw className={`w-4 h-4 ${syncing ? 'animate-spin' : ''}`} />
+                        {syncing ? 'Syncing...' : 'Sync from Sheets'}
+                    </button>
+                    <button
+                        onClick={() => setShowAddModal(true)}
+                        className="bg-white text-black px-4 py-2 rounded-lg font-bold flex items-center gap-2 hover:bg-gray-200 transition-colors"
+                    >
+                        <Plus className="w-4 h-4" /> Add Lead
+                    </button>
+                </div>
             </div>
 
             {/* Kanban Board */}
@@ -108,8 +214,15 @@ export default function LeadsPage() {
                         <div
                             key={column}
                             className="flex-1 flex flex-col gap-4 min-w-0"
-                            onDragOver={(e) => e.preventDefault()}
-                            onDrop={() => handleDrop(column)}
+                            onDragOver={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                            }}
+                            onDrop={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                handleDrop(column);
+                            }}
                         >
                             {/* Column Header */}
                             <div className="flex items-center justify-between p-2">
@@ -135,16 +248,17 @@ export default function LeadsPage() {
                                             initial={{ opacity: 0, scale: 0.8 }}
                                             animate={{ opacity: 1, scale: 1 }}
                                             exit={{ opacity: 0, scale: 0.8 }}
-                                            draggable
-                                            onDragStart={() => handleDragStart(lead.id)}
-                                            onDragEnd={handleDragEnd}
-                                            className={`bg-black/40 border border-white/10 p-4 rounded-xl hover:border-white/30 transition-all cursor-grab active:cursor-grabbing group ${draggedLead === lead.id ? "opacity-50 scale-95" : ""
+                                            draggable={true}
+                                            onDragStart={(e) => {
+                                                handleDragStart(e, lead.id);
+                                            }}
+                                            onDragEnd={(e) => {
+                                                handleDragEnd();
+                                            }}
+                                            className={`bg-black/40 border border-white/10 p-4 rounded-xl hover:border-white/30 transition-all cursor-grab active:cursor-grabbing group select-none ${draggedLead === lead.id ? "opacity-30" : ""
                                                 }`}
                                         >
-                                            <div className="flex items-start justify-between mb-3">
-                                                <span className="text-xs font-medium px-2 py-1 rounded bg-white/10 text-white/60">
-                                                    {lead.tag}
-                                                </span>
+                                            <div className="flex items-end justify-end mb-2">
                                                 <button
                                                     onClick={() => deleteLead(lead.id)}
                                                     className="text-white/20 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity"
@@ -157,7 +271,7 @@ export default function LeadsPage() {
                                             <p className="text-sm text-white/60 mb-4">{lead.contact}</p>
 
                                             <div className="flex items-center justify-between pt-3 border-t border-white/10">
-                                                <span className="font-mono font-bold text-green-400">{lead.value}</span>
+                                                <span className="text-sm text-white/60">{lead.qualification || 'Sem qualificação'}</span>
                                                 <div className="flex gap-2">
                                                     <button className="p-1.5 hover:bg-white/10 rounded-lg text-white/40 hover:text-white transition-colors">
                                                         <Phone className="w-3 h-3" />

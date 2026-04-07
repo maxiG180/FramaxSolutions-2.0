@@ -79,6 +79,12 @@ export function InvoiceModal({ isOpen, onClose, onInvoiceSaved, editingInvoiceId
     const [isBankingDetailsExpanded, setIsBankingDetailsExpanded] = useState(false);
     const [manuallyExpandedClient, setManuallyExpandedClient] = useState(false);
 
+    // Generate preview invoice number once and keep it stable during editing
+    const [previewInvoiceNumber] = useState(() => `FAT-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 1000)).padStart(3, '0')}`);
+
+    // Tax control
+    const [includeTax, setIncludeTax] = useState(true);
+
     const formatPhoneNumber = (value: string) => {
         if (!value) return '';
         const hasPlus = value.startsWith('+');
@@ -211,6 +217,7 @@ export function InvoiceModal({ isOpen, onClose, onInvoiceSaved, editingInvoiceId
         setClientEmail(client.email || "");
         setClientPhone(formatPhoneNumber(client.phone || ""));
         setClientContact(client.contact_person || "");
+        setClientNif(client.nif || "");
 
         let fullAddress = "";
         if (client.address && client.country) {
@@ -295,7 +302,7 @@ export function InvoiceModal({ isOpen, onClose, onInvoiceSaved, editingInvoiceId
     };
 
     const subtotal = calculateSubtotal();
-    const taxRate = 0.23;
+    const taxRate = includeTax ? 0.23 : 0; // 23% VAT or 0% if tax is excluded
     const tax = subtotal * taxRate;
     const total = subtotal + tax;
 
@@ -364,10 +371,9 @@ export function InvoiceModal({ isOpen, onClose, onInvoiceSaved, editingInvoiceId
         try {
             setExporting(true);
 
-            const tempInvoiceNumber = `FAT-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 1000)).padStart(3, '0')}`;
-
+            // Use the stable preview invoice number
             const pdfData: QuotePDFData = {
-                invoice_number: tempInvoiceNumber,
+                invoice_number: previewInvoiceNumber,
                 client_name: clientName,
                 client_contact: clientContact || undefined,
                 client_email: clientEmail || undefined,
@@ -415,7 +421,7 @@ export function InvoiceModal({ isOpen, onClose, onInvoiceSaved, editingInvoiceId
                 }
             });
 
-            const fileName = `Invoice-${tempInvoiceNumber}.pdf`;
+            const fileName = `Invoice-${previewInvoiceNumber}.pdf`;
             const url = URL.createObjectURL(pdfBlob);
             const a = document.createElement('a');
             a.href = url;
@@ -1079,6 +1085,27 @@ export function InvoiceModal({ isOpen, onClose, onInvoiceSaved, editingInvoiceId
                                                 </AnimatePresence>
                                             </div>
 
+                                            {/* Tax Toggle */}
+                                            <div className="flex items-center justify-between p-4 bg-white/5 rounded-lg border border-white/10">
+                                                <div className="flex flex-col gap-1">
+                                                    <span className="text-sm font-medium text-white">Incluir IVA (23%)</span>
+                                                    <span className="text-xs text-white/40">Adicionar imposto sobre o valor</span>
+                                                </div>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setIncludeTax(!includeTax)}
+                                                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                                                        includeTax ? 'bg-blue-600' : 'bg-white/10'
+                                                    }`}
+                                                >
+                                                    <span
+                                                        className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                                                            includeTax ? 'translate-x-6' : 'translate-x-1'
+                                                        }`}
+                                                    />
+                                                </button>
+                                            </div>
+
                                             {/* Notes - Collapsible */}
                                             <div className="space-y-4">
                                                 <button
@@ -1144,7 +1171,7 @@ export function InvoiceModal({ isOpen, onClose, onInvoiceSaved, editingInvoiceId
                                             <p className="text-gray-500 font-medium text-sm uppercase tracking-wide">
                                                 {previewT.quoteModal.invoiceNumber}
                                             </p>
-                                            <p className="text-gray-700 font-bold text-lg">FAT-{new Date().getFullYear()}-{String(Math.floor(Math.random() * 1000)).padStart(3, '0')}</p>
+                                            <p className="text-gray-700 font-bold text-lg">{previewInvoiceNumber}</p>
                                         </div>
                                     </div>
 
@@ -1206,10 +1233,12 @@ export function InvoiceModal({ isOpen, onClose, onInvoiceSaved, editingInvoiceId
                                                 <span>{previewT.quoteModal.subtotal}</span>
                                                 <span>{formatCurrency(subtotal)}</span>
                                             </div>
-                                            <div className="flex justify-between text-sm text-gray-500">
-                                                <span>{previewT.quoteModal.tax} ({taxRate * 100}%)</span>
-                                                <span>{formatCurrency(tax)}</span>
-                                            </div>
+                                            {includeTax && (
+                                                <div className="flex justify-between text-sm text-gray-500">
+                                                    <span>{previewT.quoteModal.tax} ({taxRate * 100}%)</span>
+                                                    <span>{formatCurrency(tax)}</span>
+                                                </div>
+                                            )}
                                             <div className="border-t border-gray-200 pt-2 flex justify-between text-lg font-bold text-blue-600">
                                                 <span>{previewT.quoteModal.total}</span>
                                                 <span>{formatCurrency(total)}</span>

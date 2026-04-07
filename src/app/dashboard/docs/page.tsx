@@ -485,11 +485,21 @@ export default function DocsPage() {
                                                 <Trash2 className="w-3 h-3" />
                                             </button>
                                         </div>
-                                        <div className="flex-1 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                                        <div className="flex-1 flex items-center justify-center overflow-hidden">
                                             {file.id.startsWith('temp-') ? (
                                                 <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
+                                            ) : file.type === "image" && file.url ? (
+                                                <div className="relative w-full h-full p-2">
+                                                    <img
+                                                        src={file.url}
+                                                        alt={file.name}
+                                                        className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-300"
+                                                    />
+                                                </div>
                                             ) : (
-                                                getFileIcon(file.type)
+                                                <div className="group-hover:scale-110 transition-transform duration-300">
+                                                    {getFileIcon(file.type)}
+                                                </div>
                                             )}
                                         </div>
                                         <div className="mt-4">
@@ -534,9 +544,15 @@ export default function DocsPage() {
                                                 )}
                                             >
                                                 <td className="p-4 flex items-center gap-3">
-                                                    <div className="w-8 h-8 flex items-center justify-center bg-white/5 rounded-lg group-hover:bg-white/10 transition-colors">
+                                                    <div className="w-8 h-8 flex items-center justify-center bg-white/5 rounded-lg group-hover:bg-white/10 transition-colors overflow-hidden">
                                                         {file.id.startsWith('temp-') ? (
                                                             <Loader2 className="w-4 h-4 animate-spin text-blue-500" />
+                                                        ) : file.type === "image" && file.url ? (
+                                                            <img
+                                                                src={file.url}
+                                                                alt={file.name}
+                                                                className="w-full h-full object-cover"
+                                                            />
                                                         ) : (
                                                             getFileIcon(file.type)
                                                         )}

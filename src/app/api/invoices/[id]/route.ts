@@ -210,11 +210,12 @@ export async function PUT(
         if (data.iban !== undefined) updateData.iban = data.iban;
         if (data.swiftBic !== undefined) updateData.swift_bic = data.swiftBic;
 
+        // TODO: Migrar para invoice_items table (normalized items instead of jsonb)
         // Recalculate totals if items changed
         if (data.items) {
-            updateData.items = data.items;
+            updateData.items = data.items; // TODO: Migrar para invoice_items table
             const subtotal = data.items.reduce((sum, item) => sum + (item.quantity * item.price), 0);
-            const taxRate = data.taxRate !== undefined ? data.taxRate : existingInvoice.tax_rate || 0.23;
+            const taxRate = data.taxRate !== undefined ? data.taxRate : (existingInvoice.tax_rate ?? 0);
             const taxAmount = subtotal * taxRate;
             const total = subtotal + taxAmount;
 
