@@ -99,7 +99,7 @@ export default function AboutPage() {
                                 role={t.about.maksym.role}
                                 description={t.about.maksym.description}
                                 linkedinUrl="https://www.linkedin.com/in/maksym-grebeniuk-7a8b63174/"
-                                imageUrl="/Maksym.png"
+                                imageUrl="/Maksym.jpeg"
                                 viewProfileLabel={t.about.viewProfile}
                             />
                         </motion.div>
