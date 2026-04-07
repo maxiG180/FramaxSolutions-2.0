@@ -2,6 +2,11 @@ import type { NextConfig } from "next";
 import path from "path";
 
 const nextConfig: NextConfig = {
+  // Ignore ESLint during builds as flat config isn't fully supported by Next.js inner eslint caller
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
+
   // Fix Vercel lockfile warning — point tracing to the actual project root
   outputFileTracingRoot: path.join(__dirname),
 

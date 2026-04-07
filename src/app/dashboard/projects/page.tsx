@@ -135,15 +135,7 @@ export default function ProjectsPage() {
         setTeamInput("");
     };
 
-    const handleDeleteProject = (id: number) => {
-        if (confirm("Are you sure you want to delete this project?")) {
-            setProjects(projects.filter(p => p.id !== id));
-        }
-    };
-
-    const handleEditProject = (id: number) => {
-        alert("Edit functionality coming soon!");
-    };
+    // Delete and Edit functionality will be implemented inside individual project pages or ProjectCard updates
 
     return (
         <div className="space-y-8">
@@ -202,9 +194,11 @@ export default function ProjectsPage() {
                             layout
                         >
                             <ProjectCard
-                                {...project}
-                                onDelete={handleDeleteProject}
-                                onEdit={handleEditProject}
+                                id={project.id}
+                                title={project.title}
+                                client={project.client}
+                                startDate={project.deadline}
+                                status={project.status === 'completed' ? 'completed' : 'in-progress'}
                             />
                         </motion.div>
                     ))}

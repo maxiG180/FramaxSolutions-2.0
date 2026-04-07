@@ -115,7 +115,7 @@ export async function POST(request: Request) {
     const total = subtotal + taxAmount;
 
     // Use custom quote number if provided, otherwise generate sequential one
-    let quoteNumber: string;
+    let quoteNumber: string = '';
 
     if (customQuoteNumber && customQuoteNumber.trim()) {
       // Validate that custom number doesn't already exist

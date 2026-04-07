@@ -249,10 +249,10 @@ export default function LeadsPage() {
                                             animate={{ opacity: 1, scale: 1 }}
                                             exit={{ opacity: 0, scale: 0.8 }}
                                             draggable={true}
-                                            onDragStart={(e) => {
+                                            onDragStart={(e: any) => {
                                                 handleDragStart(e, lead.id);
                                             }}
-                                            onDragEnd={(e) => {
+                                            onDragEnd={(e: any) => {
                                                 handleDragEnd();
                                             }}
                                             className={`bg-black/40 border border-white/10 p-4 rounded-xl hover:border-white/30 transition-all cursor-grab active:cursor-grabbing group select-none ${draggedLead === lead.id ? "opacity-30" : ""
