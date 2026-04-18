@@ -113,7 +113,7 @@ export const en: Translation = {
         confirming: "Confirming...",
         change: "Change",
         checkingAvailability: "Checking availability...",
-        spotsLeft: "spots left for this day",
+        spotsLeft: "left for this day",
         spot: "spot",
         spots: "spots",
         timezoneNote: "Times are in your local timezone",

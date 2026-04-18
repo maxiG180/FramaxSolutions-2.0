@@ -113,7 +113,7 @@ export const pt: Translation = {
         confirming: "A confirmar...",
         change: "Alterar",
         checkingAvailability: "A verificar disponibilidade...",
-        spotsLeft: "vagas restantes para este dia",
+        spotsLeft: "restantes para este dia",
         spot: "vaga",
         spots: "vagas",
         timezoneNote: "As horas estão no seu fuso horário local",
