@@ -222,6 +222,7 @@ export interface Translation {
             docs: string;
             settings: string;
             logout: string;
+            viewSite: string;
         };
     };
     invoices: {

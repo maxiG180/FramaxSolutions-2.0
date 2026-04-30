@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { LayoutDashboard, Users, ShoppingBag, CreditCard, Settings, LogOut, Globe, FileText, CheckSquare, Folder, Target, Calendar, Briefcase, FolderKanban, ChevronDown, ChevronRight, BarChart3, PanelLeftClose, PanelLeftOpen, ReceiptText, FileSignature } from "lucide-react";
+import { LayoutDashboard, Users, ShoppingBag, CreditCard, Settings, LogOut, Globe, FileText, CheckSquare, Folder, Target, Calendar, Briefcase, FolderKanban, ChevronDown, ChevronRight, BarChart3, PanelLeftClose, PanelLeftOpen, ReceiptText, FileSignature, Home } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/utils/supabase/client";
@@ -189,6 +189,17 @@ export function Sidebar({ isCollapsed, onToggle, isMobileOpen = false, onMobileC
                     </button>
 
                     <div className={cn("flex items-center gap-2", isCollapsed && "flex-col")}>
+                        <Link
+                            href="/"
+                            className={cn(
+                                "flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-white/60 hover:text-white hover:bg-white/5 transition-all",
+                                isCollapsed ? "justify-center w-full px-2" : "flex-1"
+                            )}
+                            title={t.dashboard.menu.viewSite}
+                        >
+                            <Home className="w-5 h-5 flex-shrink-0" />
+                            {!isCollapsed && t.dashboard.menu.viewSite}
+                        </Link>
                         <Link
                             href="/dashboard/settings"
                             className={cn(

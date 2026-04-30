@@ -244,6 +244,7 @@ export const en: Translation = {
             docs: "Docs",
             settings: "Settings",
             logout: "Logout",
+            viewSite: "View Website",
         },
     },
     invoices: {

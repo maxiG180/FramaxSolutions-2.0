@@ -244,6 +244,7 @@ export const pt: Translation = {
             docs: "Docs",
             settings: "Definições",
             logout: "Sair",
+            viewSite: "Ver Website",
         },
     },
     invoices: {
