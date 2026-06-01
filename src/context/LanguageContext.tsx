@@ -23,8 +23,8 @@ export const translations = {
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
-    // Always initialize with 'en' to match server-side rendering
-    const [language, setLanguage] = useState<Language>("en");
+    // Always start with 'en' on both server and client to match hydration
+    const [language, setLanguage] = useState<Language>('en');
     const [isLoaded, setIsLoaded] = useState(false);
 
     useEffect(() => {
@@ -34,7 +34,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
             const isDashboard = window.location.pathname.startsWith('/dashboard');
 
             if (isDashboard) {
-                // Dashboard ALWAYS defaults to Portuguese (ignore saved preference for now)
+                // Dashboard ALWAYS defaults to Portuguese
                 setLanguage('pt');
                 localStorage.setItem('framax_lang', 'pt');
             } else {

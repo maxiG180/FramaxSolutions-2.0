@@ -11,7 +11,13 @@ import { LanguageSwitcher } from "@/components/ui/LanguageSwitcher";
 export function Header() {
     const [isScrolled, setIsScrolled] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-    const { t } = useLanguage();
+    const [isMounted, setIsMounted] = useState(false);
+    const { t, isLoaded } = useLanguage();
+
+    // Prevent hydration mismatch by only applying scroll state after mount
+    useEffect(() => {
+        setIsMounted(true);
+    }, []);
 
     // Native passive scroll listener — much cheaper than framer-motion useScroll
     // which subscribes to every animation frame. This only fires when threshold changes.
@@ -29,12 +35,11 @@ export function Header() {
     return (
         <header
             className={cn(
-                "sticky left-0 right-0 z-[9999] transition-all duration-300",
-                isScrolled
+                "fixed top-0 left-0 right-0 w-full z-[9999] transition-all duration-300",
+                isMounted && isScrolled
                     ? "bg-background/95 backdrop-blur-md border-b border-border/50 py-3"
-                    : "bg-transparent py-5",
+                    : "bg-background/30 backdrop-blur-sm py-5",
             )}
-            style={{ top: 'env(safe-area-inset-top)' }}
         >
             <div className="container mx-auto px-4 flex items-center justify-between gap-4">
                 {/* Left - Logo */}
@@ -52,13 +57,13 @@ export function Header() {
 
                 {/* Center - Navigation (Desktop) */}
                 <nav className="hidden lg:flex flex-1 items-center justify-center gap-6 lg:gap-10">
-                    <Link href="/#features" className="text-sm font-semibold hover:text-primary transition-all hover:scale-105 active:scale-95">
+                    <Link href="/#features" className="text-sm font-semibold hover:text-primary transition-all hover:scale-105 active:scale-95" suppressHydrationWarning>
                         {t.header.features}
                     </Link>
-                    <Link href="/about" className="text-sm font-semibold hover:text-primary transition-all hover:scale-105 active:scale-95">
+                    <Link href="/about" className="text-sm font-semibold hover:text-primary transition-all hover:scale-105 active:scale-95" suppressHydrationWarning>
                         {t.header.about}
                     </Link>
-                    <Link href="/#portfolio" className="text-sm font-semibold hover:text-primary transition-all hover:scale-105 active:scale-95">
+                    <Link href="/#portfolio" className="text-sm font-semibold hover:text-primary transition-all hover:scale-105 active:scale-95" suppressHydrationWarning>
                         {t.header.portfolio}
                     </Link>
                 </nav>
@@ -67,7 +72,7 @@ export function Header() {
                 <div className="flex items-center gap-3 lg:gap-6 shrink-0">
                     <div className="hidden md:flex items-center gap-4">
                         <LanguageSwitcher />
-                        <Link href="/#booking" className="hidden lg:block bg-primary text-primary-foreground px-6 py-2.5 rounded-full text-sm font-bold hover:bg-primary/90 transition-all hover:scale-105 active:scale-95 shadow-lg shadow-primary/20">
+                        <Link href="/#booking" className="hidden lg:block bg-primary text-primary-foreground px-6 py-2.5 rounded-full text-sm font-bold hover:bg-primary/90 transition-all hover:scale-105 active:scale-95 shadow-lg shadow-primary/20" suppressHydrationWarning>
                             {t.header.getStarted}
                         </Link>
                     </div>
@@ -89,6 +94,7 @@ export function Header() {
                         href="/#features"
                         className="text-sm font-medium p-2 hover:bg-muted rounded-md"
                         onClick={closeMobileMenu}
+                        suppressHydrationWarning
                     >
                         {t.header.features}
                     </Link>
@@ -96,6 +102,7 @@ export function Header() {
                         href="/about"
                         className="text-sm font-medium p-2 hover:bg-muted rounded-md"
                         onClick={closeMobileMenu}
+                        suppressHydrationWarning
                     >
                         {t.header.about}
                     </Link>
@@ -103,6 +110,7 @@ export function Header() {
                         href="/#portfolio"
                         className="text-sm font-medium p-2 hover:bg-muted rounded-md"
                         onClick={closeMobileMenu}
+                        suppressHydrationWarning
                     >
                         {t.header.portfolio}
                     </Link>
@@ -111,6 +119,7 @@ export function Header() {
                         href="/#booking"
                         className="bg-primary text-primary-foreground w-full py-3 rounded-full text-sm font-medium text-center"
                         onClick={closeMobileMenu}
+                        suppressHydrationWarning
                     >
                         {t.header.getStarted}
                     </Link>

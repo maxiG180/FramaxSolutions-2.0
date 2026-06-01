@@ -113,5 +113,15 @@ credentials.json
 *.pem
 .secrets/
 
-# Claude Code
+# Claude Code and AI tools
 .claude/
+*.claude
+.anthropic/
+
+# Private and sensitive files
+nul
+*.private
+.private/
+secrets/
+.secrets/
+private/

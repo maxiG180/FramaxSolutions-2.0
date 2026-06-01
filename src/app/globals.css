@@ -32,7 +32,6 @@ body {
     font-family: var(--font-sans), Arial, Helvetica, sans-serif;
     -webkit-text-size-adjust: 100%;
     /* Prevents iOS from auto-scaling text on orientation change */
-    padding-top: max(env(safe-area-inset-top), 0px);
     padding-bottom: env(safe-area-inset-bottom);
 }
 
