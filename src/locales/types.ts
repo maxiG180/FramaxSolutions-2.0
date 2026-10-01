@@ -41,6 +41,7 @@ export interface Translation {
         startProject: string;
         viewWork: string;
         trustedBy: string;
+        recentWork: string;
         // New Hero Section
         title: string;
         subtitle: string;

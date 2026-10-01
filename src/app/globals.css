@@ -237,6 +237,25 @@ section:first-of-type {
     transform: translateZ(0);
 }
 
+/* Hero background — slow vertical drift of client screenshots */
+@keyframes hero-wall-scroll {
+    from {
+        transform: translate3d(0, 0, 0);
+    }
+    to {
+        transform: translate3d(0, -50%, 0);
+    }
+}
+
+.hero-wall-col {
+    animation: hero-wall-scroll 70s linear infinite;
+    will-change: transform;
+}
+
+.hero-wall-col[data-reverse="true"] {
+    animation-direction: reverse;
+}
+
 /* Reduce motion: disable heavy animations for accessibility + perf */
 @media (prefers-reduced-motion: reduce) {
 
@@ -245,7 +264,8 @@ section:first-of-type {
     .animate-cta-pulse,
     .animate-click-cursor,
     .animate-marquee,
-    .animate-marquee-reverse {
+    .animate-marquee-reverse,
+    .hero-wall-col {
         animation: none !important;
         will-change: auto;
     }
