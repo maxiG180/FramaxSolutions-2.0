@@ -15,33 +15,8 @@ interface Project {
     description?: string;
 }
 
-const PROJECTS: Project[] = [
-    {
-        id: 1,
-        title: "Clínica Alves",
-        category: "Healthcare Website",
-        image: "/portfolio/prints/clinicaalvesprint2.jpg",
-        video: "/portfolio/videos/clinicaalvesdemo.mp4",
-        link: "https://clinicaalves.vercel.app/",
-        description: "Medical clinic website with modern design and appointment booking system"
-    },
-    {
-        id: 2,
-        title: "Pérola do Vouga",
-        category: "Restaurant Website",
-        image: "/portfolio/prints/peroladovougaprint.jpg",
-        link: "https://www.peroladovouga.com/pt",
-        description: "Traditional Portuguese restaurant with online ordering and menu system"
-    },
-    {
-        id: 3,
-        title: "BB Nails",
-        category: "Beauty Salon",
-        image: "/portfolio/prints/bbnailsprint.jpg",
-        link: "https://bbnails.vercel.app/",
-        description: "Premium nail salon with appointment booking and service showcase"
-    },
-];
+// Empty for now: the section shows "Coming soon" until real projects are added here.
+const PROJECTS: Project[] = [];
 
 // Duplicate projects for infinite loop
 const MARQUEE_PROJECTS = [...PROJECTS, ...PROJECTS, ...PROJECTS];
@@ -147,8 +122,7 @@ const PortfolioItem = ({ project, onClick }: { project: Project; onClick: (link:
     );
 };
 
-export function NewPortfolio() {
-    const { t } = useLanguage();
+const ProjectCarousel = () => {
     const containerRef = useRef<HTMLDivElement>(null);
     const [contentWidth, setContentWidth] = useState(0);
     const [isHovered, setIsHovered] = useState(false);
@@ -198,6 +172,69 @@ export function NewPortfolio() {
     };
 
     return (
+        <div className="relative w-full overflow-hidden py-10">
+            <motion.div
+                ref={containerRef}
+                className="flex gap-6"
+                style={{ x }}
+                drag="x"
+                dragConstraints={{ left: -contentWidth * 2, right: 0 }}
+                onDragStart={() => {
+                    setIsDragging(true);
+                    isDraggingRef.current = true;
+                }}
+                onDragEnd={() => {
+                    setIsDragging(false);
+                    isDraggingRef.current = false;
+                }}
+                onMouseEnter={() => setIsHovered(true)}
+                onMouseLeave={() => setIsHovered(false)}
+            >
+                {MARQUEE_PROJECTS.map((project, index) => (
+                    <PortfolioItem
+                        key={`${project.id}-${index}`}
+                        project={project}
+                        onClick={handleProjectClick}
+                    />
+                ))}
+            </motion.div>
+        </div>
+    );
+};
+
+const ComingSoon = ({ label }: { label: string }) => (
+    <div className="container mx-auto px-4 py-10">
+        <div className="relative max-w-5xl mx-auto">
+            <div className="grid md:grid-cols-3 gap-6 blur-[6px] opacity-60 select-none" aria-hidden="true">
+                {[0, 1, 2].map((i) => (
+                    <div
+                        key={i}
+                        className={`aspect-video rounded-2xl border border-white/10 bg-white/[0.03] p-5 ${i > 0 ? "hidden md:block" : ""}`}
+                    >
+                        <div className="flex gap-1.5 mb-5">
+                            <span className="w-2 h-2 rounded-full bg-white/20" />
+                            <span className="w-2 h-2 rounded-full bg-white/20" />
+                            <span className="w-2 h-2 rounded-full bg-white/20" />
+                        </div>
+                        <div className="h-3 w-2/3 rounded bg-white/15 mb-2" />
+                        <div className="h-3 w-1/2 rounded bg-white/10 mb-6" />
+                        <div className="h-1/3 rounded-lg bg-primary/20" />
+                    </div>
+                ))}
+            </div>
+            <div className="absolute inset-0 flex items-center justify-center">
+                <span className="px-5 py-2 rounded-full border border-white/15 bg-background text-sm font-medium tracking-wide text-neutral-200">
+                    {label}
+                </span>
+            </div>
+        </div>
+    </div>
+);
+
+export function NewPortfolio() {
+    const { t } = useLanguage();
+
+    return (
         <section id="portfolio" className="py-32 bg-background overflow-hidden">
             {/* Section Header */}
             <div className="container mx-auto px-4 mb-12 text-center">
@@ -234,34 +271,7 @@ export function NewPortfolio() {
                 </motion.p>
             </div>
 
-            {/* Infinite Carousel */}
-            <div className="relative w-full overflow-hidden py-10">
-                <motion.div
-                    ref={containerRef}
-                    className="flex gap-6"
-                    style={{ x }}
-                    drag="x"
-                    dragConstraints={{ left: -contentWidth * 2, right: 0 }}
-                    onDragStart={() => {
-                        setIsDragging(true);
-                        isDraggingRef.current = true;
-                    }}
-                    onDragEnd={() => {
-                        setIsDragging(false);
-                        isDraggingRef.current = false;
-                    }}
-                    onMouseEnter={() => setIsHovered(true)}
-                    onMouseLeave={() => setIsHovered(false)}
-                >
-                    {MARQUEE_PROJECTS.map((project, index) => (
-                        <PortfolioItem
-                            key={`${project.id}-${index}`}
-                            project={project}
-                            onClick={handleProjectClick}
-                        />
-                    ))}
-                </motion.div>
-            </div>
+            {PROJECTS.length > 0 ? <ProjectCarousel /> : <ComingSoon label={t.portfolio.comingSoon} />}
 
             {/* CTA */}
             <div className="container mx-auto px-4 mt-12 flex justify-center">
