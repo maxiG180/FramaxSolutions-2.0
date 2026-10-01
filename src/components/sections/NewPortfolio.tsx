@@ -20,7 +20,7 @@ const PROJECTS: Project[] = [
         id: 1,
         title: "Clínica Alves",
         category: "Healthcare Website",
-        image: "/portfolio/prints/clinicaalvesprint2.png",
+        image: "/portfolio/prints/clinicaalvesprint2.jpg",
         video: "/portfolio/videos/clinicaalvesdemo.mp4",
         link: "https://clinicaalves.vercel.app/",
         description: "Medical clinic website with modern design and appointment booking system"
@@ -29,7 +29,7 @@ const PROJECTS: Project[] = [
         id: 2,
         title: "Pérola do Vouga",
         category: "Restaurant Website",
-        image: "/portfolio/peroladovougaprint.png",
+        image: "/portfolio/prints/peroladovougaprint.jpg",
         link: "https://www.peroladovouga.com/pt",
         description: "Traditional Portuguese restaurant with online ordering and menu system"
     },
@@ -37,7 +37,7 @@ const PROJECTS: Project[] = [
         id: 3,
         title: "BB Nails",
         category: "Beauty Salon",
-        image: "/portfolio/bbnailsprint.png",
+        image: "/portfolio/prints/bbnailsprint.jpg",
         link: "https://bbnails.vercel.app/",
         description: "Premium nail salon with appointment booking and service showcase"
     },

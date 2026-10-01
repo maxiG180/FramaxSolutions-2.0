@@ -36,8 +36,8 @@ export const pt: Translation = {
     },
     hero: {
         badge: "Transforme Visitantes em Clientes.",
-        titlePre: "Websites que",
-        titleHighlight: "vendem mais",
+        titlePre: "Software que",
+        titleHighlight: "automatiza o seu negócio",
         dynamicKeywords: [
             "poupam tempo",
             "automatizam trabalho",
@@ -49,8 +49,9 @@ export const pt: Translation = {
         startProject: "Comece o seu Projeto",
         viewWork: "Ver o nosso Trabalho",
         trustedBy: "Confiado por empresas inovadoras",
+        recentWork: "Trabalhos recentes",
         // New Hero Section
-        title: "Websites que vendem mais",
+        title: "Software que automatiza o seu negócio",
         subtitle: "Criamos soluções de software que entendem o seu negócio e trazem resultados REAIS.",
         bookMeeting: "Agende reunião gratuita",
         couldBeYou: "A sua Empresa",
