@@ -237,7 +237,7 @@ section:first-of-type {
     transform: translateZ(0);
 }
 
-/* Hero background — slow vertical drift of client screenshots */
+/* Hero background — slow vertical drift of the automation feed columns */
 @keyframes hero-wall-scroll {
     from {
         transform: translate3d(0, 0, 0);
