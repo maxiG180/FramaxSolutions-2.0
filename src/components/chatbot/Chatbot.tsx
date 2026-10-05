@@ -47,27 +47,27 @@ export default function Chatbot() {
         }
     }, [isOpen]);
 
-    // Auto-open logic
+    // Greeting bubble: shown a few seconds after load, until the visitor has opened the chat once
     useEffect(() => {
-        const hasSeen = localStorage.getItem('framax-chatbot-seen');
-        if (!hasSeen) {
-            const timer = setTimeout(() => {
-                setOpen(true);
-                localStorage.setItem('framax-chatbot-seen', 'true');
-            }, 30000);
-            return () => clearTimeout(timer);
-        }
-    }, [setOpen]);
-
-    // Notification bubble logic
-    useEffect(() => {
-        if (!isOpen) {
-            const timer = setTimeout(() => setShowNotification(true), 5000);
-            return () => clearTimeout(timer);
-        } else {
+        if (isOpen) {
             setShowNotification(false);
+            localStorage.setItem('framax-chatbot-opened', 'true');
+            return;
         }
+        if (localStorage.getItem('framax-chatbot-opened')) return;
+        const timer = setTimeout(() => setShowNotification(true), 8000);
+        return () => clearTimeout(timer);
     }, [isOpen]);
+
+    // Escape closes the chat
+    useEffect(() => {
+        if (!isOpen) return;
+        const onKeyDown = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') setOpen(false);
+        };
+        window.addEventListener('keydown', onKeyDown);
+        return () => window.removeEventListener('keydown', onKeyDown);
+    }, [isOpen, setOpen]);
 
     const handleSubmit = async (e?: React.FormEvent) => {
         e?.preventDefault();
@@ -96,12 +96,14 @@ export default function Chatbot() {
     };
 
     const presets = [
-        cb.presets.timeline,
-        cb.presets.pricing,
-        cb.presets.maintenance,
         cb.presets.services,
+        cb.presets.pricing,
+        cb.presets.timeline,
         cb.presets.contact,
     ];
+
+    // Quick questions only help to get started; hide them once the visitor has asked something
+    const hasUserMessage = messages.some((msg) => msg.role === 'user');
 
     return (
         <>
@@ -112,7 +114,9 @@ export default function Chatbot() {
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: 20, scale: 0.95 }}
                         transition={{ duration: 0.2 }}
-                        className="fixed bottom-24 right-6 z-50 w-[90vw] md:w-[420px] h-[600px] md:h-[650px] max-h-[80vh] flex flex-col rounded-2xl border border-white/10 bg-[#050505]/80 backdrop-blur-xl shadow-2xl overflow-hidden"
+                        role="dialog"
+                        aria-label={cb.title}
+                        className="fixed inset-0 z-[10000] h-[100dvh] flex flex-col bg-[#050505]/95 backdrop-blur-xl overflow-hidden md:inset-auto md:bottom-24 md:right-6 md:w-[420px] md:h-[650px] md:max-h-[80vh] md:rounded-2xl md:border md:border-white/10 md:bg-[#050505]/80 md:shadow-2xl"
                         style={{ boxShadow: "0 0 50px -12px rgba(37, 99, 235, 0.25)" }}
                     >
                         {/* Header */}
@@ -141,9 +145,10 @@ export default function Chatbot() {
                                 <button
                                     onClick={toggleOpen}
                                     className="p-2 hover:bg-white/10 rounded-full transition-colors text-white/70 hover:text-white"
-                                    aria-label="Minimize"
+                                    aria-label="Close chat"
                                 >
-                                    <Minus size={18} />
+                                    <X size={20} className="md:hidden" />
+                                    <Minus size={18} className="hidden md:block" />
                                 </button>
                             </div>
                         </div>
@@ -169,7 +174,9 @@ export default function Chatbot() {
                                                 components={{
                                                     strong: ({ node, ...props }) => <span className="font-semibold text-white" {...props} />,
                                                     ul: ({ node, ...props }) => <ul className="list-disc pl-4 my-2 space-y-1" {...props} />,
+                                                    ol: ({ node, ...props }) => <ol className="list-decimal pl-4 my-2 space-y-1" {...props} />,
                                                     li: ({ node, ...props }) => <li className="text-white/80" {...props} />,
+                                                    em: ({ node, ...props }) => <em className="italic" {...props} />,
                                                     p: ({ node, ...props }) => <p className="mb-2 last:mb-0" {...props} />,
                                                     a: ({ node, href, ...props }) => {
                                                         // On-site links (e.g. /#booking) close the chat so the section is visible
@@ -219,13 +226,13 @@ export default function Chatbot() {
                         </div>
 
                         {/* Suggested Questions */}
-                        {!isTyping && messages[messages.length - 1]?.role === 'bot' && (
+                        {!isTyping && !hasUserMessage && (
                             <div className="px-4 pb-2">
                                 <p className="text-xs text-white/40 mb-2 font-medium uppercase tracking-wider">
                                     {cb.suggestedQuestions}
                                 </p>
                                 <div className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:flex-wrap md:overflow-visible">
-                                    {presets.slice(0, 4).map((text) => (
+                                    {presets.map((text) => (
                                         <button
                                             key={text}
                                             onClick={() => handlePresetClick(text)}
@@ -269,7 +276,10 @@ export default function Chatbot() {
             </AnimatePresence>
 
             {/* Floating Button & Notification Bubble */}
-            <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-2 isolate pointer-events-none">
+            <div className={cn(
+                "fixed bottom-6 right-6 z-50 flex-col items-end gap-2 isolate pointer-events-none",
+                isOpen ? "hidden md:flex" : "flex"
+            )}>
                 <AnimatePresence>
                     {showNotification && !isOpen && (
                         <motion.div
