@@ -58,12 +58,14 @@ export const QUESTION_MATCHERS: QuestionMatcher[] = [
         id: 'pricing',
         patterns: [
             /how much/i,
+            /charge/i,
+            /cobram/i,
             /cost/i,
             /price/i,
             /pricing/i,
             /quote/i,
             /budget/i,
-            /rates/i,
+            /\brates?\b/i,
             /payment/i,
             /deposit/i,
             /expensive/i,
@@ -96,6 +98,7 @@ export const QUESTION_MATCHERS: QuestionMatcher[] = [
     {
         id: 'services',
         patterns: [
+            /automat/i,
             /what.*offer/i,
             /services/i,
             /what.*do/i,
@@ -104,13 +107,13 @@ export const QUESTION_MATCHERS: QuestionMatcher[] = [
             /design/i,
             /development/i,
             /website/i,
-            /app/i,
+            /\bapps?\b/i,
             /serviço/i,
             /fazem/i,
             /oferecem/i,
             /constroem/i
         ],
-        keywords: ['offerings', 'work', 'create', 'product', 'serviços', 'trabalho']
+        keywords: ['offerings', 'create', 'product', 'automation', 'serviços', 'automação']
     },
     {
         id: 'contact',
@@ -129,7 +132,9 @@ export const QUESTION_MATCHERS: QuestionMatcher[] = [
             /falar/i,
             /ligar/i,
             /reunião/i,
-            /marcar/i
+            /marcar/i,
+            /agend/i,
+            /chamada/i
         ],
         keywords: ['touch', 'message', 'number', 'address', 'location', 'contacto', 'telefone', 'reunião']
     },
@@ -137,23 +142,22 @@ export const QUESTION_MATCHERS: QuestionMatcher[] = [
         id: 'portfolio',
         patterns: [
             /example/i,
-            /work/i,
+            /(your|previous|past) work/i,
             /portfolio/i,
-            /case/i,
-            /client/i,
-            /show/i,
-            /see/i,
+            /case stud/i,
+            /\bshow me\b/i,
+            /\bsee\b.*\b(work|projects?|examples?)\b/i,
             /exemplo/i,
-            /trabalho/i,
-            /projeto/i,
-            /ver/i
+            /trabalhos/i,
+            /portfólio/i,
+            /\bver\b/i
         ],
         keywords: ['sample', 'project', 'previous', 'done', 'exemplo', 'trabalho', 'portfólio']
     },
     {
         id: 'team',
         patterns: [
-            /who/i,
+            /\bwho\b/i,
             /team/i,
             /people/i,
             /developer/i,
