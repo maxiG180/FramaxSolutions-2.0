@@ -22,7 +22,8 @@ type GeminiResponse = {
 
 /**
  * Website chatbot. Answers with Gemini when it's configured and available;
- * otherwise returns { fallback: true } and the widget uses its keyword answers.
+ * otherwise returns { fallback: true, reason } and the widget uses its keyword answers.
+ * Failures are logged with console.* because the shared logger only prints in development.
  */
 export async function POST(request: NextRequest) {
     const rateLimitResponse = rateLimit(request, RATE_LIMITS.CHATBOT);
@@ -34,7 +35,8 @@ export async function POST(request: NextRequest) {
 
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {
-        return NextResponse.json({ fallback: true });
+        console.warn('[api/chat] GEMINI_API_KEY is not set in this deployment');
+        return NextResponse.json({ fallback: true, reason: 'not_configured' });
     }
 
     let body: unknown;
@@ -84,13 +86,9 @@ export async function POST(request: NextRequest) {
         });
 
         if (!response.ok) {
-            // 429 here means the free daily quota is used up
-            logger.logWarning('Gemini request failed', {
-                endpoint: '/api/chat',
-                status: response.status,
-                body: (await response.text()).slice(0, 300),
-            });
-            return NextResponse.json({ fallback: true });
+            // 429 = free quota used up; 400/403 = invalid or restricted API key
+            console.warn('[api/chat] Gemini request failed', response.status, (await response.text()).slice(0, 300));
+            return NextResponse.json({ fallback: true, reason: `upstream_${response.status}` });
         }
 
         const data = (await response.json()) as GeminiResponse;
@@ -101,17 +99,13 @@ export async function POST(request: NextRequest) {
             .trim();
 
         if (!reply) {
-            logger.logWarning('Gemini returned no text', {
-                endpoint: '/api/chat',
-                finishReason: data.candidates?.[0]?.finishReason,
-                blockReason: data.promptFeedback?.blockReason,
-            });
-            return NextResponse.json({ fallback: true });
+            console.warn('[api/chat] Gemini returned no text', data.candidates?.[0]?.finishReason, data.promptFeedback?.blockReason);
+            return NextResponse.json({ fallback: true, reason: 'empty_reply' });
         }
 
         return NextResponse.json({ reply });
     } catch (error) {
-        logger.logApiError('/api/chat', error);
-        return NextResponse.json({ fallback: true });
+        console.error('[api/chat] Gemini request error', error instanceof Error ? error.message : error);
+        return NextResponse.json({ fallback: true, reason: 'request_failed' });
     }
 }
