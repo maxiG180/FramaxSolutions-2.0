@@ -4,6 +4,7 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 import RootClientWrapper from "./RootClientWrapper";
+import { SITE_URL, SITE_NAME } from "@/lib/seo";
 
 const outfit = Outfit({
   variable: "--font-sans",
@@ -13,30 +14,17 @@ const outfit = Outfit({
 });
 
 export const metadata: Metadata = {
-  title: "Framax Solutions | Digital Transformation",
-  description: "Empowering businesses through cutting-edge digital solutions. Web development, UI/UX design, and AI integration tailored for your success.",
-  metadataBase: new URL("https://framaxsolutions.com"),
+  // Defaults for pages without their own metadata; public pages use pageMetadata() from @/lib/seo
+  title: "Framax Solutions | Software that automates your business",
+  description: "Custom software and automations for small businesses: bookings, invoicing, reminders, CRM and websites. Based in Portugal. Book a free call.",
+  metadataBase: new URL(SITE_URL),
   openGraph: {
-    title: "Framax Solutions",
-    description: "Empowering businesses through cutting-edge digital solutions.",
-    url: "https://framaxsolutions.com",
-    siteName: "Framax Solutions",
-    images: [
-      {
-        url: "/og-image.png",
-        width: 1200,
-        height: 630,
-        alt: "Framax Solutions - Digital Transformation",
-      },
-    ],
+    siteName: SITE_NAME,
     locale: "en_US",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Framax Solutions",
-    description: "Empowering businesses through cutting-edge digital solutions.",
-    images: ["/og-image.png"],
   },
   icons: {
     icon: "/logos/framax_icon.png",

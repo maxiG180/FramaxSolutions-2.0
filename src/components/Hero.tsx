@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { ArrowRight, Check } from "lucide-react";
-import { useLanguage } from "@/context/LanguageContext";
+import { useLanguage, useLocalePath } from "@/context/LanguageContext";
 
 type FeedItem = { app: string; event: string; result: string };
 
@@ -77,6 +77,7 @@ const AutomationWall = ({ feed }: { feed: FeedItem[] }) => (
 
 const Hero = () => {
   const { t } = useLanguage();
+  const localePath = useLocalePath();
 
   return (
     <section
@@ -105,14 +106,14 @@ const Hero = () => {
 
             <div className="mt-10 flex flex-wrap items-center gap-x-8 gap-y-4">
               <Link
-                href="/#booking"
+                href={localePath("/#booking")}
                 className="group inline-flex items-center gap-2 px-7 py-4 text-base font-semibold text-white bg-primary rounded-full hover:bg-primary/90 transition-colors"
               >
                 {t.hero.bookMeeting}
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </Link>
               <Link
-                href="/#features"
+                href={localePath("/#features")}
                 className="text-base font-medium text-neutral-300 hover:text-white underline-offset-8 hover:underline transition-colors"
               >
                 {t.hero.learnMore}
@@ -125,8 +126,8 @@ const Hero = () => {
       <div className="relative z-10 pb-10">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-wrap items-center gap-x-6 gap-y-2 pt-6 border-t border-white/10 text-sm">
-            <span className="text-neutral-500">{t.hero.automateLabel}</span>
-            {t.hero.automateItems.map((item) => (
+            <span className="text-neutral-500">{t.hero.buildLabel}</span>
+            {t.hero.buildItems.map((item) => (
               <span key={item} className="text-neutral-300">{item}</span>
             ))}
           </div>

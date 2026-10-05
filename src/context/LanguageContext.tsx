@@ -1,8 +1,10 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
+import { usePathname } from "next/navigation";
+import { getUrlLocale, localizePath, type Locale } from "@/lib/i18n-routes";
 
-type Language = "en" | "pt";
+type Language = Locale;
 
 import { en } from "@/locales/en";
 import { pt } from "@/locales/pt";
@@ -23,8 +25,11 @@ export const translations = {
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
-    // Always start with 'en' on both server and client to match hydration
-    const [language, setLanguage] = useState<Language>('en');
+    // Pages under /pt are Portuguese from the first (server) render, so search engines
+    // index them in Portuguese. Elsewhere, start with 'en' on both server and client
+    // to match hydration, then apply the visitor's preference below.
+    const urlLocale = getUrlLocale(usePathname());
+    const [language, setLanguage] = useState<Language>(urlLocale ?? 'en');
     const [isLoaded, setIsLoaded] = useState(false);
 
     useEffect(() => {
@@ -33,7 +38,10 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
             // Check if we're in the dashboard
             const isDashboard = window.location.pathname.startsWith('/dashboard');
 
-            if (isDashboard) {
+            if (urlLocale) {
+                // The URL decides (e.g. /pt/about)
+                setLanguage(urlLocale);
+            } else if (isDashboard) {
                 // Dashboard ALWAYS defaults to Portuguese
                 setLanguage('pt');
                 localStorage.setItem('framax_lang', 'pt');
@@ -54,6 +62,16 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
 
         initLanguage();
     }, []);
+
+    // Follow client-side navigation into a /pt page
+    useEffect(() => {
+        if (urlLocale) setLanguage(urlLocale);
+    }, [urlLocale]);
+
+    // Keep <html lang> in sync (the root layout renders it as "en")
+    useEffect(() => {
+        document.documentElement.lang = language === 'pt' ? 'pt-PT' : 'en';
+    }, [language]);
 
     // Persist language changes
     useEffect(() => {
@@ -82,4 +100,10 @@ export function useLanguage() {
         throw new Error("useLanguage must be used within a LanguageProvider");
     }
     return context;
+}
+
+/** Returns a function that turns an English path like "/about" or "/#booking" into the current language's URL */
+export function useLocalePath() {
+    const { language } = useLanguage();
+    return useCallback((path: string) => localizePath(path, language), [language]);
 }

@@ -2,5 +2,6 @@ User-agent: *
 Disallow: /dashboard/
 Disallow: /login/
 Disallow: /portal/
+Disallow: /api/
 
 Sitemap: https://www.framaxsolutions.com/sitemap.xml
