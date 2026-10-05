@@ -17,7 +17,7 @@ import { cn } from '@/lib/utils';
 import { useLanguage } from '@/context/LanguageContext';
 
 export default function Chatbot() {
-    const { t } = useLanguage();
+    const { t, language } = useLanguage();
     const cb = t.chatbot;
 
     const {
@@ -74,12 +74,12 @@ export default function Chatbot() {
         if (!inputValue.trim()) return;
         const text = inputValue;
         setInputValue('');
-        // Pass the translated answers so the store resolves the right language
-        await handleUserMessage(text, cb.answers as Record<string, string>);
+        // Pass the translated answers so the keyword fallback uses the right language
+        await handleUserMessage(text, cb.answers as Record<string, string>, language);
     };
 
     const handlePresetClick = async (text: string) => {
-        await handleUserMessage(text, cb.answers as Record<string, string>);
+        await handleUserMessage(text, cb.answers as Record<string, string>, language);
     };
 
     /**
@@ -171,6 +171,22 @@ export default function Chatbot() {
                                                     ul: ({ node, ...props }) => <ul className="list-disc pl-4 my-2 space-y-1" {...props} />,
                                                     li: ({ node, ...props }) => <li className="text-white/80" {...props} />,
                                                     p: ({ node, ...props }) => <p className="mb-2 last:mb-0" {...props} />,
+                                                    a: ({ node, href, ...props }) => {
+                                                        // On-site links (e.g. /#booking) close the chat so the section is visible
+                                                        const isExternal = href?.startsWith('http');
+                                                        // "#booking" only exists on the homepage, so make it work from other pages too
+                                                        const target = href?.startsWith('#') ? `/${href}` : href;
+                                                        return (
+                                                            <a
+                                                                href={target}
+                                                                className="text-blue-400 underline underline-offset-2 hover:text-blue-300"
+                                                                {...(isExternal
+                                                                    ? { target: '_blank', rel: 'noopener noreferrer' }
+                                                                    : { onClick: () => setOpen(false) })}
+                                                                {...props}
+                                                            />
+                                                        );
+                                                    },
                                                 }}
                                             >
                                                 {resolveContent(msg)}
@@ -234,11 +250,14 @@ export default function Chatbot() {
                                     value={inputValue}
                                     onChange={(e) => setInputValue(e.target.value)}
                                     placeholder={cb.inputPlaceholder}
+                                    aria-label={cb.inputPlaceholder}
+                                    maxLength={500}
                                     className="flex-1 bg-transparent border-none outline-none text-sm text-white placeholder-white/30"
                                 />
                                 <button
                                     type="submit"
                                     disabled={!inputValue.trim() || isTyping}
+                                    aria-label="Send"
                                     className="p-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 disabled:opacity-50 disabled:hover:bg-blue-600 text-white transition-colors"
                                 >
                                     <Send size={16} />

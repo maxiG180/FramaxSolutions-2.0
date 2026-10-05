@@ -31,6 +31,22 @@ export const sendDiscountSchema = z.object({
 });
 
 /**
+ * Website chatbot request: recent conversation history, newest message last
+ */
+export const chatRequestSchema = z.object({
+    messages: z
+        .array(
+            z.object({
+                role: z.enum(['user', 'bot']),
+                content: z.string().min(1).max(2000),
+            })
+        )
+        .min(1)
+        .max(12),
+    language: z.enum(['en', 'pt']),
+});
+
+/**
  * Validate discount code request
  */
 export const validateDiscountRequestSchema = z.object({
