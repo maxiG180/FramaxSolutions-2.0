@@ -621,7 +621,7 @@ export const en: Translation = {
         notificationBubble: "👋 Need help? I'm here!",
         suggestedQuestions: "Quick questions",
         inputPlaceholder: "Type your question...",
-        initialMessage: "👋 Hi! I'm the **Framax AI Assistant**.\n\nI can help you with:\n- 💼 Services & capabilities\n- 💳 Pricing & quotes\n- ⏱️ Project timelines\n- 🔧 Maintenance & support\n- 📞 How to get in touch\n\nWhat would you like to know?",
+        initialMessage: "👋 Hi! I'm the **Framax AI Assistant**.\n\nI can help you with:\n- ⚙️ Automating your business processes\n- 💼 Services & capabilities\n- 💳 Pricing & quotes\n- ⏱️ Project timelines\n- 🔧 Maintenance & support\n- 📞 How to get in touch\n\nAsk me anything, in your own words.",
         presets: {
             timeline: "How long does a project take?",
             pricing: "How does pricing work?",
@@ -639,7 +639,7 @@ export const en: Translation = {
             services: `💼 **Our Services:**\n\n**Core:**\n- Full Websites (Domain + Hosting + Basic SEO)\n- Custom Web Applications\n- Website Redesigns\n\n**Add-Ons:**\n- Advanced SEO Strategies\n- Booking Systems\n- CRM / ERP Integration\n\n**Support:**\n- Maintenance (€15/hr)\n- Domain & Hosting (€29/mo)\n\nWant to know more about how we build things?`,
             services_more: `💼 **How we build things:**\n\nWe use modern, high-performance tech:\n- **Next.js / React** — fast, scalable frontends\n- **Supabase / PostgreSQL** — secure, reliable databases\n- **Tailwind CSS** — responsive, pixel-perfect design\n- **Vercel** — global deployment & peak performance\n\nEvery project includes:\n- Mobile-first responsive design\n- Basic SEO setup\n- Performance optimisation\n- 1 month of post-launch support\n\nInterested in starting a project? Book a free discovery call!`,
             contact: `📞 **Let's connect:**\n- Email: contact@framaxsolutions.com\n- Book a discovery call on our site\n- Facebook: Framax Solutions\n\nWe typically respond within a few hours. Is there anything else I can help you with?`,
-            portfolio: `🎨 **Our Work:**\n\nOur portfolio section is currently being updated with our latest projects.\nHere are some of our most impactful solutions:\n\n- **Lumina Finance** (Fintech Dashboard)\n- **Velvet & Oak** (Luxury E-commerce)\n- **Nexus Health** (SaaS Platform)\n\nCheck back soon for the full visual showcase!`,
+            portfolio: `🎨 **Our Work:**\n\nOur portfolio is being updated with our latest projects — coming soon!\n\nIn the meantime, **book a free call** and we'll show you examples that fit your business.`,
             team: `👥 **About Us:**\n\nWe are a development team based in **Portugal**, also present in the **Netherlands**.\n\nWe build custom solutions based on your real needs:\n- Automation systems\n- Management dashboards\n- Booking platforms\n- Business tools\n\nReal people, real code, real results.`,
             hiring: `🚀 **Join the Team:**\n\nWe are primarily looking for **Marketing Specialists** and creative **Designers** to help our clients grow.\n\nWe are also open to talented Developers.\n\nSend your portfolio/CV to: careers@framaxsolutions.com`,
             greeting: `👋 Hey there! Great to have you here.\n\nI'm the **Framax AI Assistant** — I can help you with info about our services, pricing, timelines, and more.\n\nWhat would you like to know?`,

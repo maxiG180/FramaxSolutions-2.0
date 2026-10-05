@@ -126,6 +126,11 @@ export const RATE_LIMITS = {
         maxRequests: 20,
         windowMs: 60 * 1000, // 20 list requests per minute per IP
     },
+    // Website chatbot - protects the free Gemini quota from spam
+    CHATBOT: {
+        maxRequests: 10,
+        windowMs: 60 * 1000, // 10 messages per minute per IP
+    },
     // Generic API calls
     API_CALL: {
         maxRequests: 20,
