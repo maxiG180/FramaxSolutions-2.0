@@ -1,14 +1,25 @@
 "use client";
 
+import { usePathname, useRouter } from "next/navigation";
 import { useLanguage } from "@/context/LanguageContext";
+import { LOCALIZED_PATHS, localizePath, stripLocale } from "@/lib/i18n-routes";
 import { Globe } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export function LanguageSwitcher() {
     const { language, setLanguage } = useLanguage();
+    const pathname = usePathname();
+    const router = useRouter();
 
     const toggleLanguage = () => {
-        setLanguage(language === "en" ? "pt" : "en");
+        const next = language === "en" ? "pt" : "en";
+        setLanguage(next);
+
+        // Pages with a /pt version: go to the other language's URL (/about <-> /pt/about)
+        const basePath = stripLocale(pathname ?? "/");
+        if ((LOCALIZED_PATHS as readonly string[]).includes(basePath)) {
+            router.push(localizePath(basePath, next) + window.location.hash, { scroll: false });
+        }
     };
 
     return (

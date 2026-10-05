@@ -35,7 +35,7 @@ export const en: Translation = {
         accept: "Accept",
     },
     hero: {
-        badge: "Turn Visitors into Clients.",
+        badge: "Websites & software for small businesses",
         titlePre: "Software that",
         titleHighlight: "automates your business",
         dynamicKeywords: [
@@ -49,8 +49,8 @@ export const en: Translation = {
         startProject: "Start Your Project",
         viewWork: "View Our Work",
         trustedBy: "Trusted by innovative companies",
-        automateLabel: "What we automate",
-        automateItems: ["Bookings", "Invoicing", "Reminders", "Leads & CRM", "Reports"],
+        buildLabel: "What we build",
+        buildItems: ["Websites", "Booking systems", "Invoicing", "CRM", "Admin dashboards"],
         automationFeed: [
             { app: "Bookings", event: "New booking — Ana Silva", result: "Confirmation sent" },
             { app: "Invoicing", event: "Invoice #1048 created", result: "Emailed to client" },
@@ -65,7 +65,7 @@ export const en: Translation = {
         ],
         // New Hero Section
         title: "Software that automates your business",
-        subtitle: "We create software solutions that understand your business and bring REAL results.",
+        subtitle: "From the website that brings clients in to the systems that run your day: bookings, invoices, admin and reports. Less manual work, more time for your business.",
         bookMeeting: "Book free meeting",
         couldBeYou: "Your Company",
         moreClients: "More Clients",

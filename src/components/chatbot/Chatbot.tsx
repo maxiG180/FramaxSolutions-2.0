@@ -14,10 +14,11 @@ import {
 import ReactMarkdown from 'react-markdown';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
-import { useLanguage } from '@/context/LanguageContext';
+import { useLanguage, useLocalePath } from '@/context/LanguageContext';
 
 export default function Chatbot() {
     const { t, language } = useLanguage();
+    const localePath = useLocalePath();
     const cb = t.chatbot;
 
     const {
@@ -181,8 +182,10 @@ export default function Chatbot() {
                                                     a: ({ node, href, ...props }) => {
                                                         // On-site links (e.g. /#booking) close the chat so the section is visible
                                                         const isExternal = href?.startsWith('http');
-                                                        // "#booking" only exists on the homepage, so make it work from other pages too
-                                                        const target = href?.startsWith('#') ? `/${href}` : href;
+                                                        // "#booking" only exists on the homepage, so make it work from other pages
+                                                        // too, and keep visitors on the Portuguese site when they're on it
+                                                        const target = href?.startsWith('#') ? localePath(`/${href}`)
+                                                            : href?.startsWith('/') ? localePath(href) : href;
                                                         return (
                                                             <a
                                                                 href={target}

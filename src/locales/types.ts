@@ -41,8 +41,8 @@ export interface Translation {
         startProject: string;
         viewWork: string;
         trustedBy: string;
-        automateLabel: string;
-        automateItems: string[];
+        buildLabel: string;
+        buildItems: string[];
         // Decorative hero background: things software handles for a business
         automationFeed: { app: string; event: string; result: string }[];
         // New Hero Section

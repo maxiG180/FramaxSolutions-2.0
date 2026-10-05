@@ -1,4 +1,5 @@
 import dynamic from 'next/dynamic';
+import { pageMetadata, SITE_URL, SITE_NAME } from '@/lib/seo';
 
 // Dynamically import ALL heavy client components to reduce initial bundle
 const Hero = dynamic(() => import('@/components/Hero'));
@@ -21,9 +22,31 @@ const TechStack = dynamic(() => import('@/components/sections/TechStack').then(m
 });
 
 
+export const metadata = pageMetadata('home', 'en');
+
+// Structured data so search engines can show the business name, logo and contact details
+const organizationJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: SITE_NAME,
+  url: SITE_URL,
+  logo: `${SITE_URL}/logos/framax_icon.png`,
+  email: 'contact@framaxsolutions.com',
+  description: 'Custom software and automations for small businesses: bookings, invoicing, reminders, CRM and websites.',
+  address: { '@type': 'PostalAddress', addressCountry: 'PT' },
+  founder: [
+    { '@type': 'Person', name: 'Maksym Grebeniuk' },
+    { '@type': 'Person', name: 'Francisco Farias' },
+  ],
+};
+
 export default function Home() {
   return (
     <main className="min-h-screen bg-background text-foreground overflow-x-hidden">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
+      />
       <Hero />
       <Features />
       <NewPortfolio />

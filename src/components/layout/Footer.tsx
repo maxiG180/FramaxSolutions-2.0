@@ -3,17 +3,18 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Twitter, Github, Linkedin, Heart, Facebook, Mail } from "lucide-react";
-import { useLanguage } from "@/context/LanguageContext";
+import { useLanguage, useLocalePath } from "@/context/LanguageContext";
 
 export function Footer() {
     const { t } = useLanguage();
+    const localePath = useLocalePath();
 
     return (
         <footer className="bg-muted/30 border-t border-border py-12">
             <div className="container mx-auto px-4">
                 <div className="grid grid-cols-1 md:grid-cols-5 gap-8 mb-12">
                     <div className="col-span-1 md:col-span-2">
-                        <Link href="/" className="mb-4 block">
+                        <Link href={localePath("/")} className="mb-4 block">
                             <Image
                                 src="/logos/framax-logo-white.png"
                                 alt="Framax Solutions"
@@ -31,23 +32,23 @@ export function Footer() {
                     <div>
                         <h3 className="font-bold mb-4">{t.header.features}</h3>
                         <ul className="space-y-2">
-                            <li><Link href="/#features" className="text-sm text-muted-foreground hover:text-primary transition-colors">{t.header.features}</Link></li>
-                            <li><Link href="/#portfolio" className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">{t.header.portfolio}</Link></li>
-                            <li><Link href="/#booking" className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">{t.header.getStarted}</Link></li>
+                            <li><Link href={localePath("/#features")} className="text-sm text-muted-foreground hover:text-primary transition-colors">{t.header.features}</Link></li>
+                            <li><Link href={localePath("/#portfolio")} className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">{t.header.portfolio}</Link></li>
+                            <li><Link href={localePath("/#booking")} className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">{t.header.getStarted}</Link></li>
                         </ul>
                     </div>
 
                     <div>
                         <h3 className="font-bold mb-4">{t.about.title}</h3>
                         <ul className="space-y-2">
-                            <li><Link href="/about" className="text-sm text-muted-foreground hover:text-primary transition-colors">{t.about.title}</Link></li>
+                            <li><Link href={localePath("/about")} className="text-sm text-muted-foreground hover:text-primary transition-colors">{t.about.title}</Link></li>
                         </ul>
                     </div>
 
                     <div>
                         <h3 className="font-bold mb-4">{t.footer.legal}</h3>
                         <ul className="space-y-2">
-                            <li><Link href="/legal/privacy" className="text-sm text-muted-foreground hover:text-primary transition-colors">{t.footer.privacy}</Link></li>
+                            <li><Link href={localePath("/legal/privacy")} className="text-sm text-muted-foreground hover:text-primary transition-colors">{t.footer.privacy}</Link></li>
                         </ul>
                     </div>
                 </div>

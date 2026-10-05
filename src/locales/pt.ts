@@ -35,7 +35,7 @@ export const pt: Translation = {
         accept: "Aceitar",
     },
     hero: {
-        badge: "Transforme Visitantes em Clientes.",
+        badge: "Websites e software para pequenas empresas",
         titlePre: "Software que",
         titleHighlight: "automatiza o seu negócio",
         dynamicKeywords: [
@@ -49,8 +49,8 @@ export const pt: Translation = {
         startProject: "Comece o seu Projeto",
         viewWork: "Ver o nosso Trabalho",
         trustedBy: "Confiado por empresas inovadoras",
-        automateLabel: "O que automatizamos",
-        automateItems: ["Marcações", "Faturação", "Lembretes", "Contactos & CRM", "Relatórios"],
+        buildLabel: "O que criamos",
+        buildItems: ["Websites", "Sistemas de marcações", "Faturação", "CRM", "Painéis de gestão"],
         automationFeed: [
             { app: "Marcações", event: "Nova marcação — Ana Silva", result: "Confirmação enviada" },
             { app: "Faturação", event: "Fatura #1048 criada", result: "Enviada ao cliente" },
@@ -65,7 +65,7 @@ export const pt: Translation = {
         ],
         // New Hero Section
         title: "Software que automatiza o seu negócio",
-        subtitle: "Criamos soluções de software que entendem o seu negócio e trazem resultados REAIS.",
+        subtitle: "Do website que traz clientes aos sistemas que gerem o seu dia a dia: marcações, faturas, gestão e relatórios. Menos trabalho manual, mais tempo para o seu negócio.",
         bookMeeting: "Agende reunião gratuita",
         couldBeYou: "A sua Empresa",
         moreClients: "Mais Clientes",

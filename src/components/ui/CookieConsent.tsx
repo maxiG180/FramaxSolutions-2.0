@@ -1,6 +1,6 @@
 "use client";
 
-import { useLanguage } from "@/context/LanguageContext";
+import { useLanguage, useLocalePath } from "@/context/LanguageContext";
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { X } from "lucide-react";
@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 
 export function CookieConsent() {
     const { t } = useLanguage();
+    const localePath = useLocalePath();
     const [isVisible, setIsVisible] = useState(false);
 
     useEffect(() => {
@@ -41,7 +42,7 @@ export function CookieConsent() {
                         <p className="text-sm text-muted-foreground">
                             {t.cookie.text}
                             <br />
-                            <Link href="/legal/privacy" className="text-primary hover:underline mt-1 inline-block">
+                            <Link href={localePath("/legal/privacy")} className="text-primary hover:underline mt-1 inline-block">
                                 {t.cookie.readLink}
                             </Link>
                         </p>

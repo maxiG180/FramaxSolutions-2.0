@@ -1,6 +1,6 @@
 "use client";
 
-import { useLanguage } from "@/context/LanguageContext";
+import { useLanguage, useLocalePath } from "@/context/LanguageContext";
 import { LinkedInCard } from "@/components/ui/LinkedInCard";
 import { motion, useScroll, useTransform } from "framer-motion";
 import Link from "next/link";
@@ -13,6 +13,7 @@ import { useRef } from "react";
 
 export default function AboutPage() {
     const { t } = useLanguage();
+    const localePath = useLocalePath();
     const containerRef = useRef(null);
     const { scrollYProgress } = useScroll({
         target: containerRef,
@@ -158,7 +159,7 @@ export default function AboutPage() {
                         
                         <div className="flex flex-col sm:flex-row items-center justify-center gap-6 relative z-10">
                             <Link 
-                                href="/#booking" 
+                                href={localePath("/#booking")} 
                                 className="group flex items-center gap-3 px-10 py-5 bg-white text-blue-600 hover:bg-blue-50 rounded-full font-bold text-lg transition-all transform hover:scale-105 active:scale-95 shadow-xl"
                             >
                                 Get Started
@@ -166,7 +167,7 @@ export default function AboutPage() {
                             </Link>
 
                             <Link 
-                                href="/" 
+                                href={localePath("/")} 
                                 className="text-white/80 hover:text-white transition-colors text-sm font-bold uppercase tracking-widest"
                             >
                                 Back to Home
