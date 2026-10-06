@@ -34,10 +34,6 @@ const organizationJsonLd = {
   email: 'contact@framaxsolutions.com',
   description: 'Custom software and automations for small businesses: bookings, invoicing, reminders, CRM and websites.',
   address: { '@type': 'PostalAddress', addressCountry: 'PT' },
-  founder: [
-    { '@type': 'Person', name: 'Maksym Grebeniuk' },
-    { '@type': 'Person', name: 'Francisco Farias' },
-  ],
 };
 
 export default function Home() {

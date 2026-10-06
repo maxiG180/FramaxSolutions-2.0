@@ -23,12 +23,12 @@ const PAGES = {
     about: {
         path: '/about',
         en: {
-            title: 'About Us | Framax Solutions',
-            description: 'Meet Framax Solutions, a software studio from Portugal building automations, web apps and websites that save small businesses time.',
+            title: 'How We Work | Framax Solutions',
+            description: 'Framax is a software studio in Portugal building websites, management systems and automations for small businesses. See how we work and what we build.',
         },
         pt: {
-            title: 'Sobre Nós | Framax Solutions',
-            description: 'Conheça a Framax Solutions, um estúdio de software português que cria automações, aplicações web e websites que poupam tempo às pequenas empresas.',
+            title: 'Como Trabalhamos | Framax Solutions',
+            description: 'A Framax é um estúdio de software em Portugal que cria websites, sistemas de gestão e automações para pequenas empresas. Veja como trabalhamos e o que criamos.',
         },
     },
     privacy: {

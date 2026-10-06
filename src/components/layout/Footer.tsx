@@ -39,9 +39,9 @@ export function Footer() {
                     </div>
 
                     <div>
-                        <h3 className="font-bold mb-4">{t.about.title}</h3>
+                        <h3 className="font-bold mb-4">{t.footer.studio}</h3>
                         <ul className="space-y-2">
-                            <li><Link href={localePath("/about")} className="text-sm text-muted-foreground hover:text-primary transition-colors">{t.about.title}</Link></li>
+                            <li><Link href={localePath("/about")} className="text-sm text-muted-foreground hover:text-primary transition-colors">{t.header.about}</Link></li>
                         </ul>
                     </div>
 

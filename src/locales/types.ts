@@ -616,27 +616,16 @@ export interface Translation {
         };
     };
     about: {
+        eyebrow: string;
         title: string;
-        subtitle: string;
         introduction: string;
-        teamTitle: string;
-        teamSubtitle: string;
-        maksym: {
-            name: string;
-            role: string;
-            description: string;
-        };
-        francisco: {
-            name: string;
-            role: string;
-            description: string;
-        };
-        codeturtle: {
-            name: string;
-            role: string;
-            description: string;
-        };
-        viewProfile: string;
-        cta: string;
+        howWeWorkTitle: string;
+        principles: { title: string; description: string }[];
+        whatWeBuildTitle: string;
+        services: { title: string; description: string }[];
+        ctaTitle: string;
+        ctaText: string;
+        ctaButton: string;
+        backHome: string;
     };
 }
