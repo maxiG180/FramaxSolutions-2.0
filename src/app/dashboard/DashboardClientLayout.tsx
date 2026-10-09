@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Sidebar } from "@/components/dashboard/Sidebar";
+import { PrivacyModeToggle } from "@/components/dashboard/PrivacyMode";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/utils/supabase/client";
 import { Loader2, Menu, CheckSquare } from "lucide-react";
@@ -81,6 +82,8 @@ export default function DashboardClientLayout({
             >
                 {children}
             </main>
+
+            <PrivacyModeToggle />
         </div>
     );
 }

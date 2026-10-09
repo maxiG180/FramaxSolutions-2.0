@@ -1,36 +1,43 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Framax Solutions
 
-## Getting Started
+Website and back office for [Framax Solutions](https://www.framaxsolutions.com), a small web agency building platforms for Portuguese SMBs.
 
-First, run the development server:
+The repo has two sides:
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- **Public site** — agency pages in Portuguese and English, meeting booking against a live Google Calendar, discount codes, and dynamic QR codes with scan tracking.
+- **Admin dashboard** (`/dashboard`, login required) — the agency's back office: clients, projects, services, quotes, invoices, payments, leads, documents, calendar, notes and to-dos. Quotes and invoices export to PDF and can be emailed to clients, who accept or decline through a client portal (`/portal/[id]`).
+
+## Stack
+
+- **Frontend:** Next.js 15 (App Router), React 18, TypeScript, Tailwind CSS, Framer Motion
+- **Backend:** Next.js API routes, Supabase (Postgres, Auth, Storage, Row Level Security)
+- **Integrations:** Google Calendar and Sheets, Resend (email), n8n workflows
+- **Hosting:** Vercel
+
+## Security
+
+- `/dashboard` routes are gated by Supabase session middleware.
+- API routes that read or change business data check the Supabase user on every request; hiding UI is never the only check.
+- Request bodies are validated with Zod, and public endpoints such as email sending are rate limited.
+- Data access is restricted per user with Postgres Row Level Security (see `supabase/`).
+- Security headers (CSP, HSTS, X-Frame-Options, Referrer-Policy) are set in `src/middleware.ts`.
+
+## Project layout
+
+```
+src/app/            pages, dashboard and API routes
+src/components/     UI components (dashboard/, ui/, …)
+src/utils/          Supabase clients, rate limiting, validation, CORS
+supabase/           schema, migrations, RLS and storage policies, one-off scripts
+integrations/n8n/   n8n workflow exports used for booking automation
+docs/               setup notes (Google Sheets, storage cascade deletes, …)
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Running locally
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+npm install
+npm run dev
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Requires a `.env.local` with Supabase, Google and Resend credentials. It is not committed.

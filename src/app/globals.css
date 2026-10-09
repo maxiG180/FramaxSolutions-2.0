@@ -256,6 +256,12 @@ section:first-of-type {
     animation-direction: reverse;
 }
 
+/* Dashboard "Hide data" mode (components/dashboard/PrivacyMode.tsx) */
+[data-privacy-mask] {
+    filter: blur(6px);
+    user-select: none;
+}
+
 /* Reduce motion: disable heavy animations for accessibility + perf */
 @media (prefers-reduced-motion: reduce) {
 

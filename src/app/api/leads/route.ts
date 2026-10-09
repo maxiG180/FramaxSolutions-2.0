@@ -1,12 +1,28 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getLeadsFromPublicSheet, updateLeadStatus } from '@/lib/google-sheets';
+import { createClient } from '@/utils/supabase/server';
 
 // ID da spreadsheet extraído da URL
 const SPREADSHEET_ID = '1Di85QHcKc4uSBd1-ZaVpeOmhcaif1iOucz16y8Wpo0Q';
 // Usar aspas simples para nomes de aba com espaços
 const SHEET_RANGE = "'Leads Sem Website'!A:Z";
 
+// Leads são dados internos: só utilizadores autenticados no dashboard
+async function requireUser() {
+  const supabase = await createClient();
+  const { data: { user }, error } = await supabase.auth.getUser();
+
+  if (error || !user) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  return null;
+}
+
 export async function GET(request: NextRequest) {
+  const unauthorized = await requireUser();
+  if (unauthorized) return unauthorized;
+
   try {
     // Verificar se a spreadsheet está configurada como pública
     // ou se tem as credenciais necessárias
@@ -33,6 +49,9 @@ export async function GET(request: NextRequest) {
 
 // Endpoint para refrescar/sincronizar leads
 export async function POST(request: NextRequest) {
+  const unauthorized = await requireUser();
+  if (unauthorized) return unauthorized;
+
   try {
     const leads = await getLeadsFromPublicSheet(SPREADSHEET_ID, SHEET_RANGE);
 
@@ -58,6 +77,9 @@ export async function POST(request: NextRequest) {
 
 // Endpoint para atualizar o estado de uma lead
 export async function PUT(request: NextRequest) {
+  const unauthorized = await requireUser();
+  if (unauthorized) return unauthorized;
+
   try {
     const body = await request.json();
     const { leadId, newStatus } = body;
@@ -88,7 +110,6 @@ export async function PUT(request: NextRequest) {
         success: false,
         error: 'Failed to update lead status',
         message: errorMessage,
-        details: error instanceof Error ? error.stack : undefined,
       },
       { status: 500 }
     );
